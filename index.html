@@ -6,6 +6,12 @@
   <title>Mój garaż 1.1</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta">
   <meta name="color-scheme" content="light">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Garaż">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="/Moj_garaz/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/Moj_garaz/icon-192.png">
 
   <style>
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -3091,6 +3097,14 @@
 
   activeVehicleId = db.vehicles[0]?.id || "";
   renderAll();
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("/Moj_garaz/sw.js", { scope: "/Moj_garaz/" })
+        .catch(console.warn);
+    });
+  }
 })();
 </script>
 </body>
