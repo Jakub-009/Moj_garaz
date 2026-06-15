@@ -1,4 +1,4 @@
-const CACHE_NAME = "moj-garaz-pwa-v1-1-1";
+const CACHE_NAME = "moj-garaz-pwa-v1-2-0";
 const BASE = "/Moj_garaz/";
 
 const ASSETS = [
