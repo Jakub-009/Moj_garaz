@@ -1,0 +1,12 @@
+{
+  "name": "Mój garaż",
+  "short_name": "Garaż",
+  "description": "Historia serwisu, przebiegu i kosztów pojazdów.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef1f6",
+  "theme_color": "#eef1f6",
+  "orientation": "portrait",
+  "lang": "pl"
+}
