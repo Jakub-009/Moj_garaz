@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Mój garaż 1.1</title>
+  <title>Mój garaż 1.2</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta">
   <meta name="color-scheme" content="light">
   <meta name="mobile-web-app-capable" content="yes">
@@ -1211,6 +1211,11 @@
         <div class="drawerDivider"></div>
 
         <div class="drawerSection">
+          <button class="drawerItem" id="drawerExportCsv" type="button">
+            <svg viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5V3Zm9 1.5V8h3.5L14 4.5ZM8 12h8v2H8v-2Zm0 4h8v2H8v-2Zm0-8h4v2H8V8Z"/></svg>
+            <span>Eksport CSV</span>
+          </button>
+
           <button class="drawerItem" id="drawerBackup" type="button">
             <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2ZM19 9h-4V3H9v6H5l7 7 7-7Z"/></svg>
             <span>Pobierz kopię</span>
@@ -1231,7 +1236,7 @@
       <button class="drawerClose" id="drawerClose" type="button" aria-label="Zamknij menu"></button>
 
       <div class="drawerFooter">
-        Mój garaż 1.1<br>
+        Mój garaż 1.2<br>
         Dane zapisują się lokalnie w przeglądarce.
       </div>
     </div>
@@ -1587,7 +1592,7 @@
 
         <div class="modalBody">
           <section class="heroCard money">
-            <div class="heroKicker">Wydatki w tym roku</div>
+            <div class="heroKicker">Wydatki według filtrów</div>
             <div class="heroMain">
               <strong id="costsYearHero">0,00 zł</strong>
             </div>
@@ -1597,8 +1602,37 @@
             </div>
           </section>
 
+          <div class="fieldGrid">
+            <div>
+              <label>Rok</label>
+              <select id="costFilterYear"></select>
+            </div>
+            <div>
+              <label>Kategoria</label>
+              <select id="costFilterCategory">
+                <option value="all">Wszystkie</option>
+                <option value="serwis">Serwis</option>
+                <option value="naprawa">Naprawa</option>
+                <option value="części">Części</option>
+                <option value="robocizna">Robocizna</option>
+                <option value="opony">Opony</option>
+                <option value="ubezpieczenie">Ubezpieczenie</option>
+                <option value="przegląd">Przegląd</option>
+                <option value="paliwo">Paliwo</option>
+                <option value="opłaty">Opłaty</option>
+                <option value="inne">Inne</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="miniActions">
+            <button class="tonal" id="costsExportCsv" type="button">Eksportuj widoczne CSV</button>
+            <button class="text" id="costsClearFilters" type="button">Wyczyść filtry</button>
+          </div>
+
           <div class="sectionTitleRow">
             <h2>Ostatnie koszty</h2>
+            <div class="muted" id="costsFilterInfo">—</div>
           </div>
           <div class="historyList" id="allCostsList"></div>
         </div>
@@ -1652,7 +1686,7 @@
             <div class="historyItem">
               <div class="stripe"></div>
               <div>
-                <div class="historyTitle">Mój garaż 1.1</div>
+                <div class="historyTitle">Mój garaż 1.2</div>
                 <div class="historyMeta">Dane są zapisywane lokalnie w przeglądarce przez localStorage.</div>
               </div>
             </div>
@@ -1688,7 +1722,7 @@
 
 <script>
 (() => {
-  const APP_VERSION = "1.1";
+  const APP_VERSION = "1.2";
   const STORAGE_KEY = "moj_garaz_pwa_v1";
 
   const $ = (id) => document.getElementById(id);
@@ -1858,6 +1892,7 @@
   let editingServiceId = "";
   let editingExpenseId = "";
   let pendingServiceExpense = null;
+  let expenseTotalEditedByUser = false;
 
   function saveDb(){
     db.version = APP_VERSION;
@@ -1951,20 +1986,24 @@
   const confirmDanger = (message,title="Potwierdź") => openAppDialog({title,message,okText:"Usuń",cancelText:"Anuluj",tone:"danger"});
   const confirmNormal = (message,title="Potwierdź") => openAppDialog({title,message,okText:"Tak",cancelText:"Anuluj"});
 
-  function totalFromExpenseFields(prefix){
-    const parts = toNum($(prefix + "PartsCost").value);
-    const labor = toNum($(prefix + "LaborCost").value);
-    const other = $(prefix + "OtherCost") ? toNum($(prefix + "OtherCost").value) : 0;
-    const totalInput = $(prefix + "Total");
-
+  function recalcExpenseTotal(){
+    const parts = toNum($("expensePartsCost").value);
+    const labor = toNum($("expenseLaborCost").value);
+    const other = toNum($("expenseOtherCost").value);
     const sum = parts + labor + other;
 
-    if (totalInput && document.activeElement !== totalInput) {
-      totalInput.value = sum ? String(Math.round(sum * 100) / 100) : "";
+    if (!expenseTotalEditedByUser) {
+      $("expenseTotal").value = sum ? String(Math.round(sum * 100) / 100) : "";
     }
+  }
 
-    if (totalInput && toNum(totalInput.value) > 0) return toNum(totalInput.value);
-    return sum;
+  function getExpenseTotalFromForm(){
+    const parts = toNum($("expensePartsCost").value);
+    const labor = toNum($("expenseLaborCost").value);
+    const other = toNum($("expenseOtherCost").value);
+    const manual = toNum($("expenseTotal").value);
+    const sum = parts + labor + other;
+    return manual || sum;
   }
 
   function serviceStatus(vehicle, service){
@@ -2062,6 +2101,26 @@
     }).sort((a,b) => a.score - b.score);
 
     return list[0] || null;
+  }
+
+  function getAllExpenseItems(){
+    const items = [];
+    for (const v of db.vehicles) {
+      for (const e of v.expenses || []) items.push({vehicle:v,expense:e});
+    }
+    return items.sort((a,b) => String(b.expense.date || "").localeCompare(String(a.expense.date || "")));
+  }
+
+  function getFilteredExpenseItems(){
+    const year = $("costFilterYear")?.value || "all";
+    const category = $("costFilterCategory")?.value || "all";
+
+    return getAllExpenseItems().filter(item => {
+      const e = item.expense;
+      const okYear = year === "all" || String(e.date || "").startsWith(year + "-");
+      const okCategory = category === "all" || e.category === category;
+      return okYear && okCategory;
+    });
   }
 
   function vehicleTypeIcon(){
@@ -2291,25 +2350,47 @@
     `;
   }
 
-  function renderCostsPanel(){
-    const summary = globalSummary();
-    $("costsYearHero").textContent = fmtMoney(summary.costYear);
-    $("costsAllHero").textContent = `${fmtMoney(summary.costAll)} łącznie`;
-    $("costsEntriesHero").textContent = `${summary.entries} wpisów`;
+  function populateCostYearFilter(){
+    const el = $("costFilterYear");
+    if (!el) return;
 
-    const items = [];
-    for (const v of db.vehicles) {
-      for (const e of v.expenses || []) items.push({vehicle:v,expense:e});
+    const current = el.value || String(nowYear());
+    const years = new Set();
+
+    for (const item of getAllExpenseItems()) {
+      const y = String(item.expense.date || "").slice(0,4);
+      if (/^\d{4}$/.test(y)) years.add(y);
     }
 
-    items.sort((a,b) => String(b.expense.date || "").localeCompare(String(a.expense.date || "")));
+    years.add(String(nowYear()));
 
-    $("allCostsList").innerHTML = items.length
-      ? items.map(item => renderExpenseItem(item.vehicle,item.expense,false)).join("")
+    const sorted = [...years].sort((a,b) => Number(b) - Number(a));
+    el.innerHTML = `<option value="all">Wszystkie lata</option>` + sorted.map(y => `<option value="${y}">${y}</option>`).join("");
+
+    if ([...el.options].some(o => o.value === current)) el.value = current;
+    else el.value = String(nowYear());
+  }
+
+  function renderCostsPanel(){
+    populateCostYearFilter();
+
+    const filtered = getFilteredExpenseItems();
+    const all = getAllExpenseItems();
+
+    const filteredTotal = filtered.reduce((sum,item) => sum + Number(item.expense.total || 0), 0);
+    const allTotal = all.reduce((sum,item) => sum + Number(item.expense.total || 0), 0);
+
+    $("costsYearHero").textContent = fmtMoney(filteredTotal);
+    $("costsAllHero").textContent = `${fmtMoney(allTotal)} łącznie`;
+    $("costsEntriesHero").textContent = `${filtered.length} wpisów`;
+    $("costsFilterInfo").textContent = filtered.length ? `${filtered.length} wyników` : "brak wyników";
+
+    $("allCostsList").innerHTML = filtered.length
+      ? filtered.map(item => renderExpenseItem(item.vehicle,item.expense,false)).join("")
       : `
         <div class="emptyState" style="margin-top:0;">
           <h2>Brak kosztów</h2>
-          <p>Po dodaniu wydatków pojawi się tu pełna historia ze wszystkich pojazdów.</p>
+          <p>Nie ma wpisów dla wybranych filtrów. Zmień rok lub kategorię.</p>
         </div>
       `;
   }
@@ -2359,15 +2440,19 @@
     `;
   }
 
+  function renderVisiblePanels(){
+    const active = getActiveVehicle();
+
+    if (activeVehicleId && $("vehiclePanel").open && active) renderVehiclePanel(active);
+    if ($("costsPanel").open) renderCostsPanel();
+    if ($("statsPanel").open) renderStatsPanel();
+  }
+
   function renderAll(){
     saveDb();
     renderMain();
     renderVehicleSelects();
-    renderCostsPanel();
-    renderStatsPanel();
-
-    const active = getActiveVehicle();
-    if (activeVehicleId && $("vehiclePanel").open && active) renderVehiclePanel(active);
+    renderVisiblePanels();
   }
 
   function clearVehicleForm(){
@@ -2622,6 +2707,8 @@
   function clearExpenseForm(vehicleId = ""){
     editingExpenseId = "";
     pendingServiceExpense = null;
+    expenseTotalEditedByUser = false;
+
     $("expenseFormTitle").textContent = "Dodaj koszt";
     renderVehicleSelects();
 
@@ -2653,6 +2740,8 @@
       if (!v || !e) return;
 
       editingExpenseId = expenseId;
+      expenseTotalEditedByUser = true;
+
       $("expenseFormTitle").textContent = "Edytuj koszt";
       $("expenseVehicle").value = v.id;
       $("expenseDate").value = e.date || todayISO();
@@ -2680,8 +2769,7 @@
     const partsCost = toNum($("expensePartsCost").value);
     const laborCost = toNum($("expenseLaborCost").value);
     const otherCost = toNum($("expenseOtherCost").value);
-    const calculatedTotal = partsCost + laborCost + otherCost;
-    const total = toNum($("expenseTotal").value) || calculatedTotal;
+    const total = getExpenseTotalFromForm();
 
     if (total <= 0) {
       notify("Wpisz koszt albo rozbij go na części, robociznę i inne.");
@@ -2739,6 +2827,8 @@
 
     activeVehicleId = vehicle.id;
     pendingServiceExpense = null;
+    expenseTotalEditedByUser = false;
+
     renderAll();
     closeDialog("expensePanel");
     haptic.success();
@@ -2752,6 +2842,8 @@
     clearExpenseForm(vehicleId);
     pendingServiceExpense = {vehicleId,serviceId};
 
+    const total = Number(s.partsCost || 0) + Number(s.laborCost || 0) + Number(s.otherCost || 0);
+
     $("expenseFormTitle").textContent = "Wpisz wykonaną wymianę";
     $("expenseVehicle").value = v.id;
     $("expenseDate").value = todayISO();
@@ -2761,8 +2853,10 @@
     $("expensePartsCost").value = s.partsCost || "";
     $("expenseLaborCost").value = s.laborCost || "";
     $("expenseOtherCost").value = s.otherCost || "";
-    $("expenseTotal").value = (Number(s.partsCost || 0) + Number(s.laborCost || 0) + Number(s.otherCost || 0)) || "";
+    $("expenseTotal").value = total || "";
     $("expenseNote").value = s.note || "";
+
+    expenseTotalEditedByUser = false;
 
     openDialog("expensePanel");
   }
@@ -2831,6 +2925,64 @@
     haptic.success();
   }
 
+  function csvEscape(value){
+    const s = String(value ?? "");
+    return `"${s.replaceAll('"','""')}"`;
+  }
+
+  function exportExpensesCsv(items = getAllExpenseItems(), suffix = "wszystkie"){
+    if (!items.length) {
+      notify("Brak kosztów do eksportu.");
+      return;
+    }
+
+    const header = [
+      "Pojazd",
+      "Data",
+      "Przebieg",
+      "Kategoria",
+      "Tytuł",
+      "Części",
+      "Robocizna",
+      "Inne",
+      "Razem",
+      "Notatka"
+    ];
+
+    const rows = items.map(item => {
+      const v = item.vehicle;
+      const e = item.expense;
+      return [
+        v.name,
+        e.date,
+        e.mileage,
+        e.category,
+        e.title,
+        e.partsCost || 0,
+        e.laborCost || 0,
+        e.otherCost || 0,
+        e.total || 0,
+        e.note || ""
+      ];
+    });
+
+    const csv = "\uFEFF" + [header,...rows].map(row => row.map(csvEscape).join(";")).join("\n");
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const date = todayISO();
+
+    a.href = url;
+    a.download = `moj-garaz-koszty-${suffix}-${date}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    setStatus("Pobrano CSV kosztów.");
+    haptic.success();
+  }
+
   function restoreBackup(file){
     if (!file) return;
 
@@ -2875,7 +3027,11 @@
   }
 
   function seedDemo(){
-    if (db.vehicles.length) return;
+    if (db.vehicles.length) {
+      notify("Masz już dodane pojazdy. Przykład można wstawić tylko do pustej aplikacji.");
+      haptic.warning();
+      return;
+    }
 
     const vehicleId = uid("veh");
     const oilServiceId = uid("srv");
@@ -3022,6 +3178,11 @@
       openDialog("statsPanel");
     };
 
+    $("drawerExportCsv").onclick = () => {
+      closeDrawer();
+      exportExpensesCsv(getAllExpenseItems(), "wszystkie");
+    };
+
     $("drawerBackup").onclick = () => {
       closeDrawer();
       exportBackup();
@@ -3079,8 +3240,30 @@
     });
 
     ["expensePartsCost","expenseLaborCost","expenseOtherCost"].forEach(id => {
-      $(id).addEventListener("input", () => totalFromExpenseFields("expense"));
+      $(id).addEventListener("input", () => {
+        if (!$("expenseTotal").value) expenseTotalEditedByUser = false;
+        recalcExpenseTotal();
+      });
     });
+
+    $("expenseTotal").addEventListener("input", () => {
+      expenseTotalEditedByUser = $("expenseTotal").value.trim() !== "";
+    });
+
+    $("costFilterYear").addEventListener("change", renderCostsPanel);
+    $("costFilterCategory").addEventListener("change", renderCostsPanel);
+
+    $("costsExportCsv").onclick = () => {
+      const year = $("costFilterYear").value || "all";
+      const category = $("costFilterCategory").value || "all";
+      exportExpensesCsv(getFilteredExpenseItems(), `${year}-${category}`);
+    };
+
+    $("costsClearFilters").onclick = () => {
+      $("costFilterYear").value = String(nowYear());
+      $("costFilterCategory").value = "all";
+      renderCostsPanel();
+    };
 
     closeAnyDialogOnCancel("vehiclePanel");
     closeAnyDialogOnCancel("vehicleFormPanel");
@@ -3095,6 +3278,7 @@
   setSystemBars("#eef1f6");
   setupEvents();
 
+  populateCostYearFilter();
   activeVehicleId = db.vehicles[0]?.id || "";
   renderAll();
 
