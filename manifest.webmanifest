@@ -2,11 +2,25 @@
   "name": "Mój garaż",
   "short_name": "Garaż",
   "description": "Historia serwisu, przebiegu i kosztów pojazdów.",
-  "start_url": "./index.html",
-  "scope": "./",
+  "start_url": "/Moj_garaz/",
+  "scope": "/Moj_garaz/",
   "display": "standalone",
   "background_color": "#eef1f6",
   "theme_color": "#eef1f6",
   "orientation": "portrait",
-  "lang": "pl"
+  "lang": "pl",
+  "icons": [
+    {
+      "src": "/Moj_garaz/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/Moj_garaz/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
