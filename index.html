@@ -1,0 +1,3097 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mój garaż 1.1</title>
+  <meta name="theme-color" content="#eef1f6" id="themeColorMeta">
+  <meta name="color-scheme" content="light">
+
+  <style>
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+    :root{
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Roboto","Segoe UI",Arial,sans-serif;
+
+      --bg:#eef1f6;
+      --surface:#ffffff;
+      --surface-low:#f7f9fd;
+      --surface-mid:#edf1f7;
+      --surface-high:#e1e7f0;
+
+      --text:#111318;
+      --text-2:#42474f;
+      --text-3:#6f7785;
+
+      --outline:#c4cad4;
+      --outline-soft:#e2e6ed;
+
+      --primary:#1a73e8;
+      --primary-google:#4285f4;
+      --primary-soft:#d7e3ff;
+      --on-primary:#ffffff;
+      --on-primary-soft:#12355f;
+
+      --green:#137333;
+      --green-soft:#d7f2dd;
+      --yellow:#f9ab00;
+      --yellow-soft:#feefc3;
+      --red:#d93025;
+      --red-soft:#fce8e6;
+      --purple:#7e57c2;
+      --purple-soft:#f3eefe;
+
+      --radius-sheet:32px;
+      --radius-card:24px;
+      --radius-pill:999px;
+
+      --shadow-fab:0 8px 20px rgba(60,64,67,.25),0 2px 6px rgba(60,64,67,.16);
+      --shadow-sheet:0 18px 60px rgba(32,33,36,.26);
+    }
+
+    html{background:var(--bg)}
+    html,body{width:100%;overflow-x:hidden}
+    body{
+      margin:0;
+      min-height:100vh;
+      background:var(--bg);
+      color:var(--text);
+      padding-bottom:96px;
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+
+    body.scroll-locked{
+      position:fixed;
+      left:0;
+      right:0;
+      width:100%;
+      overflow:hidden;
+      overscroll-behavior:none;
+      touch-action:none;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:920px;
+      margin:0 auto;
+      padding:0 0 96px;
+    }
+
+    .appHeader{
+      min-height:64px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px 6px;
+      background:var(--bg);
+      position:sticky;
+      top:0;
+      z-index:20;
+    }
+
+    .appLeft{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .hamburger{
+      width:42px;
+      height:42px;
+      min-height:42px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      color:var(--text);
+      flex:0 0 auto;
+      background:transparent;
+      border:none;
+      padding:0;
+      box-shadow:none;
+    }
+
+    .hamburger:hover{background:var(--surface-mid)}
+    .hamburger svg{width:25px;height:25px;fill:currentColor}
+
+    .appTitleWrap{min-width:0}
+    .appTitle{
+      margin:0;
+      font-size:26px;
+      line-height:1.08;
+      font-weight:560;
+      letter-spacing:-.04em;
+      color:var(--text);
+      max-width:62vw;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .appSub{
+      margin-top:2px;
+      font-size:13px;
+      line-height:1.2;
+      color:var(--text-2);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:62vw;
+    }
+
+    .topActions{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      flex:0 0 auto;
+    }
+
+    button{
+      min-height:40px;
+      padding:0 18px;
+      border-radius:var(--radius-pill);
+      border:none;
+      background:var(--primary);
+      color:var(--on-primary);
+      font:inherit;
+      font-size:14px;
+      font-weight:650;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      transition:background .15s ease,box-shadow .15s ease,transform .08s ease;
+    }
+
+    button:active{transform:scale(.985)}
+    button.tonal{background:var(--primary-soft);color:var(--on-primary-soft);box-shadow:none}
+    button.text{background:transparent;color:var(--primary);padding:0 12px;box-shadow:none}
+    button.danger{background:var(--red-soft);color:#a50e0e;box-shadow:none}
+    button.iconBtn{
+      width:42px;
+      height:42px;
+      min-height:42px;
+      padding:0;
+      border-radius:50%;
+      background:transparent;
+      color:var(--text);
+      box-shadow:none;
+    }
+    button.iconBtn:hover{background:var(--surface-mid)}
+    button:disabled{opacity:.55;cursor:default}
+
+    input,textarea,select{
+      width:100%;
+      min-height:50px;
+      padding:13px 13px 10px;
+      border:1px solid transparent;
+      border-bottom:1px solid #a7afbc;
+      border-radius:14px 14px 0 0;
+      background:#f5f7fb;
+      color:var(--text);
+      font:inherit;
+      font-size:15px;
+      transition:background .15s ease,border-color .15s ease;
+    }
+
+    textarea{
+      min-height:82px;
+      resize:vertical;
+      line-height:1.4;
+    }
+
+    input:hover,textarea:hover,select:hover{background:#eef3fa}
+    input:focus-visible,textarea:focus-visible,select:focus-visible{
+      outline:none;
+      border-bottom:2px solid var(--primary);
+      padding-bottom:9px;
+      background:#eef3fa;
+    }
+
+    label{
+      display:block;
+      font-size:13px;
+      line-height:1.2;
+      font-weight:650;
+      color:var(--text-2);
+      margin-bottom:7px;
+    }
+
+    .muted{
+      font-size:13px;
+      line-height:1.35;
+      color:var(--text-2);
+    }
+
+    .screen{
+      padding:0 10px 0;
+    }
+
+    .heroCard{
+      margin:4px 0 12px;
+      padding:18px 18px;
+      border-radius:28px;
+      background:linear-gradient(135deg,#e8f0fe,#ffffff);
+      border:1px solid #dfe7fb;
+      box-shadow:0 1px 2px rgba(60,64,67,.08);
+    }
+
+    .heroCard.money{
+      background:linear-gradient(135deg,#f3eefe,#ffffff);
+      border-color:#eadffd;
+    }
+
+    .heroKicker{
+      font-size:13px;
+      line-height:1.2;
+      font-weight:700;
+      color:var(--text-2);
+    }
+
+    .heroMain{
+      margin-top:7px;
+      display:flex;
+      align-items:baseline;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .heroMain strong{
+      font-size:34px;
+      line-height:1;
+      font-weight:560;
+      letter-spacing:-.05em;
+      color:var(--text);
+    }
+
+    .heroMain span{
+      font-size:15px;
+      color:var(--text-2);
+      font-weight:650;
+    }
+
+    .heroMeta{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .chip{
+      min-height:30px;
+      padding:0 10px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid #e4e8f1;
+      color:#3c4043;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:12.5px;
+      font-weight:650;
+      white-space:nowrap;
+    }
+
+    .chip.ok{background:var(--green-soft);color:var(--green);border-color:transparent}
+    .chip.warn{background:var(--yellow-soft);color:#8a5a00;border-color:transparent}
+    .chip.bad{background:var(--red-soft);color:#a50e0e;border-color:transparent}
+    .chip.purple{background:var(--purple-soft);color:var(--purple);border-color:transparent}
+
+    .sectionTitleRow{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:14px;
+      margin:18px 2px 10px;
+    }
+
+    .sectionTitleRow h2{
+      margin:0;
+      font-size:21px;
+      line-height:1.1;
+      font-weight:620;
+      letter-spacing:-.035em;
+    }
+
+    .sectionTitleRow .muted{
+      text-align:right;
+      flex:0 0 auto;
+    }
+
+    .vehicleList,
+    .serviceList,
+    .historyList{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .vehicleCard{
+      width:100%;
+      min-height:118px;
+      padding:15px;
+      border-radius:26px;
+      background:#fff;
+      border:1px solid var(--outline-soft);
+      box-shadow:0 1px 2px rgba(60,64,67,.08);
+      display:grid;
+      grid-template-columns:52px minmax(0,1fr) 26px;
+      gap:13px;
+      align-items:center;
+      text-align:left;
+      color:var(--text);
+      cursor:pointer;
+    }
+
+    .vehicleCard:active{transform:scale(.995)}
+
+    .vehicleIcon{
+      width:52px;
+      height:52px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      background:var(--primary-soft);
+      color:var(--primary);
+      flex:0 0 auto;
+    }
+
+    .vehicleIcon svg{
+      width:31px;
+      height:31px;
+      fill:currentColor;
+    }
+
+    .vehicleContent{min-width:0}
+
+    .vehicleName{
+      font-size:20px;
+      line-height:1.1;
+      font-weight:650;
+      letter-spacing:-.03em;
+      color:var(--text);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .vehicleMeta{
+      margin-top:6px;
+      font-size:13.5px;
+      line-height:1.25;
+      color:var(--text-2);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .vehicleNext{
+      margin-top:9px;
+      font-size:13px;
+      line-height:1.25;
+      font-weight:650;
+      color:#3c4043;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .arrowIcon{
+      width:24px;
+      height:24px;
+      fill:#5f6368;
+    }
+
+    .emptyState{
+      margin-top:14px;
+      padding:28px 20px;
+      border-radius:28px;
+      background:#fff;
+      border:1px dashed #c4cad4;
+      text-align:center;
+    }
+
+    .emptyState svg{
+      width:54px;
+      height:54px;
+      fill:var(--primary);
+      opacity:.9;
+    }
+
+    .emptyState h2{
+      margin:12px 0 8px;
+      font-size:22px;
+      line-height:1.1;
+      letter-spacing:-.035em;
+    }
+
+    .emptyState p{
+      margin:0 auto 18px;
+      max-width:420px;
+      color:var(--text-2);
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    .emptyActions{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .softGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-bottom:12px;
+    }
+
+    .statBox{
+      min-width:0;
+      padding:13px 14px;
+      border-radius:22px;
+      background:#fff;
+      border:1px solid #e4e8f1;
+    }
+
+    .statBox strong{
+      display:block;
+      font-size:24px;
+      line-height:1.05;
+      color:#202124;
+      letter-spacing:-.035em;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .statBox span{
+      display:block;
+      margin-top:6px;
+      font-size:12.5px;
+      line-height:1.2;
+      color:#5f6368;
+      font-weight:600;
+    }
+
+    .serviceItem,
+    .historyItem{
+      padding:14px 14px;
+      border-radius:22px;
+      background:#fff;
+      border:1px solid #e4e8f1;
+      display:grid;
+      grid-template-columns:5px minmax(0,1fr);
+      gap:12px;
+      align-items:start;
+    }
+
+    .itemTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .itemTopText{
+      min-width:0;
+    }
+
+    .stripe{
+      width:5px;
+      height:100%;
+      min-height:58px;
+      border-radius:999px;
+      background:var(--primary);
+    }
+
+    .stripe.ok{background:#34a853}
+    .stripe.warn{background:#fbbc04}
+    .stripe.bad{background:#ea4335}
+    .stripe.cost{background:#7e57c2}
+
+    .serviceTitle,
+    .historyTitle{
+      font-size:16px;
+      line-height:1.15;
+      font-weight:700;
+      color:#202124;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .serviceMeta,
+    .historyMeta{
+      margin-top:5px;
+      font-size:13px;
+      line-height:1.3;
+      color:#5f6368;
+    }
+
+    .serviceStatus{
+      font-size:12px;
+      line-height:1.2;
+      font-weight:800;
+      border-radius:999px;
+      padding:7px 9px;
+      white-space:nowrap;
+      flex:0 0 auto;
+    }
+
+    .serviceStatus.ok{background:var(--green-soft);color:var(--green)}
+    .serviceStatus.warn{background:var(--yellow-soft);color:#8a5a00}
+    .serviceStatus.bad{background:var(--red-soft);color:#a50e0e}
+    .serviceStatus.cost{background:var(--purple-soft);color:var(--purple)}
+
+    .itemActions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .itemActions button,
+    .miniActions button{
+      min-height:36px;
+      padding:0 13px;
+      font-size:12.5px;
+    }
+
+    .miniActions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:12px 0 0;
+    }
+
+    .fieldGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .fieldGrid.single{grid-template-columns:1fr}
+
+    .formBlock{
+      margin-bottom:16px;
+    }
+
+    .checkRow{
+      min-height:42px;
+      margin:0;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      color:#202124;
+      font-size:15px;
+      font-weight:500;
+    }
+
+    .checkRow input{
+      width:20px;
+      min-width:20px;
+      height:20px;
+      min-height:20px;
+      margin:0;
+      padding:0;
+      accent-color:#1a73e8;
+      border-radius:4px;
+    }
+
+    .actionRow{
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+      gap:10px;
+      margin-top:28px;
+      flex-wrap:wrap;
+    }
+
+    .statusLine{
+      min-height:18px;
+      margin:12px 14px 0;
+      text-align:center;
+      color:var(--text-2);
+    }
+
+    .fabScrim{
+      position:fixed;
+      inset:0;
+      z-index:29;
+      background:rgba(248,249,250,.82);
+      backdrop-filter:blur(1.5px);
+      -webkit-backdrop-filter:blur(1.5px);
+    }
+
+    .fabScrim[hidden]{display:none}
+
+    .fab-container{
+      position:fixed;
+      right:20px;
+      bottom:calc(20px + env(safe-area-inset-bottom));
+      z-index:31;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:14px;
+    }
+
+    .fabActions{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:10px;
+    }
+
+    .fabActions[hidden]{display:none}
+
+    .fabActionPill{
+      min-height:48px;
+      height:48px;
+      padding:0 18px 0 15px;
+      gap:12px;
+      font-size:15.5px;
+      font-weight:550;
+      border-radius:999px;
+      background:#d7e3ff;
+      color:#27446f;
+      box-shadow:none;
+      animation:fabActionIn .18s cubic-bezier(.2,0,0,1) both;
+    }
+
+    @keyframes fabActionIn{
+      from{opacity:0;transform:translateY(10px) scale(.96)}
+      to{opacity:1;transform:translateY(0) scale(1)}
+    }
+
+    .fabActionPill svg{
+      width:22px;
+      height:22px;
+      fill:currentColor;
+      flex:0 0 auto;
+    }
+
+    .fab{
+      width:56px;
+      height:56px;
+      min-height:56px;
+      padding:0;
+      border-radius:19px;
+      background:#4285f4;
+      color:#fff;
+      box-shadow:var(--shadow-fab);
+      display:grid;
+      place-items:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .fab::before,
+    .fab::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:20px;
+      height:3px;
+      border-radius:2px;
+      background:#fff;
+      transform-origin:center;
+      transition:transform .18s cubic-bezier(.2,0,0,1), width .18s cubic-bezier(.2,0,0,1);
+    }
+
+    .fab::before{transform:translate(-50%,-50%) rotate(0deg)}
+    .fab::after{transform:translate(-50%,-50%) rotate(90deg)}
+    .fab-container.is-open .fab::before{width:19px;transform:translate(-50%,-50%) rotate(45deg)}
+    .fab-container.is-open .fab::after{width:19px;transform:translate(-50%,-50%) rotate(-45deg)}
+
+    dialog{
+      border:none;
+      padding:0;
+      background:var(--surface);
+      color:var(--text);
+      box-shadow:var(--shadow-sheet);
+      overflow:hidden;
+    }
+
+    dialog:focus{outline:none}
+
+    dialog::backdrop{
+      background:rgba(32,33,36,.38);
+      backdrop-filter:blur(2px);
+      -webkit-backdrop-filter:blur(2px);
+    }
+
+    .googlePanel{
+      position:fixed;
+      inset:0;
+      width:100vw;
+      max-width:none;
+      height:100dvh;
+      max-height:none;
+      margin:0;
+      padding:0;
+      border-radius:0;
+      background:#fff;
+      color:var(--text);
+      overflow:hidden;
+      box-shadow:none;
+    }
+
+    .googlePanel[open]{
+      animation:googlePanelIn .18s cubic-bezier(.2,0,0,1);
+    }
+
+    @keyframes googlePanelIn{
+      from{transform:translateY(10px);opacity:.98}
+      to{transform:translateY(0);opacity:1}
+    }
+
+    .googlePanelShell{
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      background:#fff;
+      overflow:hidden;
+    }
+
+    .googlePanelBar{
+      position:sticky;
+      top:0;
+      z-index:5;
+      min-height:calc(54px + env(safe-area-inset-top));
+      padding:calc(8px + env(safe-area-inset-top)) 24px 6px;
+      background:#fff;
+      border-bottom:1px solid rgba(60,64,67,.12);
+    }
+
+    .panelCloseBtn{
+      position:absolute;
+      left:22px;
+      top:calc(12px + env(safe-area-inset-top));
+      width:32px;
+      height:32px;
+      min-height:32px;
+      padding:0;
+      border-radius:50%;
+      background:transparent;
+      color:#111318;
+      box-shadow:none;
+    }
+
+    .panelCloseBtn::before,
+    .panelCloseBtn::after{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:19px;
+      height:2.25px;
+      border-radius:999px;
+      background:currentColor;
+      transform-origin:center;
+    }
+
+    .panelCloseBtn::before{transform:translate(-50%,-50%) rotate(45deg)}
+    .panelCloseBtn::after{transform:translate(-50%,-50%) rotate(-45deg)}
+
+    .panelSaveBtn{
+      position:absolute;
+      right:22px;
+      top:calc(8px + env(safe-area-inset-top));
+      min-height:40px;
+      height:40px;
+      padding:0 22px;
+      border-radius:999px;
+      background:#4285f4;
+      color:#fff;
+      box-shadow:none;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .googlePanelContent{
+      flex:1 1 auto;
+      min-height:0;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      overscroll-behavior:contain;
+      padding-bottom:calc(26px + env(safe-area-inset-bottom));
+      background:#fff;
+      touch-action:pan-y;
+    }
+
+    .modalHead{
+      padding:18px 24px 16px;
+      background:#fff;
+      border:none;
+    }
+
+    .modalHead h3{
+      margin:0;
+      font-size:27px;
+      line-height:1.16;
+      font-weight:560;
+      letter-spacing:-.035em;
+      color:#111318;
+    }
+
+    .modalHead .muted{
+      margin-top:8px;
+      font-size:14.5px;
+      line-height:1.34;
+      color:#3c4043;
+    }
+
+    .modalBody{
+      padding:0 24px 32px;
+      background:#fff;
+    }
+
+    .drawerDialog{
+      width:100vw;
+      max-width:100vw;
+      height:100dvh;
+      max-height:100dvh;
+      margin:0;
+      border-radius:0;
+      background:transparent;
+      box-shadow:none;
+      overflow:hidden;
+    }
+
+    .drawerDialog::backdrop{
+      background:rgba(32,33,36,.46);
+      backdrop-filter:blur(2px);
+      -webkit-backdrop-filter:blur(2px);
+    }
+
+    .drawerPanel{
+      position:relative;
+      width:min(292px,82vw);
+      height:100dvh;
+      background:#fff;
+      box-shadow:0 12px 34px rgba(60,64,67,.28);
+      display:flex;
+      flex-direction:column;
+      animation:drawerIn .24s cubic-bezier(.2,0,0,1);
+    }
+
+    @keyframes drawerIn{
+      from{transform:translateX(-100%)}
+      to{transform:translateX(0)}
+    }
+
+    .drawerHeader{
+      min-height:84px;
+      padding:22px 20px 12px;
+      display:flex;
+      align-items:center;
+      gap:0;
+      flex:0 0 auto;
+    }
+
+    .drawerAppName{
+      font-size:24px;
+      line-height:1.1;
+      font-weight:560;
+      letter-spacing:-.035em;
+      color:#202124;
+    }
+
+    .drawerAppSub{
+      margin-top:5px;
+      font-size:13px;
+      color:#5f6368;
+    }
+
+    .drawerContent{
+      flex:1 1 auto;
+      min-height:0;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      padding:0 8px calc(96px + env(safe-area-inset-bottom));
+    }
+
+    .drawerSection{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      padding:2px 0;
+    }
+
+    .drawerDivider{
+      height:1px;
+      background:#e2e6ed;
+      margin:10px 10px;
+    }
+
+    .drawerItem{
+      width:100%;
+      min-height:46px;
+      padding:0 10px;
+      border-radius:999px;
+      background:transparent;
+      color:#202124;
+      box-shadow:none;
+      display:flex;
+      justify-content:flex-start;
+      align-items:center;
+      gap:14px;
+      font-size:15px;
+      font-weight:550;
+      text-align:left;
+    }
+
+    .drawerItem:hover{background:#f1f3f4}
+    .drawerItem.active{
+      background:#d3e3fd;
+      color:#174ea6;
+      font-weight:700;
+    }
+
+    .drawerItem svg{
+      width:22px;
+      height:22px;
+      fill:currentColor;
+      flex:0 0 auto;
+    }
+
+    .drawerFooter{
+      flex:0 0 auto;
+      padding:12px 24px calc(18px + env(safe-area-inset-bottom));
+      border-top:1px solid #e2e6ed;
+      color:#6f7785;
+      font-size:12px;
+      line-height:1.25;
+    }
+
+    .drawerClose{
+      position:absolute;
+      right:18px;
+      bottom:calc(76px + env(safe-area-inset-bottom));
+      z-index:5;
+      width:54px;
+      height:54px;
+      min-height:54px;
+      padding:0;
+      border-radius:18px;
+      background:#4285f4;
+      color:#fff;
+      box-shadow:0 8px 20px rgba(60,64,67,.24),0 2px 6px rgba(60,64,67,.16);
+      display:grid;
+      place-items:center;
+    }
+
+    .drawerClose::before,
+    .drawerClose::after{
+      content:"";
+      position:absolute;
+      background:#fff;
+      border-radius:999px;
+    }
+
+    .drawerClose::before{
+      width:22px;
+      height:3px;
+      left:18px;
+      top:26px;
+    }
+
+    .drawerClose::after{
+      width:13px;
+      height:13px;
+      left:18px;
+      top:20px;
+      background:transparent;
+      border-left:3px solid #fff;
+      border-bottom:3px solid #fff;
+      border-radius:2px;
+      transform:rotate(45deg);
+    }
+
+    .appConfirmDialog{
+      width:min(420px,calc(100vw - 36px));
+      max-width:420px;
+      padding:0;
+      margin:auto;
+      border:none;
+      border-radius:22px;
+      background:#fff;
+      color:var(--text);
+      box-shadow:0 18px 46px rgba(32,33,36,.26),0 2px 8px rgba(32,33,36,.12);
+    }
+
+    .appConfirmCard{
+      padding:24px 24px 18px;
+    }
+
+    .appConfirmCard h3{
+      margin:0 0 10px;
+      font-size:21px;
+      line-height:1.15;
+      font-weight:700;
+      letter-spacing:-.02em;
+    }
+
+    .appConfirmCard p{
+      margin:0;
+      color:#3c4043;
+      font-size:15px;
+      line-height:1.42;
+      white-space:pre-line;
+    }
+
+    .appConfirmActions{
+      display:flex;
+      justify-content:flex-end;
+      align-items:center;
+      gap:10px;
+      margin-top:22px;
+    }
+
+    .appConfirmActions button{
+      min-height:40px;
+      padding:0 18px;
+      border-radius:999px;
+      font-size:14.5px;
+      font-weight:700;
+      box-shadow:none;
+    }
+
+    .dialogCancel{background:#f1f3f4;color:#3c4043}
+    .dialogPrimary{background:#4285f4;color:#fff}
+    .dialogDanger{background:#fce8e6;color:#a50e0e}
+
+    .hidden{display:none!important}
+
+    @media(min-width:680px){
+      .screen{padding-left:14px;padding-right:14px}
+      .modalHead{padding-left:88px;padding-right:88px}
+      .modalBody{padding-left:88px;padding-right:88px}
+      .panelCloseBtn{left:24px}
+      .panelSaveBtn{right:24px}
+      .fab-container{right:32px;bottom:calc(32px + env(safe-area-inset-bottom))}
+    }
+
+    @media(max-width:430px){
+      .appTitle{font-size:24px;max-width:55vw}
+      .appSub{max-width:55vw}
+      .heroMain strong{font-size:31px}
+      .vehicleCard{grid-template-columns:48px minmax(0,1fr) 22px}
+      .vehicleIcon{width:48px;height:48px;border-radius:17px}
+      .softGrid{gap:8px}
+      .statBox strong{font-size:21px}
+      .fieldGrid{grid-template-columns:1fr}
+      .itemTop{flex-direction:column;gap:8px}
+      .serviceStatus{width:max-content}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="appHeader">
+      <div class="appLeft">
+        <button class="hamburger" id="mainMenuBtn" type="button" aria-label="Menu">
+          <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2Zm0-5h18v-2H3v2Zm0-7v2h18V6H3Z"/></svg>
+        </button>
+
+        <div class="appTitleWrap">
+          <h1 class="appTitle">Mój garaż</h1>
+          <div class="appSub" id="appSubtitle">Historia serwisu i kosztów</div>
+        </div>
+      </div>
+
+      <div class="topActions">
+        <button class="iconBtn" id="refreshBtn" type="button" aria-label="Odśwież">
+          <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.1A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h8V3l-3.35 3.35Z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="screen" id="mainScreen">
+      <section class="heroCard money">
+        <div class="heroKicker">Koszty utrzymania</div>
+        <div class="heroMain">
+          <strong id="heroCostYear">0,00 zł</strong>
+        </div>
+        <div class="heroMeta">
+          <span class="chip" id="heroVehicleCount">0 pojazdów</span>
+          <span class="chip" id="heroUrgent">0 pilnych</span>
+          <span class="chip" id="heroSoon">0 zbliżających się</span>
+        </div>
+      </section>
+
+      <div class="sectionTitleRow">
+        <h2>Pojazdy</h2>
+        <div class="muted" id="vehicleCounter">—</div>
+      </div>
+
+      <div class="vehicleList" id="vehicleList"></div>
+
+      <div class="emptyState" id="emptyState" hidden>
+        <svg viewBox="0 0 24 24">
+          <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99ZM6.5 16C5.67 16 5 15.33 5 14.5S5.67 13 6.5 13 8 13.67 8 14.5 7.33 16 6.5 16Zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5ZM5 11l1.5-4.5h11L19 11H5Z"/>
+        </svg>
+        <h2>Dodaj pierwszy pojazd</h2>
+        <p>Wpisz auto, quada albo motocykl. Potem dodasz przebieg, interwały, naprawy, koszty i historię utrzymania.</p>
+        <div class="emptyActions">
+          <button class="tonal" id="emptyAddVehicle" type="button">Dodaj pojazd</button>
+          <button class="text" id="emptyDemo" type="button">Wstaw przykład</button>
+        </div>
+      </div>
+
+      <div class="muted statusLine" id="status"></div>
+    </main>
+  </div>
+
+  <div class="fabScrim" id="fabScrim" hidden></div>
+
+  <div class="fab-container" id="fabContainer">
+    <div class="fabActions" id="fabActions" hidden>
+      <button class="fabActionPill" id="fabAddCost" type="button">
+        <svg viewBox="0 0 24 24"><path d="M11 2v2.07A8.01 8.01 0 0 0 4.07 11H2v2h2.07A8.01 8.01 0 0 0 11 19.93V22h2v-2.07A8.01 8.01 0 0 0 19.93 13H22v-2h-2.07A8.01 8.01 0 0 0 13 4.07V2h-2Zm1 4a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z"/></svg>
+        <span>Dodaj koszt</span>
+      </button>
+
+      <button class="fabActionPill" id="fabAddService" type="button">
+        <svg viewBox="0 0 24 24"><path d="M22.7 19 13.6 9.9c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3l4.1 4.1-2.9 2.9-4.2-4.1C.6 7 .9 10 3 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.4-.4.4-1 0-1.4Z"/></svg>
+        <span>Dodaj serwis</span>
+      </button>
+
+      <button class="fabActionPill" id="fabAddVehicle" type="button">
+        <svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99Z"/></svg>
+        <span>Dodaj pojazd</span>
+      </button>
+    </div>
+
+    <button class="fab" id="mainFab" type="button" aria-label="Szybkie akcje" aria-expanded="false"></button>
+  </div>
+
+  <dialog id="mainMenuDialog" class="drawerDialog">
+    <div class="drawerPanel">
+      <div class="drawerHeader">
+        <div>
+          <div class="drawerAppName">Mój garaż</div>
+          <div class="drawerAppSub">Mini księgowość auta</div>
+        </div>
+      </div>
+
+      <div class="drawerContent">
+        <div class="drawerSection">
+          <button class="drawerItem active" id="drawerGarage" type="button">
+            <svg viewBox="0 0 24 24"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9Z"/></svg>
+            <span>Garaż</span>
+          </button>
+
+          <button class="drawerItem" id="drawerCosts" type="button">
+            <svg viewBox="0 0 24 24"><path d="M11 2v2H7v2h10V4h-4V2h-2Zm-5 6h12v13H6V8Zm2 2v9h8v-9H8Z"/></svg>
+            <span>Koszty</span>
+          </button>
+
+          <button class="drawerItem" id="drawerStats" type="button">
+            <svg viewBox="0 0 24 24"><path d="M5 19V9h3v10H5Zm5.5 0V5h3v14h-3ZM16 19v-7h3v7h-3Z"/></svg>
+            <span>Statystyki</span>
+          </button>
+        </div>
+
+        <div class="drawerDivider"></div>
+
+        <div class="drawerSection">
+          <button class="drawerItem" id="drawerBackup" type="button">
+            <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2ZM19 9h-4V3H9v6H5l7 7 7-7Z"/></svg>
+            <span>Pobierz kopię</span>
+          </button>
+
+          <button class="drawerItem" id="drawerRestore" type="button">
+            <svg viewBox="0 0 24 24"><path d="M19.35 10.04A7.49 7.49 0 0 0 5.64 7.1 6 6 0 0 0 6 19h13a5 5 0 0 0 .35-8.96ZM13 13v4h-2v-4H8l4-4 4 4h-3Z"/></svg>
+            <span>Wczytaj dane</span>
+          </button>
+
+          <button class="drawerItem" id="drawerInfo" type="button">
+            <svg viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6Zm1-14a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 16a7 7 0 1 1 0-14 7 7 0 0 1 0 14ZM11 9h2V7h-2v2Z"/></svg>
+            <span>Informacje</span>
+          </button>
+        </div>
+      </div>
+
+      <button class="drawerClose" id="drawerClose" type="button" aria-label="Zamknij menu"></button>
+
+      <div class="drawerFooter">
+        Mój garaż 1.1<br>
+        Dane zapisują się lokalnie w przeglądarce.
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="vehiclePanel" class="googlePanel">
+    <div class="googlePanelShell">
+      <div class="googlePanelBar">
+        <button class="panelCloseBtn" id="vehicleClose" type="button" aria-label="Zamknij"></button>
+      </div>
+
+      <div class="googlePanelContent">
+        <div class="modalHead">
+          <h3 id="vehiclePanelTitle">Pojazd</h3>
+          <div class="muted" id="vehiclePanelSub">—</div>
+        </div>
+
+        <div class="modalBody">
+          <section class="heroCard">
+            <div class="heroKicker">Aktualny przebieg</div>
+            <div class="heroMain">
+              <strong id="vehicleMileageHero">0</strong>
+              <span>km</span>
+            </div>
+            <div class="heroMeta" id="vehicleHeroMeta"></div>
+          </section>
+
+          <div class="softGrid">
+            <div class="statBox"><strong id="vehicleCostYear">0 zł</strong><span>Koszt w tym roku</span></div>
+            <div class="statBox"><strong id="vehicleCostAll">0 zł</strong><span>Koszt łącznie</span></div>
+            <div class="statBox"><strong id="vehicleAvgCost">0 zł</strong><span>Średnio / wpis</span></div>
+            <div class="statBox"><strong id="vehicleServiceBad">0</strong><span>Po terminie</span></div>
+          </div>
+
+          <div class="miniActions">
+            <button class="tonal" id="vehicleUpdateMileage" type="button">Aktualizuj przebieg</button>
+            <button class="tonal" id="vehicleEdit" type="button">Edytuj pojazd</button>
+            <button class="tonal" id="vehicleAddService" type="button">Dodaj serwis</button>
+            <button class="tonal" id="vehicleAddCost" type="button">Dodaj koszt</button>
+            <button class="danger" id="vehicleDelete" type="button">Usuń pojazd</button>
+          </div>
+
+          <div class="sectionTitleRow">
+            <h2>Interwały</h2>
+            <div class="muted" id="serviceCounter">—</div>
+          </div>
+          <div class="serviceList" id="vehicleServices"></div>
+
+          <div class="sectionTitleRow">
+            <h2>Historia kosztów</h2>
+            <div class="muted" id="historyCounter">—</div>
+          </div>
+          <div class="historyList" id="vehicleHistory"></div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="vehicleFormPanel" class="googlePanel">
+    <div class="googlePanelShell">
+      <div class="googlePanelBar">
+        <button class="panelCloseBtn" id="vehicleFormClose" type="button" aria-label="Zamknij"></button>
+        <button class="panelSaveBtn" id="vehicleFormSave" type="button">Zapisz</button>
+      </div>
+
+      <div class="googlePanelContent">
+        <div class="modalHead">
+          <h3 id="vehicleFormTitle">Dodaj pojazd</h3>
+          <div class="muted">Podstawowe dane pojazdu. W kolejnych wersjach można dodać raport sprzedaży i pełną kartę auta.</div>
+        </div>
+
+        <div class="modalBody">
+          <div class="fieldGrid">
+            <div>
+              <label>Nazwa pojazdu</label>
+              <input id="vehName" placeholder="np. Volvo V70">
+            </div>
+            <div>
+              <label>Typ</label>
+              <select id="vehType">
+                <option value="car">Samochód</option>
+                <option value="quad">Quad</option>
+                <option value="moto">Motocykl</option>
+                <option value="van">Dostawczy</option>
+                <option value="other">Inny</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Aktualny przebieg</label>
+              <input id="vehMileage" type="number" min="0" step="1" placeholder="np. 214320">
+            </div>
+            <div>
+              <label>Data przebiegu</label>
+              <input id="vehMileageDate" type="date">
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Rejestracja</label>
+              <input id="vehPlate" placeholder="opcjonalnie">
+            </div>
+            <div>
+              <label>Rocznik</label>
+              <input id="vehYear" type="number" min="1900" max="2100" step="1" placeholder="opcjonalnie">
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Data zakupu</label>
+              <input id="vehPurchaseDate" type="date">
+            </div>
+            <div>
+              <label>Cena zakupu</label>
+              <input id="vehPurchasePrice" type="number" min="0" step="0.01" placeholder="opcjonalnie">
+            </div>
+          </div>
+
+          <div class="formBlock">
+            <label>Notatka</label>
+            <textarea id="vehNote" placeholder="np. silnik, olej, uwagi techniczne"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="mileagePanel" class="googlePanel">
+    <div class="googlePanelShell">
+      <div class="googlePanelBar">
+        <button class="panelCloseBtn" id="mileageClose" type="button" aria-label="Zamknij"></button>
+        <button class="panelSaveBtn" id="mileageSave" type="button">Zapisz</button>
+      </div>
+
+      <div class="googlePanelContent">
+        <div class="modalHead">
+          <h3>Aktualizuj przebieg</h3>
+          <div class="muted">Ten przebieg służy do liczenia interwałów serwisowych.</div>
+        </div>
+
+        <div class="modalBody">
+          <div class="fieldGrid">
+            <div>
+              <label>Przebieg</label>
+              <input id="mileageValue" type="number" min="0" step="1">
+            </div>
+            <div>
+              <label>Data</label>
+              <input id="mileageDate" type="date">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="servicePanel" class="googlePanel">
+    <div class="googlePanelShell">
+      <div class="googlePanelBar">
+        <button class="panelCloseBtn" id="serviceClose" type="button" aria-label="Zamknij"></button>
+        <button class="panelSaveBtn" id="serviceSave" type="button">Zapisz</button>
+      </div>
+
+      <div class="googlePanelContent">
+        <div class="modalHead">
+          <h3 id="serviceFormTitle">Dodaj interwał serwisowy</h3>
+          <div class="muted">Aplikacja policzy, ile zostało kilometrów i dni do kolejnej wymiany.</div>
+        </div>
+
+        <div class="modalBody">
+          <div class="formBlock">
+            <label>Pojazd</label>
+            <select id="serviceVehicle"></select>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Nazwa</label>
+              <input id="serviceName" placeholder="np. Olej silnikowy">
+            </div>
+            <div>
+              <label>Kategoria</label>
+              <select id="serviceCategory">
+                <option value="olej">Olej / filtry</option>
+                <option value="napęd">Napęd / rozrząd</option>
+                <option value="hamulce">Hamulce</option>
+                <option value="zawieszenie">Zawieszenie</option>
+                <option value="płyny">Płyny eksploatacyjne</option>
+                <option value="opony">Opony</option>
+                <option value="inne">Inne</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Ostatnia wymiana przy km</label>
+              <input id="serviceLastMileage" type="number" min="0" step="1">
+            </div>
+            <div>
+              <label>Data ostatniej wymiany</label>
+              <input id="serviceLastDate" type="date">
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Interwał km</label>
+              <input id="serviceIntervalKm" type="number" min="0" step="1" placeholder="np. 10000">
+            </div>
+            <div>
+              <label>Interwał miesięcy</label>
+              <input id="serviceIntervalMonths" type="number" min="0" step="1" placeholder="np. 12">
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Ostrzegaj ile km wcześniej</label>
+              <input id="serviceWarningKm" type="number" min="0" step="1" value="1000">
+            </div>
+            <div>
+              <label>Ostrzegaj ile dni wcześniej</label>
+              <input id="serviceWarningDays" type="number" min="0" step="1" value="30">
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Części</label>
+              <input id="servicePartsCost" type="number" min="0" step="0.01" placeholder="opcjonalnie">
+            </div>
+            <div>
+              <label>Robocizna</label>
+              <input id="serviceLaborCost" type="number" min="0" step="0.01" placeholder="opcjonalnie">
+            </div>
+          </div>
+
+          <div class="formBlock">
+            <label class="checkRow">
+              <input id="serviceAddExpense" type="checkbox" checked>
+              <span>Dodaj tę wymianę również jako koszt w historii</span>
+            </label>
+          </div>
+
+          <div class="formBlock">
+            <label>Notatka</label>
+            <textarea id="serviceNote" placeholder="np. marka oleju, filtr, warsztat, uwagi"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="expensePanel" class="googlePanel">
+    <div class="googlePanelShell">
+      <div class="googlePanelBar">
+        <button class="panelCloseBtn" id="expenseClose" type="button" aria-label="Zamknij"></button>
+        <button class="panelSaveBtn" id="expenseSave" type="button">Zapisz</button>
+      </div>
+
+      <div class="googlePanelContent">
+        <div class="modalHead">
+          <h3 id="expenseFormTitle">Dodaj koszt</h3>
+          <div class="muted">Wpis trafi do historii pojazdu i podsumowania kosztów utrzymania.</div>
+        </div>
+
+        <div class="modalBody">
+          <div class="formBlock">
+            <label>Pojazd</label>
+            <select id="expenseVehicle"></select>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Data</label>
+              <input id="expenseDate" type="date">
+            </div>
+            <div>
+              <label>Przebieg</label>
+              <input id="expenseMileage" type="number" min="0" step="1">
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Kategoria</label>
+              <select id="expenseCategory">
+                <option value="serwis">Serwis</option>
+                <option value="naprawa">Naprawa</option>
+                <option value="części">Części</option>
+                <option value="robocizna">Robocizna</option>
+                <option value="opony">Opony</option>
+                <option value="ubezpieczenie">Ubezpieczenie</option>
+                <option value="przegląd">Przegląd</option>
+                <option value="paliwo">Paliwo</option>
+                <option value="opłaty">Opłaty</option>
+                <option value="inne">Inne</option>
+              </select>
+            </div>
+            <div>
+              <label>Tytuł</label>
+              <input id="expenseTitle" placeholder="np. Wymiana oleju i filtrów">
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Części</label>
+              <input id="expensePartsCost" type="number" min="0" step="0.01" placeholder="0">
+            </div>
+            <div>
+              <label>Robocizna</label>
+              <input id="expenseLaborCost" type="number" min="0" step="0.01" placeholder="0">
+            </div>
+          </div>
+
+          <div class="fieldGrid">
+            <div>
+              <label>Inne koszty</label>
+              <input id="expenseOtherCost" type="number" min="0" step="0.01" placeholder="0">
+            </div>
+            <div>
+              <label>Razem</label>
+              <input id="expenseTotal" type="number" min="0" step="0.01" placeholder="liczone automatycznie">
+            </div>
+          </div>
+
+          <div class="formBlock">
+            <label>Notatka</label>
+            <textarea id="expenseNote" placeholder="np. części, warsztat, numer faktury, uwagi"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="costsPanel" class="googlePanel">
+    <div class="googlePanelShell">
+      <div class="googlePanelBar">
+        <button class="panelCloseBtn" id="costsClose" type="button" aria-label="Zamknij"></button>
+      </div>
+
+      <div class="googlePanelContent">
+        <div class="modalHead">
+          <h3>Koszty</h3>
+          <div class="muted">Zbiorcza historia wydatków ze wszystkich pojazdów.</div>
+        </div>
+
+        <div class="modalBody">
+          <section class="heroCard money">
+            <div class="heroKicker">Wydatki w tym roku</div>
+            <div class="heroMain">
+              <strong id="costsYearHero">0,00 zł</strong>
+            </div>
+            <div class="heroMeta">
+              <span class="chip purple" id="costsAllHero">0,00 zł łącznie</span>
+              <span class="chip" id="costsEntriesHero">0 wpisów</span>
+            </div>
+          </section>
+
+          <div class="sectionTitleRow">
+            <h2>Ostatnie koszty</h2>
+          </div>
+          <div class="historyList" id="allCostsList"></div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="statsPanel" class="googlePanel">
+    <div class="googlePanelShell">
+      <div class="googlePanelBar">
+        <button class="panelCloseBtn" id="statsClose" type="button" aria-label="Zamknij"></button>
+      </div>
+
+      <div class="googlePanelContent">
+        <div class="modalHead">
+          <h3>Statystyki</h3>
+          <div class="muted">Podsumowanie kosztów i najbliższych serwisów.</div>
+        </div>
+
+        <div class="modalBody">
+          <div class="softGrid">
+            <div class="statBox"><strong id="statsVehicles">0</strong><span>Pojazdy</span></div>
+            <div class="statBox"><strong id="statsCostAll">0 zł</strong><span>Koszt łącznie</span></div>
+            <div class="statBox"><strong id="statsCostYear">0 zł</strong><span>Koszt w tym roku</span></div>
+            <div class="statBox"><strong id="statsUrgent">0</strong><span>Serwisy pilne</span></div>
+          </div>
+
+          <div class="sectionTitleRow">
+            <h2>Najbliższe serwisy</h2>
+          </div>
+          <div class="serviceList" id="statsServiceList"></div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="infoPanel" class="googlePanel">
+    <div class="googlePanelShell">
+      <div class="googlePanelBar">
+        <button class="panelCloseBtn" id="infoClose" type="button" aria-label="Zamknij"></button>
+      </div>
+
+      <div class="googlePanelContent">
+        <div class="modalHead">
+          <h3>Informacje</h3>
+          <div class="muted">Wersja testowa aplikacji PWA „Mój garaż”.</div>
+        </div>
+
+        <div class="modalBody">
+          <div class="historyList">
+            <div class="historyItem">
+              <div class="stripe"></div>
+              <div>
+                <div class="historyTitle">Mój garaż 1.1</div>
+                <div class="historyMeta">Dane są zapisywane lokalnie w przeglądarce przez localStorage.</div>
+              </div>
+            </div>
+            <div class="historyItem">
+              <div class="stripe cost"></div>
+              <div>
+                <div class="historyTitle">Kierunek aplikacji</div>
+                <div class="historyMeta">Pełna historia utrzymania pojazdu: serwis, naprawy, koszty, przebieg i przyszły raport sprzedaży.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actionRow">
+            <button class="danger" id="clearAllData" type="button">Wyczyść wszystkie dane</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="appConfirmDialog" class="appConfirmDialog">
+    <div class="appConfirmCard">
+      <h3 id="appConfirmTitle">Komunikat</h3>
+      <p id="appConfirmMessage">—</p>
+      <div class="appConfirmActions">
+        <button class="dialogCancel" id="appConfirmCancel" type="button">Anuluj</button>
+        <button class="dialogPrimary" id="appConfirmOk" type="button">OK</button>
+      </div>
+    </div>
+  </dialog>
+
+  <input id="restoreFile" type="file" accept="application/json" hidden>
+
+<script>
+(() => {
+  const APP_VERSION = "1.1";
+  const STORAGE_KEY = "moj_garaz_pwa_v1";
+
+  const $ = (id) => document.getElementById(id);
+  const nowYear = () => new Date().getFullYear();
+
+  const pad2 = (n) => String(n).padStart(2,"0");
+  const todayISO = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+  };
+
+  const uid = (prefix = "id") => `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,7)}`;
+
+  const escapeHtml = (s) => String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+  const toNum = (v) => {
+    const n = Number(String(v ?? "").replace(",","."));
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const fmtKm = (n) => `${Math.round(Number(n || 0)).toLocaleString("pl-PL")} km`;
+  const fmtMoney = (n) => Number(n || 0).toLocaleString("pl-PL",{style:"currency",currency:"PLN"});
+  const fmtDate = (iso) => {
+    if (!iso) return "brak daty";
+    const d = new Date(iso + "T12:00:00");
+    if (Number.isNaN(d.getTime())) return iso;
+    return new Intl.DateTimeFormat("pl-PL",{day:"2-digit",month:"2-digit",year:"numeric"}).format(d);
+  };
+
+  const addMonthsISO = (iso, months) => {
+    if (!iso || !months) return "";
+    const [y,m,d] = iso.split("-").map(Number);
+    const dt = new Date(y, m - 1, d || 1);
+    dt.setMonth(dt.getMonth() + Number(months || 0));
+    return `${dt.getFullYear()}-${pad2(dt.getMonth()+1)}-${pad2(dt.getDate())}`;
+  };
+
+  const daysBetween = (fromISO, toISO) => {
+    if (!fromISO || !toISO) return null;
+    const a = new Date(fromISO + "T00:00:00");
+    const b = new Date(toISO + "T00:00:00");
+    if (Number.isNaN(a.getTime()) || Number.isNaN(b.getTime())) return null;
+    return Math.ceil((b - a) / 86400000);
+  };
+
+  const hasVibe = () => "vibrate" in navigator;
+  const vibe = (p) => { try { if (hasVibe()) navigator.vibrate(p); } catch {} };
+  const haptic = {
+    tap:()=>vibe(8),
+    success:()=>vibe([10,30,10]),
+    warning:()=>vibe([12,40,12]),
+    danger:()=>vibe([20,50,20])
+  };
+
+  let scrollYBeforeLock = 0;
+
+  function lockScroll(){
+    scrollYBeforeLock = window.scrollY || 0;
+    document.body.classList.add("scroll-locked");
+    document.body.style.top = `-${scrollYBeforeLock}px`;
+  }
+
+  function unlockScroll(){
+    document.body.classList.remove("scroll-locked");
+    document.body.style.top = "";
+    window.scrollTo(0, scrollYBeforeLock || 0);
+  }
+
+  function setSystemBars(color){
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", color);
+    document.documentElement.style.background = color;
+    document.body.style.background = color;
+  }
+
+  function createEmptyDb(){
+    return {
+      version: APP_VERSION,
+      vehicles: [],
+      settings: {}
+    };
+  }
+
+  function normalizeVehicle(v){
+    return {
+      id: v.id || uid("veh"),
+      name: v.name || "Pojazd",
+      type: v.type || "car",
+      mileage: Number(v.mileage || 0),
+      mileageDate: v.mileageDate || todayISO(),
+      plate: v.plate || "",
+      year: v.year || "",
+      purchaseDate: v.purchaseDate || "",
+      purchasePrice: Number(v.purchasePrice || 0),
+      note: v.note || "",
+      services: Array.isArray(v.services) ? v.services.map(normalizeService) : [],
+      expenses: Array.isArray(v.expenses) ? v.expenses.map(normalizeExpense) : []
+    };
+  }
+
+  function normalizeService(s){
+    return {
+      id: s.id || uid("srv"),
+      name: s.name || "Serwis",
+      category: s.category || "inne",
+      lastMileage: Number(s.lastMileage || 0),
+      lastDate: s.lastDate || todayISO(),
+      intervalKm: Number(s.intervalKm || 0),
+      intervalMonths: Number(s.intervalMonths || 0),
+      warningKm: Number(s.warningKm ?? 1000),
+      warningDays: Number(s.warningDays ?? 30),
+      partsCost: Number(s.partsCost ?? s.cost ?? 0),
+      laborCost: Number(s.laborCost || 0),
+      otherCost: Number(s.otherCost || 0),
+      linkedExpenseId: s.linkedExpenseId || "",
+      note: s.note || ""
+    };
+  }
+
+  function normalizeExpense(e){
+    const parts = Number(e.partsCost || 0);
+    const labor = Number(e.laborCost || 0);
+    const other = Number(e.otherCost || 0);
+    const total = Number(e.total || e.totalCost || (parts + labor + other) || 0);
+
+    return {
+      id: e.id || uid("exp"),
+      date: e.date || todayISO(),
+      mileage: Number(e.mileage || 0),
+      category: e.category || "inne",
+      title: e.title || e.name || e.category || "Koszt",
+      partsCost: parts,
+      laborCost: labor,
+      otherCost: other,
+      total,
+      serviceId: e.serviceId || "",
+      note: e.note || ""
+    };
+  }
+
+  function loadDb(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return createEmptyDb();
+      const parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.vehicles)) return createEmptyDb();
+
+      return {
+        version: parsed.version || APP_VERSION,
+        settings: parsed.settings || {},
+        vehicles: parsed.vehicles.map(normalizeVehicle)
+      };
+    }catch(err){
+      console.warn(err);
+      return createEmptyDb();
+    }
+  }
+
+  let db = loadDb();
+  let activeVehicleId = "";
+  let editingVehicleId = "";
+  let editingServiceId = "";
+  let editingExpenseId = "";
+  let pendingServiceExpense = null;
+
+  function saveDb(){
+    db.version = APP_VERSION;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  }
+
+  function getVehicle(id){
+    return db.vehicles.find(v => v.id === id) || null;
+  }
+
+  function getActiveVehicle(){
+    return getVehicle(activeVehicleId) || db.vehicles[0] || null;
+  }
+
+  function setStatus(text){
+    const el = $("status");
+    if (el) el.textContent = text || "";
+  }
+
+  function openDialog(id){
+    closeFab();
+    const dlg = $(id);
+    if (!dlg) return;
+    setSystemBars("#ffffff");
+    lockScroll();
+    if (typeof dlg.showModal === "function") dlg.showModal();
+    else dlg.setAttribute("open","");
+  }
+
+  function closeDialog(id){
+    const dlg = $(id);
+    if (!dlg) return;
+    if (typeof dlg.close === "function") dlg.close();
+    else dlg.removeAttribute("open");
+    unlockScroll();
+    setSystemBars("#eef1f6");
+  }
+
+  function closeAnyDialogOnCancel(id, closeFn){
+    const dlg = $(id);
+    if (!dlg) return;
+    dlg.addEventListener("cancel", (e) => {
+      e.preventDefault();
+      closeFn ? closeFn() : closeDialog(id);
+    });
+    dlg.addEventListener("close", () => {
+      document.body.classList.remove("scroll-locked");
+      document.body.style.top = "";
+      setSystemBars("#eef1f6");
+    });
+  }
+
+  function openAppDialog({title="Komunikat",message="",okText="OK",cancelText="",tone=""} = {}){
+    return new Promise(resolve => {
+      const dlg = $("appConfirmDialog");
+      const titleEl = $("appConfirmTitle");
+      const msgEl = $("appConfirmMessage");
+      const ok = $("appConfirmOk");
+      const cancel = $("appConfirmCancel");
+
+      titleEl.textContent = title;
+      msgEl.textContent = message;
+      ok.textContent = okText || "OK";
+      cancel.textContent = cancelText || "Anuluj";
+      cancel.hidden = !cancelText;
+
+      ok.className = tone === "danger" ? "dialogDanger" : "dialogPrimary";
+      cancel.className = "dialogCancel";
+
+      const cleanup = (result) => {
+        ok.onclick = null;
+        cancel.onclick = null;
+        dlg.oncancel = null;
+        if (dlg.open) dlg.close();
+        resolve(result);
+      };
+
+      ok.onclick = () => cleanup(true);
+      cancel.onclick = () => cleanup(false);
+      dlg.oncancel = (e) => {
+        e.preventDefault();
+        cleanup(false);
+      };
+
+      if (typeof dlg.showModal === "function") dlg.showModal();
+      else dlg.setAttribute("open","");
+    });
+  }
+
+  const notify = (message,title="Informacja") => openAppDialog({title,message,okText:"OK"});
+  const confirmDanger = (message,title="Potwierdź") => openAppDialog({title,message,okText:"Usuń",cancelText:"Anuluj",tone:"danger"});
+  const confirmNormal = (message,title="Potwierdź") => openAppDialog({title,message,okText:"Tak",cancelText:"Anuluj"});
+
+  function totalFromExpenseFields(prefix){
+    const parts = toNum($(prefix + "PartsCost").value);
+    const labor = toNum($(prefix + "LaborCost").value);
+    const other = $(prefix + "OtherCost") ? toNum($(prefix + "OtherCost").value) : 0;
+    const totalInput = $(prefix + "Total");
+
+    const sum = parts + labor + other;
+
+    if (totalInput && document.activeElement !== totalInput) {
+      totalInput.value = sum ? String(Math.round(sum * 100) / 100) : "";
+    }
+
+    if (totalInput && toNum(totalInput.value) > 0) return toNum(totalInput.value);
+    return sum;
+  }
+
+  function serviceStatus(vehicle, service){
+    const currentMileage = Number(vehicle.mileage || 0);
+
+    const intervalKm = Number(service.intervalKm || 0);
+    const lastMileage = Number(service.lastMileage || 0);
+    const warningKm = Number(service.warningKm ?? 1000);
+
+    const intervalMonths = Number(service.intervalMonths || 0);
+    const warningDays = Number(service.warningDays ?? 30);
+
+    let kmLeft = null;
+    let daysLeft = null;
+    let nextDate = "";
+
+    if (intervalKm > 0) kmLeft = (lastMileage + intervalKm) - currentMileage;
+    if (intervalMonths > 0 && service.lastDate) {
+      nextDate = addMonthsISO(service.lastDate, intervalMonths);
+      daysLeft = daysBetween(todayISO(), nextDate);
+    }
+
+    let level = "ok";
+    if ((kmLeft !== null && kmLeft < 0) || (daysLeft !== null && daysLeft < 0)) level = "bad";
+    else if ((kmLeft !== null && kmLeft <= warningKm) || (daysLeft !== null && daysLeft <= warningDays)) level = "warn";
+
+    let label = "OK";
+    if (level === "warn") label = "Wkrótce";
+    if (level === "bad") label = "Pilne";
+
+    const parts = [];
+    if (kmLeft !== null) parts.push(kmLeft >= 0 ? `zostało ${fmtKm(kmLeft)}` : `po terminie ${fmtKm(Math.abs(kmLeft))}`);
+    if (daysLeft !== null) parts.push(daysLeft >= 0 ? `zostało ${daysLeft} dni` : `po terminie ${Math.abs(daysLeft)} dni`);
+
+    return {
+      level,
+      label,
+      kmLeft,
+      daysLeft,
+      nextDate,
+      text: parts.length ? parts.join(" · ") : "brak interwału"
+    };
+  }
+
+  function vehicleStatusCounts(vehicle){
+    let bad = 0, warn = 0, ok = 0;
+    for (const s of vehicle.services || []) {
+      const st = serviceStatus(vehicle, s);
+      if (st.level === "bad") bad++;
+      else if (st.level === "warn") warn++;
+      else ok++;
+    }
+    return {bad,warn,ok};
+  }
+
+  function vehicleYearCost(vehicle, year = nowYear()){
+    return (vehicle.expenses || [])
+      .filter(e => String(e.date || "").startsWith(String(year) + "-"))
+      .reduce((sum,e) => sum + Number(e.total || 0), 0);
+  }
+
+  function vehicleAllCost(vehicle){
+    return (vehicle.expenses || []).reduce((sum,e) => sum + Number(e.total || 0), 0);
+  }
+
+  function vehicleAverageExpense(vehicle){
+    const count = (vehicle.expenses || []).length;
+    return count ? vehicleAllCost(vehicle) / count : 0;
+  }
+
+  function globalSummary(){
+    let costYear = 0, costAll = 0, bad = 0, warn = 0, entries = 0;
+    for (const v of db.vehicles) {
+      costYear += vehicleYearCost(v);
+      costAll += vehicleAllCost(v);
+      entries += (v.expenses || []).length;
+      const c = vehicleStatusCounts(v);
+      bad += c.bad;
+      warn += c.warn;
+    }
+    return {costYear,costAll,bad,warn,entries};
+  }
+
+  function getNearestService(vehicle){
+    const list = (vehicle.services || []).map(s => {
+      const st = serviceStatus(vehicle, s);
+      let score = 999999999;
+      if (st.level === "bad") score = -999999 + Math.min(st.kmLeft ?? 0, st.daysLeft ?? 0);
+      else {
+        const kmScore = st.kmLeft === null ? 999999 : st.kmLeft;
+        const dayScore = st.daysLeft === null ? 999999 : st.daysLeft * 50;
+        score = Math.min(kmScore, dayScore);
+      }
+      return {service:s,status:st,score};
+    }).sort((a,b) => a.score - b.score);
+
+    return list[0] || null;
+  }
+
+  function vehicleTypeIcon(){
+    return `<svg viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99ZM6.5 16C5.67 16 5 15.33 5 14.5S5.67 13 6.5 13 8 13.67 8 14.5 7.33 16 6.5 16Zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5ZM5 11l1.5-4.5h11L19 11H5Z"/></svg>`;
+  }
+
+  function renderMain(){
+    const summary = globalSummary();
+
+    $("heroCostYear").textContent = fmtMoney(summary.costYear);
+    $("heroVehicleCount").textContent = `${db.vehicles.length} pojazdów`;
+    $("heroUrgent").textContent = `${summary.bad} pilnych`;
+    $("heroSoon").textContent = `${summary.warn} zbliżających się`;
+
+    $("heroUrgent").className = "chip " + (summary.bad ? "bad" : "ok");
+    $("heroSoon").className = "chip " + (summary.warn ? "warn" : "ok");
+
+    $("vehicleCounter").textContent = db.vehicles.length ? `${db.vehicles.length} w garażu` : "brak pojazdów";
+
+    const list = $("vehicleList");
+    const empty = $("emptyState");
+
+    if (!db.vehicles.length) {
+      list.innerHTML = "";
+      empty.hidden = false;
+      return;
+    }
+
+    empty.hidden = true;
+
+    list.innerHTML = db.vehicles.map(v => {
+      const nearest = getNearestService(v);
+      const counts = vehicleStatusCounts(v);
+      const stateClass = counts.bad ? "bad" : counts.warn ? "warn" : "ok";
+      const stateText = counts.bad ? `${counts.bad} pilne` : counts.warn ? `${counts.warn} wkrótce` : "OK";
+      const nextText = nearest
+        ? `${nearest.service.name}: ${nearest.status.text}`
+        : "Brak interwałów — dodaj pierwszy serwis";
+
+      const meta = [
+        fmtKm(v.mileage),
+        v.plate ? v.plate : "",
+        v.year ? `rok ${v.year}` : ""
+      ].filter(Boolean).join(" · ");
+
+      return `
+        <button class="vehicleCard" type="button" data-open-vehicle="${v.id}">
+          <div class="vehicleIcon">${vehicleTypeIcon(v.type)}</div>
+          <div class="vehicleContent">
+            <div class="vehicleName">${escapeHtml(v.name)}</div>
+            <div class="vehicleMeta">${escapeHtml(meta || "brak danych")}</div>
+            <div class="vehicleNext">${escapeHtml(nextText)}</div>
+            <div class="heroMeta" style="margin-top:8px;">
+              <span class="chip ${stateClass}">${stateText}</span>
+              <span class="chip purple">${fmtMoney(vehicleYearCost(v))} / rok</span>
+            </div>
+          </div>
+          <svg class="arrowIcon" viewBox="0 0 24 24"><path d="M9.29 6.71a1 1 0 0 1 1.42 0L15.99 12l-5.28 5.29a1 1 0 0 1-1.42-1.42L13.17 12 9.29 8.12a1 1 0 0 1 0-1.41Z"/></svg>
+        </button>
+      `;
+    }).join("");
+
+    list.querySelectorAll("[data-open-vehicle]").forEach(btn => {
+      btn.onclick = () => {
+        activeVehicleId = btn.dataset.openVehicle;
+        openVehiclePanel(activeVehicleId);
+      };
+    });
+  }
+
+  function renderVehicleSelects(){
+    const options = db.vehicles.map(v => `<option value="${v.id}">${escapeHtml(v.name)}</option>`).join("");
+    ["serviceVehicle","expenseVehicle"].forEach(id => {
+      const el = $(id);
+      if (!el) return;
+      el.innerHTML = options || `<option value="">Brak pojazdów</option>`;
+      const active = getActiveVehicle();
+      if (active) el.value = active.id;
+    });
+  }
+
+  function openVehiclePanel(id){
+    const v = getVehicle(id);
+    if (!v) return;
+
+    activeVehicleId = v.id;
+    renderVehiclePanel(v);
+    openDialog("vehiclePanel");
+    haptic.tap();
+  }
+
+  function renderVehiclePanel(v){
+    const counts = vehicleStatusCounts(v);
+
+    $("vehiclePanelTitle").textContent = v.name;
+    $("vehiclePanelSub").textContent = [
+      v.plate ? `rej. ${v.plate}` : "",
+      v.year ? `rok ${v.year}` : "",
+      v.mileageDate ? `przebieg z ${fmtDate(v.mileageDate)}` : "",
+      v.purchasePrice ? `zakup ${fmtMoney(v.purchasePrice)}` : ""
+    ].filter(Boolean).join(" · ") || "Dane pojazdu";
+
+    $("vehicleMileageHero").textContent = Number(v.mileage || 0).toLocaleString("pl-PL");
+    $("vehicleCostYear").textContent = fmtMoney(vehicleYearCost(v));
+    $("vehicleCostAll").textContent = fmtMoney(vehicleAllCost(v));
+    $("vehicleAvgCost").textContent = fmtMoney(vehicleAverageExpense(v));
+    $("vehicleServiceBad").textContent = counts.bad;
+
+    const heroMeta = $("vehicleHeroMeta");
+    heroMeta.innerHTML = `
+      <span class="chip ${counts.bad ? "bad" : counts.warn ? "warn" : "ok"}">${counts.bad ? "Wymaga uwagi" : counts.warn ? "Coś się zbliża" : "Serwis OK"}</span>
+      <span class="chip">${(v.services || []).length} interwałów</span>
+      <span class="chip purple">${(v.expenses || []).length} kosztów</span>
+    `;
+
+    const services = $("vehicleServices");
+    const sortedServices = [...(v.services || [])].sort((a,b) => {
+      const aa = serviceStatus(v,a);
+      const bb = serviceStatus(v,b);
+      const order = {bad:0,warn:1,ok:2};
+      return order[aa.level] - order[bb.level];
+    });
+
+    $("serviceCounter").textContent = sortedServices.length ? `${sortedServices.length} pozycji` : "brak";
+
+    services.innerHTML = sortedServices.length ? sortedServices.map(s => {
+      const st = serviceStatus(v,s);
+      const meta = [
+        `ostatnio: ${fmtKm(s.lastMileage)} / ${fmtDate(s.lastDate)}`,
+        s.intervalKm ? `co ${fmtKm(s.intervalKm)}` : "",
+        s.intervalMonths ? `co ${s.intervalMonths} mies.` : ""
+      ].filter(Boolean).join(" · ");
+
+      return `
+        <div class="serviceItem">
+          <div class="stripe ${st.level}"></div>
+          <div>
+            <div class="itemTop">
+              <div class="itemTopText">
+                <div class="serviceTitle">${escapeHtml(s.name)}</div>
+                <div class="serviceMeta">${escapeHtml(meta)}</div>
+                <div class="serviceMeta"><strong>${escapeHtml(st.text)}</strong></div>
+                ${s.note ? `<div class="serviceMeta">${escapeHtml(s.note)}</div>` : ""}
+              </div>
+              <div class="serviceStatus ${st.level}">${st.label}</div>
+            </div>
+            <div class="itemActions">
+              <button class="tonal" type="button" data-complete-service="${s.id}">Wpisz wymianę</button>
+              <button class="text" type="button" data-edit-service="${s.id}">Edytuj</button>
+              <button class="danger" type="button" data-delete-service="${s.id}">Usuń</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("") : `
+      <div class="emptyState" style="margin-top:0;">
+        <h2>Brak interwałów</h2>
+        <p>Dodaj np. olej silnikowy, rozrząd, płyn hamulcowy, filtr powietrza albo pasek CVT.</p>
+        <button class="tonal" id="emptyServiceAdd" type="button">Dodaj interwał</button>
+      </div>
+    `;
+
+    const emptyServiceAdd = $("emptyServiceAdd");
+    if (emptyServiceAdd) emptyServiceAdd.onclick = () => openServicePanel(v.id);
+
+    services.querySelectorAll("[data-edit-service]").forEach(btn => {
+      btn.onclick = () => openServicePanel(v.id, btn.dataset.editService);
+    });
+
+    services.querySelectorAll("[data-delete-service]").forEach(btn => {
+      btn.onclick = () => deleteService(v.id, btn.dataset.deleteService);
+    });
+
+    services.querySelectorAll("[data-complete-service]").forEach(btn => {
+      btn.onclick = () => completeService(v.id, btn.dataset.completeService);
+    });
+
+    const history = $("vehicleHistory");
+    const expenses = [...(v.expenses || [])].sort((a,b) => String(b.date || "").localeCompare(String(a.date || "")));
+
+    $("historyCounter").textContent = expenses.length ? `${expenses.length} wpisów` : "brak";
+
+    history.innerHTML = expenses.length ? expenses.map(e => renderExpenseItem(v,e,true)).join("") : `
+      <div class="emptyState" style="margin-top:0;">
+        <h2>Brak kosztów</h2>
+        <p>Dodaj naprawę, ubezpieczenie, przegląd albo zakup części. Tu zaczyna się historia utrzymania auta.</p>
+        <button class="tonal" id="emptyCostAdd" type="button">Dodaj koszt</button>
+      </div>
+    `;
+
+    const emptyCostAdd = $("emptyCostAdd");
+    if (emptyCostAdd) emptyCostAdd.onclick = () => openExpensePanel(v.id);
+
+    history.querySelectorAll("[data-edit-expense]").forEach(btn => {
+      btn.onclick = () => openExpensePanel(v.id, btn.dataset.editExpense);
+    });
+
+    history.querySelectorAll("[data-delete-expense]").forEach(btn => {
+      btn.onclick = () => deleteExpense(v.id, btn.dataset.deleteExpense);
+    });
+  }
+
+  function renderExpenseItem(vehicle, e, showActions){
+    return `
+      <div class="historyItem">
+        <div class="stripe cost"></div>
+        <div>
+          <div class="itemTop">
+            <div class="itemTopText">
+              <div class="historyTitle">${escapeHtml(e.title || e.category || "Koszt")}</div>
+              <div class="historyMeta">${escapeHtml(vehicle.name)} · ${fmtDate(e.date)} · ${fmtKm(e.mileage || 0)} · ${escapeHtml(e.category || "inne")}</div>
+              <div class="historyMeta">
+                części: ${fmtMoney(e.partsCost || 0)} · robocizna: ${fmtMoney(e.laborCost || 0)} · inne: ${fmtMoney(e.otherCost || 0)}
+              </div>
+              ${e.note ? `<div class="historyMeta">${escapeHtml(e.note)}</div>` : ""}
+            </div>
+            <div class="serviceStatus cost">${fmtMoney(e.total || 0)}</div>
+          </div>
+          ${showActions ? `
+            <div class="itemActions">
+              <button class="text" type="button" data-edit-expense="${e.id}">Edytuj</button>
+              <button class="danger" type="button" data-delete-expense="${e.id}">Usuń</button>
+            </div>
+          ` : ""}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderCostsPanel(){
+    const summary = globalSummary();
+    $("costsYearHero").textContent = fmtMoney(summary.costYear);
+    $("costsAllHero").textContent = `${fmtMoney(summary.costAll)} łącznie`;
+    $("costsEntriesHero").textContent = `${summary.entries} wpisów`;
+
+    const items = [];
+    for (const v of db.vehicles) {
+      for (const e of v.expenses || []) items.push({vehicle:v,expense:e});
+    }
+
+    items.sort((a,b) => String(b.expense.date || "").localeCompare(String(a.expense.date || "")));
+
+    $("allCostsList").innerHTML = items.length
+      ? items.map(item => renderExpenseItem(item.vehicle,item.expense,false)).join("")
+      : `
+        <div class="emptyState" style="margin-top:0;">
+          <h2>Brak kosztów</h2>
+          <p>Po dodaniu wydatków pojawi się tu pełna historia ze wszystkich pojazdów.</p>
+        </div>
+      `;
+  }
+
+  function renderStatsPanel(){
+    const summary = globalSummary();
+
+    $("statsVehicles").textContent = db.vehicles.length;
+    $("statsCostAll").textContent = fmtMoney(summary.costAll);
+    $("statsCostYear").textContent = fmtMoney(summary.costYear);
+    $("statsUrgent").textContent = summary.bad;
+
+    const allServices = [];
+    for (const v of db.vehicles) {
+      for (const s of v.services || []) {
+        const st = serviceStatus(v,s);
+        allServices.push({vehicle:v,service:s,status:st});
+      }
+    }
+
+    allServices.sort((a,b) => {
+      const order = {bad:0,warn:1,ok:2};
+      if (order[a.status.level] !== order[b.status.level]) return order[a.status.level] - order[b.status.level];
+      const ak = a.status.kmLeft ?? 999999;
+      const bk = b.status.kmLeft ?? 999999;
+      return ak - bk;
+    });
+
+    $("statsServiceList").innerHTML = allServices.length ? allServices.slice(0,12).map(item => `
+      <div class="serviceItem">
+        <div class="stripe ${item.status.level}"></div>
+        <div>
+          <div class="itemTop">
+            <div class="itemTopText">
+              <div class="serviceTitle">${escapeHtml(item.service.name)}</div>
+              <div class="serviceMeta">${escapeHtml(item.vehicle.name)} · ${escapeHtml(item.status.text)}</div>
+            </div>
+            <div class="serviceStatus ${item.status.level}">${item.status.label}</div>
+          </div>
+        </div>
+      </div>
+    `).join("") : `
+      <div class="emptyState" style="margin-top:0;">
+        <h2>Brak serwisów</h2>
+        <p>Po dodaniu interwałów pojawi się tutaj lista najbliższych wymian.</p>
+      </div>
+    `;
+  }
+
+  function renderAll(){
+    saveDb();
+    renderMain();
+    renderVehicleSelects();
+    renderCostsPanel();
+    renderStatsPanel();
+
+    const active = getActiveVehicle();
+    if (activeVehicleId && $("vehiclePanel").open && active) renderVehiclePanel(active);
+  }
+
+  function clearVehicleForm(){
+    editingVehicleId = "";
+    $("vehicleFormTitle").textContent = "Dodaj pojazd";
+    $("vehName").value = "";
+    $("vehType").value = "car";
+    $("vehMileage").value = "";
+    $("vehMileageDate").value = todayISO();
+    $("vehPlate").value = "";
+    $("vehYear").value = "";
+    $("vehPurchaseDate").value = "";
+    $("vehPurchasePrice").value = "";
+    $("vehNote").value = "";
+  }
+
+  function openVehicleForm(vehicleId = ""){
+    clearVehicleForm();
+
+    if (vehicleId) {
+      const v = getVehicle(vehicleId);
+      if (!v) return;
+
+      editingVehicleId = vehicleId;
+      $("vehicleFormTitle").textContent = "Edytuj pojazd";
+      $("vehName").value = v.name || "";
+      $("vehType").value = v.type || "car";
+      $("vehMileage").value = v.mileage || "";
+      $("vehMileageDate").value = v.mileageDate || todayISO();
+      $("vehPlate").value = v.plate || "";
+      $("vehYear").value = v.year || "";
+      $("vehPurchaseDate").value = v.purchaseDate || "";
+      $("vehPurchasePrice").value = v.purchasePrice || "";
+      $("vehNote").value = v.note || "";
+    }
+
+    openDialog("vehicleFormPanel");
+  }
+
+  function saveVehicleForm(){
+    const name = $("vehName").value.trim();
+    if (!name) {
+      notify("Wpisz nazwę pojazdu.");
+      haptic.warning();
+      return;
+    }
+
+    const data = {
+      name,
+      type: $("vehType").value || "car",
+      mileage: toNum($("vehMileage").value),
+      mileageDate: $("vehMileageDate").value || todayISO(),
+      plate: $("vehPlate").value.trim(),
+      year: $("vehYear").value.trim(),
+      purchaseDate: $("vehPurchaseDate").value || "",
+      purchasePrice: toNum($("vehPurchasePrice").value),
+      note: $("vehNote").value.trim()
+    };
+
+    if (editingVehicleId) {
+      const v = getVehicle(editingVehicleId);
+      if (!v) return;
+      Object.assign(v,data);
+      activeVehicleId = v.id;
+      setStatus(`Zapisano pojazd: ${v.name}.`);
+    } else {
+      const v = {
+        id: uid("veh"),
+        ...data,
+        services: [],
+        expenses: []
+      };
+      db.vehicles.push(v);
+      activeVehicleId = v.id;
+      setStatus(`Dodano pojazd: ${v.name}.`);
+    }
+
+    renderAll();
+    closeDialog("vehicleFormPanel");
+    haptic.success();
+  }
+
+  function openMileagePanel(){
+    const v = getActiveVehicle();
+    if (!v) {
+      notify("Najpierw dodaj pojazd.");
+      return;
+    }
+
+    $("mileageValue").value = v.mileage || "";
+    $("mileageDate").value = todayISO();
+    openDialog("mileagePanel");
+  }
+
+  function saveMileage(){
+    const v = getActiveVehicle();
+    if (!v) return;
+
+    const mileage = toNum($("mileageValue").value);
+    if (mileage <= 0) {
+      notify("Wpisz poprawny przebieg.");
+      haptic.warning();
+      return;
+    }
+
+    v.mileage = mileage;
+    v.mileageDate = $("mileageDate").value || todayISO();
+
+    renderAll();
+    closeDialog("mileagePanel");
+    setStatus(`Zaktualizowano przebieg: ${fmtKm(mileage)}.`);
+    haptic.success();
+  }
+
+  function clearServiceForm(vehicleId = ""){
+    editingServiceId = "";
+    $("serviceFormTitle").textContent = "Dodaj interwał serwisowy";
+    renderVehicleSelects();
+
+    $("serviceVehicle").value = vehicleId || activeVehicleId || (db.vehicles[0]?.id || "");
+    const v = getVehicle($("serviceVehicle").value);
+
+    $("serviceName").value = "";
+    $("serviceCategory").value = "olej";
+    $("serviceLastMileage").value = v?.mileage || "";
+    $("serviceLastDate").value = todayISO();
+    $("serviceIntervalKm").value = "";
+    $("serviceIntervalMonths").value = "";
+    $("serviceWarningKm").value = "1000";
+    $("serviceWarningDays").value = "30";
+    $("servicePartsCost").value = "";
+    $("serviceLaborCost").value = "";
+    $("serviceAddExpense").checked = true;
+    $("serviceNote").value = "";
+  }
+
+  function openServicePanel(vehicleId = "", serviceId = ""){
+    if (!db.vehicles.length) {
+      notify("Najpierw dodaj pojazd.");
+      return;
+    }
+
+    clearServiceForm(vehicleId);
+
+    if (serviceId) {
+      const v = getVehicle(vehicleId);
+      const s = v?.services?.find(x => x.id === serviceId);
+      if (!v || !s) return;
+
+      editingServiceId = serviceId;
+      $("serviceFormTitle").textContent = "Edytuj interwał";
+      $("serviceVehicle").value = v.id;
+      $("serviceName").value = s.name || "";
+      $("serviceCategory").value = s.category || "inne";
+      $("serviceLastMileage").value = s.lastMileage || "";
+      $("serviceLastDate").value = s.lastDate || todayISO();
+      $("serviceIntervalKm").value = s.intervalKm || "";
+      $("serviceIntervalMonths").value = s.intervalMonths || "";
+      $("serviceWarningKm").value = s.warningKm ?? 1000;
+      $("serviceWarningDays").value = s.warningDays ?? 30;
+      $("servicePartsCost").value = s.partsCost || "";
+      $("serviceLaborCost").value = s.laborCost || "";
+      $("serviceAddExpense").checked = false;
+      $("serviceNote").value = s.note || "";
+    }
+
+    openDialog("servicePanel");
+  }
+
+  function saveService(){
+    const vehicle = getVehicle($("serviceVehicle").value);
+    if (!vehicle) {
+      notify("Wybierz pojazd.");
+      haptic.warning();
+      return;
+    }
+
+    const name = $("serviceName").value.trim();
+    if (!name) {
+      notify("Wpisz nazwę interwału, np. Olej silnikowy.");
+      haptic.warning();
+      return;
+    }
+
+    const intervalKm = toNum($("serviceIntervalKm").value);
+    const intervalMonths = toNum($("serviceIntervalMonths").value);
+
+    if (intervalKm <= 0 && intervalMonths <= 0) {
+      notify("Podaj interwał w kilometrach lub miesiącach.");
+      haptic.warning();
+      return;
+    }
+
+    const data = {
+      name,
+      category: $("serviceCategory").value || "inne",
+      lastMileage: toNum($("serviceLastMileage").value),
+      lastDate: $("serviceLastDate").value || todayISO(),
+      intervalKm,
+      intervalMonths,
+      warningKm: toNum($("serviceWarningKm").value) || 1000,
+      warningDays: toNum($("serviceWarningDays").value) || 30,
+      partsCost: toNum($("servicePartsCost").value),
+      laborCost: toNum($("serviceLaborCost").value),
+      otherCost: 0,
+      note: $("serviceNote").value.trim()
+    };
+
+    if (editingServiceId) {
+      const s = vehicle.services.find(x => x.id === editingServiceId);
+      if (!s) return;
+      Object.assign(s,data);
+      setStatus(`Zapisano interwał: ${s.name}.`);
+    } else {
+      const service = {
+        id: uid("srv"),
+        linkedExpenseId: "",
+        ...data
+      };
+
+      vehicle.services.push(service);
+
+      const total = service.partsCost + service.laborCost + service.otherCost;
+      if ($("serviceAddExpense").checked && total > 0) {
+        const expense = {
+          id: uid("exp"),
+          date: service.lastDate,
+          mileage: service.lastMileage,
+          category: "serwis",
+          title: service.name,
+          partsCost: service.partsCost,
+          laborCost: service.laborCost,
+          otherCost: service.otherCost,
+          total,
+          serviceId: service.id,
+          note: service.note
+        };
+
+        vehicle.expenses.push(expense);
+        service.linkedExpenseId = expense.id;
+      }
+
+      setStatus(`Dodano interwał: ${service.name}.`);
+    }
+
+    activeVehicleId = vehicle.id;
+    renderAll();
+    closeDialog("servicePanel");
+    haptic.success();
+  }
+
+  function clearExpenseForm(vehicleId = ""){
+    editingExpenseId = "";
+    pendingServiceExpense = null;
+    $("expenseFormTitle").textContent = "Dodaj koszt";
+    renderVehicleSelects();
+
+    $("expenseVehicle").value = vehicleId || activeVehicleId || (db.vehicles[0]?.id || "");
+    const v = getVehicle($("expenseVehicle").value);
+
+    $("expenseDate").value = todayISO();
+    $("expenseMileage").value = v?.mileage || "";
+    $("expenseCategory").value = "serwis";
+    $("expenseTitle").value = "";
+    $("expensePartsCost").value = "";
+    $("expenseLaborCost").value = "";
+    $("expenseOtherCost").value = "";
+    $("expenseTotal").value = "";
+    $("expenseNote").value = "";
+  }
+
+  function openExpensePanel(vehicleId = "", expenseId = ""){
+    if (!db.vehicles.length) {
+      notify("Najpierw dodaj pojazd.");
+      return;
+    }
+
+    clearExpenseForm(vehicleId);
+
+    if (expenseId) {
+      const v = getVehicle(vehicleId);
+      const e = v?.expenses?.find(x => x.id === expenseId);
+      if (!v || !e) return;
+
+      editingExpenseId = expenseId;
+      $("expenseFormTitle").textContent = "Edytuj koszt";
+      $("expenseVehicle").value = v.id;
+      $("expenseDate").value = e.date || todayISO();
+      $("expenseMileage").value = e.mileage || "";
+      $("expenseCategory").value = e.category || "inne";
+      $("expenseTitle").value = e.title || "";
+      $("expensePartsCost").value = e.partsCost || "";
+      $("expenseLaborCost").value = e.laborCost || "";
+      $("expenseOtherCost").value = e.otherCost || "";
+      $("expenseTotal").value = e.total || "";
+      $("expenseNote").value = e.note || "";
+    }
+
+    openDialog("expensePanel");
+  }
+
+  function saveExpense(){
+    const vehicle = getVehicle($("expenseVehicle").value);
+    if (!vehicle) {
+      notify("Wybierz pojazd.");
+      haptic.warning();
+      return;
+    }
+
+    const partsCost = toNum($("expensePartsCost").value);
+    const laborCost = toNum($("expenseLaborCost").value);
+    const otherCost = toNum($("expenseOtherCost").value);
+    const calculatedTotal = partsCost + laborCost + otherCost;
+    const total = toNum($("expenseTotal").value) || calculatedTotal;
+
+    if (total <= 0) {
+      notify("Wpisz koszt albo rozbij go na części, robociznę i inne.");
+      haptic.warning();
+      return;
+    }
+
+    const title = $("expenseTitle").value.trim() || $("expenseCategory").value;
+
+    const data = {
+      date: $("expenseDate").value || todayISO(),
+      mileage: toNum($("expenseMileage").value) || vehicle.mileage || 0,
+      category: $("expenseCategory").value || "inne",
+      title,
+      partsCost,
+      laborCost,
+      otherCost,
+      total,
+      note: $("expenseNote").value.trim()
+    };
+
+    if (editingExpenseId) {
+      const e = vehicle.expenses.find(x => x.id === editingExpenseId);
+      if (!e) return;
+      Object.assign(e,data);
+      setStatus(`Zapisano koszt: ${fmtMoney(total)}.`);
+    } else {
+      const expense = {
+        id: uid("exp"),
+        serviceId: pendingServiceExpense?.serviceId || "",
+        ...data
+      };
+
+      vehicle.expenses.push(expense);
+
+      if (pendingServiceExpense?.serviceId) {
+        const service = vehicle.services.find(s => s.id === pendingServiceExpense.serviceId);
+        if (service) {
+          service.lastMileage = expense.mileage;
+          service.lastDate = expense.date;
+          service.partsCost = expense.partsCost;
+          service.laborCost = expense.laborCost;
+          service.otherCost = expense.otherCost;
+          service.linkedExpenseId = expense.id;
+        }
+      }
+
+      setStatus(`Dodano koszt: ${fmtMoney(total)}.`);
+    }
+
+    if (data.mileage > vehicle.mileage) {
+      vehicle.mileage = data.mileage;
+      vehicle.mileageDate = data.date;
+    }
+
+    activeVehicleId = vehicle.id;
+    pendingServiceExpense = null;
+    renderAll();
+    closeDialog("expensePanel");
+    haptic.success();
+  }
+
+  function completeService(vehicleId, serviceId){
+    const v = getVehicle(vehicleId);
+    const s = v?.services?.find(x => x.id === serviceId);
+    if (!v || !s) return;
+
+    clearExpenseForm(vehicleId);
+    pendingServiceExpense = {vehicleId,serviceId};
+
+    $("expenseFormTitle").textContent = "Wpisz wykonaną wymianę";
+    $("expenseVehicle").value = v.id;
+    $("expenseDate").value = todayISO();
+    $("expenseMileage").value = v.mileage || s.lastMileage || "";
+    $("expenseCategory").value = "serwis";
+    $("expenseTitle").value = s.name || "";
+    $("expensePartsCost").value = s.partsCost || "";
+    $("expenseLaborCost").value = s.laborCost || "";
+    $("expenseOtherCost").value = s.otherCost || "";
+    $("expenseTotal").value = (Number(s.partsCost || 0) + Number(s.laborCost || 0) + Number(s.otherCost || 0)) || "";
+    $("expenseNote").value = s.note || "";
+
+    openDialog("expensePanel");
+  }
+
+  async function deleteService(vehicleId, serviceId){
+    const v = getVehicle(vehicleId);
+    const s = v?.services?.find(x => x.id === serviceId);
+    if (!v || !s) return;
+
+    const ok = await confirmDanger(`Usunąć interwał „${s.name}”?\nHistoria kosztów zostanie bez zmian.`, "Usuń interwał");
+    if (!ok) return;
+
+    v.services = v.services.filter(x => x.id !== serviceId);
+    renderAll();
+    setStatus("Usunięto interwał.");
+    haptic.danger();
+  }
+
+  async function deleteExpense(vehicleId, expenseId){
+    const v = getVehicle(vehicleId);
+    const e = v?.expenses?.find(x => x.id === expenseId);
+    if (!v || !e) return;
+
+    const ok = await confirmDanger(`Usunąć koszt „${e.title}” (${fmtMoney(e.total)})?`, "Usuń koszt");
+    if (!ok) return;
+
+    v.expenses = v.expenses.filter(x => x.id !== expenseId);
+
+    for (const s of v.services || []) {
+      if (s.linkedExpenseId === expenseId) s.linkedExpenseId = "";
+    }
+
+    renderAll();
+    setStatus("Usunięto koszt.");
+    haptic.danger();
+  }
+
+  async function deleteActiveVehicle(){
+    const v = getActiveVehicle();
+    if (!v) return;
+
+    const ok = await confirmDanger(`Usunąć pojazd „${v.name}” razem z historią kosztów i interwałami?`, "Usuń pojazd");
+    if (!ok) return;
+
+    db.vehicles = db.vehicles.filter(x => x.id !== v.id);
+    activeVehicleId = db.vehicles[0]?.id || "";
+    renderAll();
+    closeDialog("vehiclePanel");
+    setStatus("Usunięto pojazd.");
+    haptic.danger();
+  }
+
+  function exportBackup(){
+    const data = JSON.stringify(db, null, 2);
+    const blob = new Blob([data], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const date = todayISO();
+    a.href = url;
+    a.download = `moj-garaz-backup-${date}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    setStatus("Pobrano kopię danych.");
+    haptic.success();
+  }
+
+  function restoreBackup(file){
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const parsed = JSON.parse(String(reader.result || ""));
+        if (!parsed || !Array.isArray(parsed.vehicles)) throw new Error("Nieprawidłowy plik.");
+
+        const ok = await confirmNormal("Wczytanie kopii zastąpi obecne dane w aplikacji. Kontynuować?", "Wczytaj dane");
+        if (!ok) return;
+
+        db = {
+          version: APP_VERSION,
+          settings: parsed.settings || {},
+          vehicles: parsed.vehicles.map(normalizeVehicle)
+        };
+
+        activeVehicleId = db.vehicles[0]?.id || "";
+        renderAll();
+        setStatus("Wczytano dane z pliku.");
+        haptic.success();
+      } catch(err) {
+        notify("Nie udało się wczytać pliku JSON.");
+        haptic.warning();
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  async function clearAllData(){
+    const ok = await confirmDanger("To usunie wszystkie pojazdy, interwały i koszty zapisane w tej przeglądarce.", "Wyczyść dane");
+    if (!ok) return;
+
+    db = createEmptyDb();
+    activeVehicleId = "";
+    saveDb();
+    renderAll();
+    closeDialog("infoPanel");
+    setStatus("Wyczyszczono dane.");
+    haptic.danger();
+  }
+
+  function seedDemo(){
+    if (db.vehicles.length) return;
+
+    const vehicleId = uid("veh");
+    const oilServiceId = uid("srv");
+    const airServiceId = uid("srv");
+
+    db.vehicles.push({
+      id: vehicleId,
+      name: "Przykład: Volvo V70",
+      type: "car",
+      mileage: 214320,
+      mileageDate: todayISO(),
+      plate: "",
+      year: "2007",
+      purchaseDate: "",
+      purchasePrice: 0,
+      note: "Przykładowy pojazd testowy — możesz go usunąć.",
+      services: [
+        {
+          id: oilServiceId,
+          name: "Olej silnikowy",
+          category: "olej",
+          lastMileage: 210000,
+          lastDate: todayISO(),
+          intervalKm: 10000,
+          intervalMonths: 12,
+          warningKm: 1000,
+          warningDays: 30,
+          partsCost: 280,
+          laborCost: 120,
+          otherCost: 0,
+          linkedExpenseId: "",
+          note: "Olej 5W30 + filtr"
+        },
+        {
+          id: airServiceId,
+          name: "Filtr powietrza",
+          category: "olej",
+          lastMileage: 205000,
+          lastDate: todayISO(),
+          intervalKm: 15000,
+          intervalMonths: 12,
+          warningKm: 1500,
+          warningDays: 30,
+          partsCost: 80,
+          laborCost: 0,
+          otherCost: 0,
+          linkedExpenseId: "",
+          note: ""
+        }
+      ],
+      expenses: [
+        {
+          id: uid("exp"),
+          date: todayISO(),
+          mileage: 210000,
+          category: "serwis",
+          title: "Wymiana oleju i filtrów",
+          partsCost: 280,
+          laborCost: 120,
+          otherCost: 0,
+          total: 400,
+          serviceId: oilServiceId,
+          note: "Wpis testowy"
+        }
+      ]
+    });
+
+    activeVehicleId = vehicleId;
+    renderAll();
+    setStatus("Wstawiono przykładowy pojazd.");
+    haptic.success();
+  }
+
+  function toggleFab(){
+    const box = $("fabContainer");
+    const actions = $("fabActions");
+    const scrim = $("fabScrim");
+    const open = !box.classList.contains("is-open");
+
+    box.classList.toggle("is-open", open);
+    actions.hidden = !open;
+    scrim.hidden = !open;
+    $("mainFab").setAttribute("aria-expanded", open ? "true" : "false");
+    haptic.tap();
+  }
+
+  function closeFab(){
+    $("fabContainer").classList.remove("is-open");
+    $("fabActions").hidden = true;
+    $("fabScrim").hidden = true;
+    $("mainFab").setAttribute("aria-expanded","false");
+  }
+
+  function openDrawer(){
+    closeFab();
+    const dlg = $("mainMenuDialog");
+    if (typeof dlg.showModal === "function") dlg.showModal();
+    else dlg.setAttribute("open","");
+    lockScroll();
+    haptic.tap();
+  }
+
+  function closeDrawer(){
+    const dlg = $("mainMenuDialog");
+    if (dlg.open) dlg.close();
+    unlockScroll();
+  }
+
+  function setupEvents(){
+    $("mainFab").onclick = toggleFab;
+    $("fabScrim").onclick = closeFab;
+
+    $("fabAddVehicle").onclick = () => openVehicleForm();
+    $("fabAddService").onclick = () => openServicePanel();
+    $("fabAddCost").onclick = () => openExpensePanel();
+
+    $("emptyAddVehicle").onclick = () => openVehicleForm();
+    $("emptyDemo").onclick = seedDemo;
+
+    $("refreshBtn").onclick = () => {
+      renderAll();
+      setStatus("Odświeżono widok.");
+      haptic.tap();
+    };
+
+    $("mainMenuBtn").onclick = openDrawer;
+    $("drawerClose").onclick = closeDrawer;
+    $("mainMenuDialog").addEventListener("cancel", (e) => {
+      e.preventDefault();
+      closeDrawer();
+    });
+
+    $("drawerGarage").onclick = closeDrawer;
+
+    $("drawerCosts").onclick = () => {
+      closeDrawer();
+      renderCostsPanel();
+      openDialog("costsPanel");
+    };
+
+    $("drawerStats").onclick = () => {
+      closeDrawer();
+      renderStatsPanel();
+      openDialog("statsPanel");
+    };
+
+    $("drawerBackup").onclick = () => {
+      closeDrawer();
+      exportBackup();
+    };
+
+    $("drawerRestore").onclick = () => {
+      closeDrawer();
+      $("restoreFile").click();
+    };
+
+    $("drawerInfo").onclick = () => {
+      closeDrawer();
+      openDialog("infoPanel");
+    };
+
+    $("restoreFile").onchange = (e) => {
+      const file = e.target.files?.[0];
+      restoreBackup(file);
+      e.target.value = "";
+    };
+
+    $("vehicleClose").onclick = () => closeDialog("vehiclePanel");
+    $("vehicleFormClose").onclick = () => closeDialog("vehicleFormPanel");
+    $("vehicleFormSave").onclick = saveVehicleForm;
+
+    $("mileageClose").onclick = () => closeDialog("mileagePanel");
+    $("mileageSave").onclick = saveMileage;
+
+    $("serviceClose").onclick = () => closeDialog("servicePanel");
+    $("serviceSave").onclick = saveService;
+
+    $("expenseClose").onclick = () => closeDialog("expensePanel");
+    $("expenseSave").onclick = saveExpense;
+
+    $("costsClose").onclick = () => closeDialog("costsPanel");
+    $("statsClose").onclick = () => closeDialog("statsPanel");
+    $("infoClose").onclick = () => closeDialog("infoPanel");
+
+    $("vehicleUpdateMileage").onclick = openMileagePanel;
+    $("vehicleEdit").onclick = () => openVehicleForm(activeVehicleId);
+    $("vehicleAddService").onclick = () => openServicePanel(activeVehicleId);
+    $("vehicleAddCost").onclick = () => openExpensePanel(activeVehicleId);
+    $("vehicleDelete").onclick = deleteActiveVehicle;
+
+    $("clearAllData").onclick = clearAllData;
+
+    $("serviceVehicle").addEventListener("change", () => {
+      const v = getVehicle($("serviceVehicle").value);
+      if (v && !$("serviceLastMileage").value) $("serviceLastMileage").value = v.mileage || "";
+    });
+
+    $("expenseVehicle").addEventListener("change", () => {
+      const v = getVehicle($("expenseVehicle").value);
+      if (v) $("expenseMileage").value = v.mileage || "";
+    });
+
+    ["expensePartsCost","expenseLaborCost","expenseOtherCost"].forEach(id => {
+      $(id).addEventListener("input", () => totalFromExpenseFields("expense"));
+    });
+
+    closeAnyDialogOnCancel("vehiclePanel");
+    closeAnyDialogOnCancel("vehicleFormPanel");
+    closeAnyDialogOnCancel("mileagePanel");
+    closeAnyDialogOnCancel("servicePanel");
+    closeAnyDialogOnCancel("expensePanel");
+    closeAnyDialogOnCancel("costsPanel");
+    closeAnyDialogOnCancel("statsPanel");
+    closeAnyDialogOnCancel("infoPanel");
+  }
+
+  setSystemBars("#eef1f6");
+  setupEvents();
+
+  activeVehicleId = db.vehicles[0]?.id || "";
+  renderAll();
+})();
+</script>
+</body>
+</html>
