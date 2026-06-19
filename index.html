@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Mój garaż 1.2</title>
+  <title>Mój garaż 1.3</title>
   <meta name="theme-color" content="#eef1f6" id="themeColorMeta">
   <meta name="color-scheme" content="light">
   <meta name="mobile-web-app-capable" content="yes">
@@ -216,6 +216,11 @@
       padding-bottom:9px;
       background:#eef3fa;
     }
+    input:disabled,textarea:disabled,select:disabled{
+      color:var(--text-3);
+      background:#eef1f6;
+      opacity:1;
+    }
 
     label{
       display:block;
@@ -305,6 +310,7 @@
     .chip.warn{background:var(--yellow-soft);color:#8a5a00;border-color:transparent}
     .chip.bad{background:var(--red-soft);color:#a50e0e;border-color:transparent}
     .chip.purple{background:var(--purple-soft);color:var(--purple);border-color:transparent}
+    .heroMeta.tight{margin-top:8px}
 
     .sectionTitleRow{
       display:flex;
@@ -333,6 +339,48 @@
       display:flex;
       flex-direction:column;
       gap:10px;
+    }
+
+    .monthGroup{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .monthGroup + .monthGroup{
+      margin-top:16px;
+    }
+
+    .monthHeader{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      padding:0 4px;
+      color:var(--text-2);
+    }
+
+    .monthHeader strong{
+      color:var(--text);
+      font-size:15px;
+      line-height:1.2;
+      font-weight:750;
+      text-transform:capitalize;
+    }
+
+    .monthHeader span{
+      font-size:12.5px;
+      line-height:1.2;
+      text-align:right;
+      color:var(--text-3);
+      white-space:nowrap;
+    }
+
+    .filterSummary{
+      margin:-4px 2px 12px;
+      color:var(--text-2);
+      font-size:13px;
+      line-height:1.35;
     }
 
     .vehicleCard{
@@ -419,6 +467,8 @@
       border:1px dashed #c4cad4;
       text-align:center;
     }
+
+    .emptyState.compact{margin-top:0}
 
     .emptyState svg{
       width:54px;
@@ -1202,6 +1252,11 @@
             <span>Koszty</span>
           </button>
 
+          <button class="drawerItem" id="drawerServiceCenter" type="button">
+            <svg viewBox="0 0 24 24"><path d="M22.7 19 13.6 9.9c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3l4.1 4.1-2.9 2.9-4.2-4.1C.6 7 .9 10 3 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.4-.4.4-1 0-1.4Z"/></svg>
+            <span>Centrum serwisowe</span>
+          </button>
+
           <button class="drawerItem" id="drawerStats" type="button">
             <svg viewBox="0 0 24 24"><path d="M5 19V9h3v10H5Zm5.5 0V5h3v14h-3ZM16 19v-7h3v7h-3Z"/></svg>
             <span>Statystyki</span>
@@ -1236,7 +1291,7 @@
       <button class="drawerClose" id="drawerClose" type="button" aria-label="Zamknij menu"></button>
 
       <div class="drawerFooter">
-        Mój garaż 1.2<br>
+        Mój garaż 1.3<br>
         Dane zapisują się lokalnie w przeglądarce.
       </div>
     </div>
@@ -1329,7 +1384,7 @@
           <div class="fieldGrid">
             <div>
               <label>Aktualny przebieg</label>
-              <input id="vehMileage" type="number" min="0" step="1" placeholder="np. 214320">
+              <input id="vehMileage" type="number" inputmode="numeric" min="0" step="1" placeholder="np. 214320">
             </div>
             <div>
               <label>Data przebiegu</label>
@@ -1344,7 +1399,7 @@
             </div>
             <div>
               <label>Rocznik</label>
-              <input id="vehYear" type="number" min="1900" max="2100" step="1" placeholder="opcjonalnie">
+              <input id="vehYear" type="number" inputmode="numeric" min="1900" max="2100" step="1" placeholder="opcjonalnie">
             </div>
           </div>
 
@@ -1355,7 +1410,7 @@
             </div>
             <div>
               <label>Cena zakupu</label>
-              <input id="vehPurchasePrice" type="number" min="0" step="0.01" placeholder="opcjonalnie">
+              <input id="vehPurchasePrice" type="number" inputmode="decimal" min="0" step="0.01" placeholder="opcjonalnie">
             </div>
           </div>
 
@@ -1385,7 +1440,7 @@
           <div class="fieldGrid">
             <div>
               <label>Przebieg</label>
-              <input id="mileageValue" type="number" min="0" step="1">
+              <input id="mileageValue" type="number" inputmode="numeric" min="0" step="1">
             </div>
             <div>
               <label>Data</label>
@@ -1438,7 +1493,7 @@
           <div class="fieldGrid">
             <div>
               <label>Ostatnia wymiana przy km</label>
-              <input id="serviceLastMileage" type="number" min="0" step="1">
+              <input id="serviceLastMileage" type="number" inputmode="numeric" min="0" step="1">
             </div>
             <div>
               <label>Data ostatniej wymiany</label>
@@ -1449,33 +1504,33 @@
           <div class="fieldGrid">
             <div>
               <label>Interwał km</label>
-              <input id="serviceIntervalKm" type="number" min="0" step="1" placeholder="np. 10000">
+              <input id="serviceIntervalKm" type="number" inputmode="numeric" min="0" step="1" placeholder="np. 10000">
             </div>
             <div>
               <label>Interwał miesięcy</label>
-              <input id="serviceIntervalMonths" type="number" min="0" step="1" placeholder="np. 12">
+              <input id="serviceIntervalMonths" type="number" inputmode="numeric" min="0" step="1" placeholder="np. 12">
             </div>
           </div>
 
           <div class="fieldGrid">
             <div>
               <label>Ostrzegaj ile km wcześniej</label>
-              <input id="serviceWarningKm" type="number" min="0" step="1" value="1000">
+              <input id="serviceWarningKm" type="number" inputmode="numeric" min="0" step="1" value="1000">
             </div>
             <div>
               <label>Ostrzegaj ile dni wcześniej</label>
-              <input id="serviceWarningDays" type="number" min="0" step="1" value="30">
+              <input id="serviceWarningDays" type="number" inputmode="numeric" min="0" step="1" value="30">
             </div>
           </div>
 
           <div class="fieldGrid">
             <div>
               <label>Części</label>
-              <input id="servicePartsCost" type="number" min="0" step="0.01" placeholder="opcjonalnie">
+              <input id="servicePartsCost" type="number" inputmode="decimal" min="0" step="0.01" placeholder="opcjonalnie">
             </div>
             <div>
               <label>Robocizna</label>
-              <input id="serviceLaborCost" type="number" min="0" step="0.01" placeholder="opcjonalnie">
+              <input id="serviceLaborCost" type="number" inputmode="decimal" min="0" step="0.01" placeholder="opcjonalnie">
             </div>
           </div>
 
@@ -1521,7 +1576,7 @@
             </div>
             <div>
               <label>Przebieg</label>
-              <input id="expenseMileage" type="number" min="0" step="1">
+              <input id="expenseMileage" type="number" inputmode="numeric" min="0" step="1">
             </div>
           </div>
 
@@ -1550,22 +1605,22 @@
           <div class="fieldGrid">
             <div>
               <label>Części</label>
-              <input id="expensePartsCost" type="number" min="0" step="0.01" placeholder="0">
+              <input id="expensePartsCost" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0">
             </div>
             <div>
               <label>Robocizna</label>
-              <input id="expenseLaborCost" type="number" min="0" step="0.01" placeholder="0">
+              <input id="expenseLaborCost" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0">
             </div>
           </div>
 
           <div class="fieldGrid">
             <div>
               <label>Inne koszty</label>
-              <input id="expenseOtherCost" type="number" min="0" step="0.01" placeholder="0">
+              <input id="expenseOtherCost" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0">
             </div>
             <div>
               <label>Razem</label>
-              <input id="expenseTotal" type="number" min="0" step="0.01" placeholder="liczone automatycznie">
+              <input id="expenseTotal" type="number" inputmode="decimal" min="0" step="0.01" placeholder="liczone automatycznie">
             </div>
           </div>
 
@@ -1573,6 +1628,41 @@
             <label>Notatka</label>
             <textarea id="expenseNote" placeholder="np. części, warsztat, numer faktury, uwagi"></textarea>
           </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="serviceCenterPanel" class="googlePanel">
+    <div class="googlePanelShell">
+      <div class="googlePanelBar">
+        <button class="panelCloseBtn" id="serviceCenterClose" type="button" aria-label="Zamknij"></button>
+      </div>
+
+      <div class="googlePanelContent">
+        <div class="modalHead">
+          <h3>Centrum serwisowe</h3>
+          <div class="muted">Najpilniejsze interwały ze wszystkich pojazdów w jednym miejscu.</div>
+        </div>
+
+        <div class="modalBody">
+          <section class="heroCard">
+            <div class="heroKicker">Do sprawdzenia</div>
+            <div class="heroMain">
+              <strong id="serviceCenterUrgentHero">0</strong>
+              <span>pilne</span>
+            </div>
+            <div class="heroMeta">
+              <span class="chip warn" id="serviceCenterSoonHero">0 wkrótce</span>
+              <span class="chip ok" id="serviceCenterOkHero">0 OK</span>
+            </div>
+          </section>
+
+          <div class="sectionTitleRow">
+            <h2>Lista serwisowa</h2>
+            <div class="muted" id="serviceCenterCounter">—</div>
+          </div>
+          <div class="serviceList" id="serviceCenterList"></div>
         </div>
       </div>
     </div>
@@ -1602,11 +1692,23 @@
             </div>
           </section>
 
+          <div class="formBlock">
+            <label>Szukaj</label>
+            <input id="costSearch" type="search" placeholder="Tytuł, notatka, pojazd, rejestracja">
+          </div>
+
           <div class="fieldGrid">
+            <div>
+              <label>Pojazd</label>
+              <select id="costFilterVehicle"></select>
+            </div>
             <div>
               <label>Rok</label>
               <select id="costFilterYear"></select>
             </div>
+          </div>
+
+          <div class="fieldGrid single">
             <div>
               <label>Kategoria</label>
               <select id="costFilterCategory">
@@ -1624,6 +1726,8 @@
               </select>
             </div>
           </div>
+
+          <div class="filterSummary" id="costsActiveFilters">Bez dodatkowych filtrów</div>
 
           <div class="miniActions">
             <button class="tonal" id="costsExportCsv" type="button">Eksportuj widoczne CSV</button>
@@ -1686,7 +1790,7 @@
             <div class="historyItem">
               <div class="stripe"></div>
               <div>
-                <div class="historyTitle">Mój garaż 1.2</div>
+                <div class="historyTitle">Mój garaż 1.3</div>
                 <div class="historyMeta">Dane są zapisywane lokalnie w przeglądarce przez localStorage.</div>
               </div>
             </div>
@@ -1722,7 +1826,8 @@
 
 <script>
 (() => {
-  const APP_VERSION = "1.2";
+  const APP_VERSION = "1.3";
+  const SCHEMA_VERSION = 2;
   const STORAGE_KEY = "moj_garaz_pwa_v1";
 
   const $ = (id) => document.getElementById(id);
@@ -1783,14 +1888,19 @@
   };
 
   let scrollYBeforeLock = 0;
+  let scrollLockDepth = 0;
 
   function lockScroll(){
+    scrollLockDepth++;
+    if (scrollLockDepth > 1) return;
     scrollYBeforeLock = window.scrollY || 0;
     document.body.classList.add("scroll-locked");
     document.body.style.top = `-${scrollYBeforeLock}px`;
   }
 
   function unlockScroll(){
+    scrollLockDepth = Math.max(0, scrollLockDepth - 1);
+    if (scrollLockDepth > 0) return;
     document.body.classList.remove("scroll-locked");
     document.body.style.top = "";
     window.scrollTo(0, scrollYBeforeLock || 0);
@@ -1806,13 +1916,14 @@
   function createEmptyDb(){
     return {
       version: APP_VERSION,
+      schemaVersion: SCHEMA_VERSION,
       vehicles: [],
       settings: {}
     };
   }
 
   function normalizeVehicle(v){
-    return {
+    const vehicle = {
       id: v.id || uid("veh"),
       name: v.name || "Pojazd",
       type: v.type || "car",
@@ -1826,6 +1937,14 @@
       services: Array.isArray(v.services) ? v.services.map(normalizeService) : [],
       expenses: Array.isArray(v.expenses) ? v.expenses.map(normalizeExpense) : []
     };
+
+    for (const service of vehicle.services) {
+      if (!service.linkedExpenseId) continue;
+      const expense = vehicle.expenses.find(e => e.id === service.linkedExpenseId);
+      if (expense && !expense.serviceId) expense.serviceId = service.id;
+    }
+
+    return vehicle;
   }
 
   function normalizeService(s){
@@ -1877,6 +1996,7 @@
 
       return {
         version: parsed.version || APP_VERSION,
+        schemaVersion: parsed.schemaVersion || 1,
         settings: parsed.settings || {},
         vehicles: parsed.vehicles.map(normalizeVehicle)
       };
@@ -1896,6 +2016,7 @@
 
   function saveDb(){
     db.version = APP_VERSION;
+    db.schemaVersion = SCHEMA_VERSION;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
   }
 
@@ -1928,7 +2049,7 @@
     if (typeof dlg.close === "function") dlg.close();
     else dlg.removeAttribute("open");
     unlockScroll();
-    setSystemBars("#eef1f6");
+    setSystemBars(scrollLockDepth > 0 ? "#ffffff" : "#eef1f6");
   }
 
   function closeAnyDialogOnCancel(id, closeFn){
@@ -1939,9 +2060,11 @@
       closeFn ? closeFn() : closeDialog(id);
     });
     dlg.addEventListener("close", () => {
-      document.body.classList.remove("scroll-locked");
-      document.body.style.top = "";
-      setSystemBars("#eef1f6");
+      if (scrollLockDepth <= 0) {
+        document.body.classList.remove("scroll-locked");
+        document.body.style.top = "";
+      }
+      setSystemBars(scrollLockDepth > 0 ? "#ffffff" : "#eef1f6");
     });
   }
 
@@ -2017,17 +2140,21 @@
     const warningDays = Number(service.warningDays ?? 30);
 
     let kmLeft = null;
+    let nextMileage = null;
     let daysLeft = null;
     let nextDate = "";
 
-    if (intervalKm > 0) kmLeft = (lastMileage + intervalKm) - currentMileage;
+    if (intervalKm > 0) {
+      nextMileage = lastMileage + intervalKm;
+      kmLeft = nextMileage - currentMileage;
+    }
     if (intervalMonths > 0 && service.lastDate) {
       nextDate = addMonthsISO(service.lastDate, intervalMonths);
       daysLeft = daysBetween(todayISO(), nextDate);
     }
 
     let level = "ok";
-    if ((kmLeft !== null && kmLeft < 0) || (daysLeft !== null && daysLeft < 0)) level = "bad";
+    if ((kmLeft !== null && kmLeft <= 0) || (daysLeft !== null && daysLeft <= 0)) level = "bad";
     else if ((kmLeft !== null && kmLeft <= warningKm) || (daysLeft !== null && daysLeft <= warningDays)) level = "warn";
 
     let label = "OK";
@@ -2035,15 +2162,29 @@
     if (level === "bad") label = "Pilne";
 
     const parts = [];
-    if (kmLeft !== null) parts.push(kmLeft >= 0 ? `zostało ${fmtKm(kmLeft)}` : `po terminie ${fmtKm(Math.abs(kmLeft))}`);
-    if (daysLeft !== null) parts.push(daysLeft >= 0 ? `zostało ${daysLeft} dni` : `po terminie ${Math.abs(daysLeft)} dni`);
+    if (kmLeft !== null) {
+      if (kmLeft > 0) parts.push(`zostało ${fmtKm(kmLeft)}`);
+      else if (kmLeft === 0) parts.push("do zrobienia teraz");
+      else parts.push(`po terminie ${fmtKm(Math.abs(kmLeft))}`);
+    }
+    if (daysLeft !== null) {
+      if (daysLeft > 0) parts.push(`zostało ${daysLeft} dni`);
+      else if (daysLeft === 0) parts.push("termin dzisiaj");
+      else parts.push(`po terminie ${Math.abs(daysLeft)} dni`);
+    }
+
+    const nextParts = [];
+    if (nextMileage !== null) nextParts.push(`przy ${fmtKm(nextMileage)}`);
+    if (nextDate) nextParts.push(`do ${fmtDate(nextDate)}`);
 
     return {
       level,
       label,
       kmLeft,
+      nextMileage,
       daysLeft,
       nextDate,
+      nextText: nextParts.join(" · "),
       text: parts.length ? parts.join(" · ") : "brak interwału"
     };
   }
@@ -2111,15 +2252,63 @@
     return items.sort((a,b) => String(b.expense.date || "").localeCompare(String(a.expense.date || "")));
   }
 
+  function getAllServiceItems(){
+    const items = [];
+    for (const v of db.vehicles) {
+      for (const s of v.services || []) {
+        items.push({vehicle:v,service:s,status:serviceStatus(v,s)});
+      }
+    }
+
+    return items.sort((a,b) => {
+      const order = {bad:0,warn:1,ok:2};
+      const levelDiff = order[a.status.level] - order[b.status.level];
+      if (levelDiff) return levelDiff;
+
+      const ak = Math.min(a.status.kmLeft ?? 999999, (a.status.daysLeft ?? 999999) * 50);
+      const bk = Math.min(b.status.kmLeft ?? 999999, (b.status.daysLeft ?? 999999) * 50);
+      return ak - bk;
+    });
+  }
+
+  function findServiceByExpenseId(vehicle, expenseId){
+    return (vehicle?.services || []).find(s => s.linkedExpenseId === expenseId) || null;
+  }
+
+  function syncLinkedServiceFromExpense(vehicle, expense){
+    if (!vehicle || !expense) return;
+    const service = (vehicle.services || []).find(s => s.id === expense.serviceId) || findServiceByExpenseId(vehicle, expense.id);
+    if (!service) return;
+
+    expense.serviceId = service.id;
+    service.lastMileage = expense.mileage;
+    service.lastDate = expense.date;
+    service.partsCost = expense.partsCost;
+    service.laborCost = expense.laborCost;
+    service.otherCost = expense.otherCost;
+    service.linkedExpenseId = expense.id;
+  }
+
   function getFilteredExpenseItems(){
     const year = $("costFilterYear")?.value || "all";
+    const vehicleId = $("costFilterVehicle")?.value || "all";
     const category = $("costFilterCategory")?.value || "all";
+    const query = ($("costSearch")?.value || "").trim().toLowerCase();
 
     return getAllExpenseItems().filter(item => {
       const e = item.expense;
+      const haystack = [
+        item.vehicle.name,
+        item.vehicle.plate,
+        e.title,
+        e.category,
+        e.note
+      ].join(" ").toLowerCase();
       const okYear = year === "all" || String(e.date || "").startsWith(year + "-");
+      const okVehicle = vehicleId === "all" || item.vehicle.id === vehicleId;
       const okCategory = category === "all" || e.category === category;
-      return okYear && okCategory;
+      const okQuery = !query || haystack.includes(query);
+      return okYear && okVehicle && okCategory && okQuery;
     });
   }
 
@@ -2173,7 +2362,7 @@
             <div class="vehicleName">${escapeHtml(v.name)}</div>
             <div class="vehicleMeta">${escapeHtml(meta || "brak danych")}</div>
             <div class="vehicleNext">${escapeHtml(nextText)}</div>
-            <div class="heroMeta" style="margin-top:8px;">
+            <div class="heroMeta tight">
               <span class="chip ${stateClass}">${stateText}</span>
               <span class="chip purple">${fmtMoney(vehicleYearCost(v))} / rok</span>
             </div>
@@ -2250,6 +2439,7 @@
       const st = serviceStatus(v,s);
       const meta = [
         `ostatnio: ${fmtKm(s.lastMileage)} / ${fmtDate(s.lastDate)}`,
+        st.nextText ? `następnie: ${st.nextText}` : "",
         s.intervalKm ? `co ${fmtKm(s.intervalKm)}` : "",
         s.intervalMonths ? `co ${s.intervalMonths} mies.` : ""
       ].filter(Boolean).join(" · ");
@@ -2276,7 +2466,7 @@
         </div>
       `;
     }).join("") : `
-      <div class="emptyState" style="margin-top:0;">
+      <div class="emptyState compact">
         <h2>Brak interwałów</h2>
         <p>Dodaj np. olej silnikowy, rozrząd, płyn hamulcowy, filtr powietrza albo pasek CVT.</p>
         <button class="tonal" id="emptyServiceAdd" type="button">Dodaj interwał</button>
@@ -2300,11 +2490,12 @@
 
     const history = $("vehicleHistory");
     const expenses = [...(v.expenses || [])].sort((a,b) => String(b.date || "").localeCompare(String(a.date || "")));
+    const expenseItems = expenses.map(expense => ({vehicle:v,expense}));
 
     $("historyCounter").textContent = expenses.length ? `${expenses.length} wpisów` : "brak";
 
-    history.innerHTML = expenses.length ? expenses.map(e => renderExpenseItem(v,e,true)).join("") : `
-      <div class="emptyState" style="margin-top:0;">
+    history.innerHTML = expenses.length ? renderExpenseGroups(expenseItems,true) : `
+      <div class="emptyState compact">
         <h2>Brak kosztów</h2>
         <p>Dodaj naprawę, ubezpieczenie, przegląd albo zakup części. Tu zaczyna się historia utrzymania auta.</p>
         <button class="tonal" id="emptyCostAdd" type="button">Dodaj koszt</button>
@@ -2350,6 +2541,43 @@
     `;
   }
 
+  function expenseMonthKey(e){
+    const date = String(e.date || "");
+    return /^\d{4}-\d{2}/.test(date) ? date.slice(0,7) : "brak-daty";
+  }
+
+  function formatMonthKey(key){
+    if (key === "brak-daty") return "Bez daty";
+    const [year,month] = key.split("-").map(Number);
+    const d = new Date(year, month - 1, 1, 12);
+    if (Number.isNaN(d.getTime())) return key;
+    return new Intl.DateTimeFormat("pl-PL",{month:"long",year:"numeric"}).format(d);
+  }
+
+  function renderExpenseGroups(items, showActions){
+    const groups = new Map();
+    for (const item of items) {
+      const key = expenseMonthKey(item.expense);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(item);
+    }
+
+    return [...groups.entries()].map(([key,group]) => {
+      const total = group.reduce((sum,item) => sum + Number(item.expense.total || 0), 0);
+      return `
+        <section class="monthGroup">
+          <div class="monthHeader">
+            <strong>${escapeHtml(formatMonthKey(key))}</strong>
+            <span>${group.length} wpisów · ${fmtMoney(total)}</span>
+          </div>
+          <div class="historyList">
+            ${group.map(item => renderExpenseItem(item.vehicle,item.expense,showActions)).join("")}
+          </div>
+        </section>
+      `;
+    }).join("");
+  }
+
   function populateCostYearFilter(){
     const el = $("costFilterYear");
     if (!el) return;
@@ -2371,28 +2599,101 @@
     else el.value = String(nowYear());
   }
 
+  function populateCostVehicleFilter(){
+    const el = $("costFilterVehicle");
+    if (!el) return;
+
+    const current = el.value || "all";
+    el.innerHTML = `<option value="all">Wszystkie pojazdy</option>` + db.vehicles
+      .map(v => `<option value="${v.id}">${escapeHtml(v.name)}</option>`)
+      .join("");
+
+    if ([...el.options].some(o => o.value === current)) el.value = current;
+    else el.value = "all";
+  }
+
   function renderCostsPanel(){
     populateCostYearFilter();
+    populateCostVehicleFilter();
 
     const filtered = getFilteredExpenseItems();
     const all = getAllExpenseItems();
 
     const filteredTotal = filtered.reduce((sum,item) => sum + Number(item.expense.total || 0), 0);
     const allTotal = all.reduce((sum,item) => sum + Number(item.expense.total || 0), 0);
+    const activeFilters = [
+      $("costFilterYear")?.value && $("costFilterYear").value !== "all" ? `rok ${$("costFilterYear").value}` : "",
+      $("costFilterVehicle")?.value && $("costFilterVehicle").value !== "all" ? $("costFilterVehicle").selectedOptions[0]?.textContent : "",
+      $("costFilterCategory")?.value && $("costFilterCategory").value !== "all" ? $("costFilterCategory").selectedOptions[0]?.textContent : "",
+      $("costSearch")?.value ? `szukaj: ${$("costSearch").value}` : ""
+    ].filter(Boolean);
 
     $("costsYearHero").textContent = fmtMoney(filteredTotal);
     $("costsAllHero").textContent = `${fmtMoney(allTotal)} łącznie`;
     $("costsEntriesHero").textContent = `${filtered.length} wpisów`;
     $("costsFilterInfo").textContent = filtered.length ? `${filtered.length} wyników` : "brak wyników";
+    $("costsActiveFilters").textContent = activeFilters.length ? activeFilters.join(" · ") : "Bez dodatkowych filtrów";
 
     $("allCostsList").innerHTML = filtered.length
-      ? filtered.map(item => renderExpenseItem(item.vehicle,item.expense,false)).join("")
+      ? renderExpenseGroups(filtered,false)
       : `
-        <div class="emptyState" style="margin-top:0;">
+        <div class="emptyState compact">
           <h2>Brak kosztów</h2>
           <p>Nie ma wpisów dla wybranych filtrów. Zmień rok lub kategorię.</p>
         </div>
       `;
+  }
+
+  function renderServiceCenterPanel(){
+    const allServices = getAllServiceItems();
+    const urgent = allServices.filter(item => item.status.level === "bad").length;
+    const soon = allServices.filter(item => item.status.level === "warn").length;
+    const ok = allServices.filter(item => item.status.level === "ok").length;
+
+    $("serviceCenterUrgentHero").textContent = urgent;
+    $("serviceCenterSoonHero").textContent = `${soon} wkrótce`;
+    $("serviceCenterOkHero").textContent = `${ok} OK`;
+    $("serviceCenterCounter").textContent = allServices.length ? `${allServices.length} pozycji` : "brak";
+
+    $("serviceCenterList").innerHTML = allServices.length ? allServices.map(item => `
+      <div class="serviceItem">
+        <div class="stripe ${item.status.level}"></div>
+        <div>
+          <div class="itemTop">
+            <div class="itemTopText">
+              <div class="serviceTitle">${escapeHtml(item.service.name)}</div>
+              <div class="serviceMeta">${escapeHtml(item.vehicle.name)} · ${escapeHtml(item.status.text)}</div>
+              ${item.status.nextText ? `<div class="serviceMeta">następnie: ${escapeHtml(item.status.nextText)}</div>` : ""}
+              ${item.service.note ? `<div class="serviceMeta">${escapeHtml(item.service.note)}</div>` : ""}
+            </div>
+            <div class="serviceStatus ${item.status.level}">${item.status.label}</div>
+          </div>
+          <div class="itemActions">
+            <button class="tonal" type="button" data-center-complete="${item.service.id}" data-center-vehicle="${item.vehicle.id}">Wpisz wymianę</button>
+            <button class="text" type="button" data-center-open="${item.vehicle.id}">Pojazd</button>
+          </div>
+        </div>
+      </div>
+    `).join("") : `
+      <div class="emptyState compact">
+        <h2>Brak interwałów</h2>
+        <p>Dodaj interwały serwisowe przy pojazdach, a centrum pokaże rzeczy pilne i zbliżające się.</p>
+      </div>
+    `;
+
+    $("serviceCenterList").querySelectorAll("[data-center-complete]").forEach(btn => {
+      btn.onclick = () => {
+        closeDialog("serviceCenterPanel");
+        completeService(btn.dataset.centerVehicle, btn.dataset.centerComplete);
+      };
+    });
+
+    $("serviceCenterList").querySelectorAll("[data-center-open]").forEach(btn => {
+      btn.onclick = () => {
+        closeDialog("serviceCenterPanel");
+        openVehiclePanel(btn.dataset.centerOpen);
+      };
+    });
   }
 
   function renderStatsPanel(){
@@ -2403,21 +2704,7 @@
     $("statsCostYear").textContent = fmtMoney(summary.costYear);
     $("statsUrgent").textContent = summary.bad;
 
-    const allServices = [];
-    for (const v of db.vehicles) {
-      for (const s of v.services || []) {
-        const st = serviceStatus(v,s);
-        allServices.push({vehicle:v,service:s,status:st});
-      }
-    }
-
-    allServices.sort((a,b) => {
-      const order = {bad:0,warn:1,ok:2};
-      if (order[a.status.level] !== order[b.status.level]) return order[a.status.level] - order[b.status.level];
-      const ak = a.status.kmLeft ?? 999999;
-      const bk = b.status.kmLeft ?? 999999;
-      return ak - bk;
-    });
+    const allServices = getAllServiceItems();
 
     $("statsServiceList").innerHTML = allServices.length ? allServices.slice(0,12).map(item => `
       <div class="serviceItem">
@@ -2427,13 +2714,14 @@
             <div class="itemTopText">
               <div class="serviceTitle">${escapeHtml(item.service.name)}</div>
               <div class="serviceMeta">${escapeHtml(item.vehicle.name)} · ${escapeHtml(item.status.text)}</div>
+              ${item.status.nextText ? `<div class="serviceMeta">następnie: ${escapeHtml(item.status.nextText)}</div>` : ""}
             </div>
             <div class="serviceStatus ${item.status.level}">${item.status.label}</div>
           </div>
         </div>
       </div>
     `).join("") : `
-      <div class="emptyState" style="margin-top:0;">
+      <div class="emptyState compact">
         <h2>Brak serwisów</h2>
         <p>Po dodaniu interwałów pojawi się tutaj lista najbliższych wymian.</p>
       </div>
@@ -2444,6 +2732,7 @@
     const active = getActiveVehicle();
 
     if (activeVehicleId && $("vehiclePanel").open && active) renderVehiclePanel(active);
+    if ($("serviceCenterPanel").open) renderServiceCenterPanel();
     if ($("costsPanel").open) renderCostsPanel();
     if ($("statsPanel").open) renderStatsPanel();
   }
@@ -2572,6 +2861,7 @@
     $("serviceFormTitle").textContent = "Dodaj interwał serwisowy";
     renderVehicleSelects();
 
+    $("serviceVehicle").disabled = false;
     $("serviceVehicle").value = vehicleId || activeVehicleId || (db.vehicles[0]?.id || "");
     const v = getVehicle($("serviceVehicle").value);
 
@@ -2605,6 +2895,7 @@
       editingServiceId = serviceId;
       $("serviceFormTitle").textContent = "Edytuj interwał";
       $("serviceVehicle").value = v.id;
+      $("serviceVehicle").disabled = true;
       $("serviceName").value = s.name || "";
       $("serviceCategory").value = s.category || "inne";
       $("serviceLastMileage").value = s.lastMileage || "";
@@ -2712,6 +3003,7 @@
     $("expenseFormTitle").textContent = "Dodaj koszt";
     renderVehicleSelects();
 
+    $("expenseVehicle").disabled = false;
     $("expenseVehicle").value = vehicleId || activeVehicleId || (db.vehicles[0]?.id || "");
     const v = getVehicle($("expenseVehicle").value);
 
@@ -2744,6 +3036,7 @@
 
       $("expenseFormTitle").textContent = "Edytuj koszt";
       $("expenseVehicle").value = v.id;
+      $("expenseVehicle").disabled = true;
       $("expenseDate").value = e.date || todayISO();
       $("expenseMileage").value = e.mileage || "";
       $("expenseCategory").value = e.category || "inne";
@@ -2795,6 +3088,7 @@
       const e = vehicle.expenses.find(x => x.id === editingExpenseId);
       if (!e) return;
       Object.assign(e,data);
+      syncLinkedServiceFromExpense(vehicle,e);
       setStatus(`Zapisano koszt: ${fmtMoney(total)}.`);
     } else {
       const expense = {
@@ -2846,6 +3140,7 @@
 
     $("expenseFormTitle").textContent = "Wpisz wykonaną wymianę";
     $("expenseVehicle").value = v.id;
+    $("expenseVehicle").disabled = true;
     $("expenseDate").value = todayISO();
     $("expenseMileage").value = v.mileage || s.lastMileage || "";
     $("expenseCategory").value = "serwis";
@@ -2910,7 +3205,18 @@
   }
 
   function exportBackup(){
-    const data = JSON.stringify(db, null, 2);
+    const backup = {
+      ...db,
+      version: APP_VERSION,
+      schemaVersion: SCHEMA_VERSION,
+      exportedAt: new Date().toISOString(),
+      summary: {
+        vehicles: db.vehicles.length,
+        services: db.vehicles.reduce((sum,v) => sum + (v.services || []).length, 0),
+        expenses: db.vehicles.reduce((sum,v) => sum + (v.expenses || []).length, 0)
+      }
+    };
+    const data = JSON.stringify(backup, null, 2);
     const blob = new Blob([data], {type:"application/json"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -2937,8 +3243,14 @@
     }
 
     const header = [
+      "ID pojazdu",
       "Pojazd",
+      "Rejestracja",
+      "ID kosztu",
+      "ID serwisu",
       "Data",
+      "Rok",
+      "Miesiąc",
       "Przebieg",
       "Kategoria",
       "Tytuł",
@@ -2952,9 +3264,17 @@
     const rows = items.map(item => {
       const v = item.vehicle;
       const e = item.expense;
+      const year = String(e.date || "").slice(0,4);
+      const month = String(e.date || "").slice(5,7);
       return [
+        v.id,
         v.name,
+        v.plate || "",
+        e.id,
+        e.serviceId || "",
         e.date,
+        /^\d{4}$/.test(year) ? year : "",
+        /^\d{2}$/.test(month) ? month : "",
         e.mileage,
         e.category,
         e.title,
@@ -2997,6 +3317,7 @@
 
         db = {
           version: APP_VERSION,
+          schemaVersion: parsed.schemaVersion || 1,
           settings: parsed.settings || {},
           vehicles: parsed.vehicles.map(normalizeVehicle)
         };
@@ -3008,6 +3329,8 @@
       } catch(err) {
         notify("Nie udało się wczytać pliku JSON.");
         haptic.warning();
+      } finally {
+        $("restoreFile").value = "";
       }
     };
     reader.readAsText(file);
@@ -3172,6 +3495,12 @@
       openDialog("costsPanel");
     };
 
+    $("drawerServiceCenter").onclick = () => {
+      closeDrawer();
+      renderServiceCenterPanel();
+      openDialog("serviceCenterPanel");
+    };
+
     $("drawerStats").onclick = () => {
       closeDrawer();
       renderStatsPanel();
@@ -3217,6 +3546,7 @@
     $("expenseClose").onclick = () => closeDialog("expensePanel");
     $("expenseSave").onclick = saveExpense;
 
+    $("serviceCenterClose").onclick = () => closeDialog("serviceCenterPanel");
     $("costsClose").onclick = () => closeDialog("costsPanel");
     $("statsClose").onclick = () => closeDialog("statsPanel");
     $("infoClose").onclick = () => closeDialog("infoPanel");
@@ -3250,6 +3580,8 @@
       expenseTotalEditedByUser = $("expenseTotal").value.trim() !== "";
     });
 
+    $("costSearch").addEventListener("input", renderCostsPanel);
+    $("costFilterVehicle").addEventListener("change", renderCostsPanel);
     $("costFilterYear").addEventListener("change", renderCostsPanel);
     $("costFilterCategory").addEventListener("change", renderCostsPanel);
 
@@ -3260,6 +3592,8 @@
     };
 
     $("costsClearFilters").onclick = () => {
+      $("costSearch").value = "";
+      $("costFilterVehicle").value = "all";
       $("costFilterYear").value = String(nowYear());
       $("costFilterCategory").value = "all";
       renderCostsPanel();
@@ -3270,6 +3604,7 @@
     closeAnyDialogOnCancel("mileagePanel");
     closeAnyDialogOnCancel("servicePanel");
     closeAnyDialogOnCancel("expensePanel");
+    closeAnyDialogOnCancel("serviceCenterPanel");
     closeAnyDialogOnCancel("costsPanel");
     closeAnyDialogOnCancel("statsPanel");
     closeAnyDialogOnCancel("infoPanel");
@@ -3279,6 +3614,7 @@
   setupEvents();
 
   populateCostYearFilter();
+  populateCostVehicleFilter();
   activeVehicleId = db.vehicles[0]?.id || "";
   renderAll();
 
