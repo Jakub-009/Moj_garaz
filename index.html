@@ -3,23 +3,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-  <meta name="theme-color" content="#f4f6fa">
+  <meta name="theme-color" content="#f3f4f7">
   <meta name="color-scheme" content="light">
   <title>Czas pracy</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <style>
-    /* 1. Kolory, rytm, typografia — jeden system komponentów One UI. */
+    /* 1. Wspólne kolory, typografia i komponenty One UI. */
     :root {
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       color-scheme: light;
-      --bg: #f4f6fa;
-      --surface: #fff;
-      --surface-alt: #f9fafe;
-      --ink: #171b26;
-      --muted: #697384;
-      --line: #e5e9f1;
-      --blue: #2868d6;
-      --blue-soft: #e8f0ff;
+      --bg: #f3f4f7;
+      --surface: #ffffff;
+      --surface-alt: #eef1f6;
+      --ink: #171b24;
+      --muted: #606878;
+      --line: #e1e5ec;
+      --blue: #1565d8;
+      --blue-soft: #eaf2ff;
       --green: #21804b;
       --green-soft: #e7f6ec;
       --purple: #7b54b7;
@@ -28,9 +28,17 @@
       --red-soft: #ffece9;
       --yellow: #ab790a;
       --yellow-soft: #fff6dc;
+      --neutral-soft: #eff1f5;
+      --neutral-ink: #545c6b;
+      --blue-ink: #194f9e;
+      --green-ink: #146339;
+      --purple-ink: #61408f;
+      --red-ink: #a52e2c;
+      --yellow-ink: #79580b;
       --radius-lg: 24px;
       --radius-md: 18px;
-      --radius-sm: 13px;
+      --radius-sm: 14px;
+      --radius-pill: 999px;
       --shadow: 0 3px 18px rgb(27 44 80 / 5%);
       --ease: cubic-bezier(.2,.8,.2,1);
       --speed: 190ms;
@@ -54,16 +62,16 @@
     .header-left { flex: 1; }
     .header-title { font-size: clamp(20px, 5.5vw, 26px); letter-spacing: -.04em; font-weight: 720; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .icon-btn { display: inline-grid; place-items: center; flex: 0 0 auto; border: 0; border-radius: 50%; background: transparent; color: var(--ink); width: 44px; height: 44px; padding: 0; }
-    .btn { border: 0; background: var(--blue); color: #fff; min-height: 44px; padding: 11px 18px; border-radius: 16px; font-weight: 660; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: transform var(--speed) var(--ease), background var(--speed) var(--ease); text-align: center; }
-    .btn:active, .icon-btn:active, .day-cell:active, .event:active, .nav-item:active { transform: scale(.975); }
-    .btn.secondary { background: var(--blue-soft); color: #1b56ad; }
-    .btn.ghost { background: #eef1f6; color: #354154; }
-    .btn.danger { background: var(--red-soft); color: #a02a29; }
-    .btn.small { min-height: 38px; padding: 8px 12px; border-radius: 13px; font-size: 13px; }
+    .btn { border: 0; background: var(--blue); color: #fff; min-height: 46px; padding: 11px 18px; border-radius: var(--radius-pill); font-weight: 660; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: transform var(--speed) var(--ease), background var(--speed) var(--ease); text-align: center; }
+    .btn:active, .icon-btn:active, .day-cell:active, .event:active, .nav-item:active, .quick-chip:active { transform: scale(.975); }
+    .btn.secondary { background: var(--blue-soft); color: var(--blue); }
+    .btn.ghost { background: var(--surface-alt); color: var(--ink); }
+    .btn.danger { background: var(--red-soft); color: var(--red-ink); }
+    .btn.small { min-height: 38px; padding: 8px 13px; font-size: 13px; }
     .btn.wide { width: 100%; }
     .btn-row { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
     .btn-row > .btn { flex: 1 1 auto; }
-    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+    .panel { background: var(--surface); border: 0; border-radius: var(--radius-lg); box-shadow: var(--shadow); min-width: 0; }
     .space-bottom { margin-bottom: 13px; }
     .eyebrow { color: var(--muted); font-size: 12px; font-weight: 660; margin-bottom: 5px; }
     .section-title { margin: 0 0 12px; font-size: 17px; font-weight: 700; letter-spacing: -.02em; }
@@ -72,7 +80,7 @@
     @keyframes appear { from { opacity: .5; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
     /* 2. Kalendarz miesięczny — stałe wymiary komórek niezależnie od liczby wpisów. */
-    .month-head { display: flex; align-items: center; gap: 4px; padding: 4px 2px 14px; }
+    .month-head { display: flex; align-items: center; gap: 4px; padding: 8px 2px 14px; }
     .month-label { flex: 1; min-width: 0; border: 0; background: none; color: var(--ink); font-size: clamp(19px,5vw,24px); font-weight: 735; letter-spacing: -.04em; text-align: left; padding: 8px 7px; border-radius: 12px; }
     .month-label .icon { vertical-align: middle; margin-left: 5px; }
     .calendar-panel { padding: 12px 6px 14px; }
@@ -80,9 +88,9 @@
     .weekday-row { margin-bottom: 8px; }
     .weekday-row span { text-align: center; padding: 5px 0; color: var(--muted); font-size: 12px; font-weight: 665; }
     .weekday-row span:last-child { color: var(--red); }
-    .day-cell { aspect-ratio: 1 / .98; min-height: 43px; padding: 5px 1px 4px; display: flex; flex-direction: column; gap: 3px; align-items: center; justify-content: flex-start; position: relative; border: 1px solid transparent; border-radius: 15px; background: transparent; color: var(--ink); transition: background var(--speed) var(--ease), transform var(--speed) var(--ease); }
+    .day-cell { aspect-ratio: 1 / .98; min-height: 43px; padding: 5px 1px 4px; display: flex; flex-direction: column; gap: 3px; align-items: center; justify-content: flex-start; position: relative; border: 1px solid transparent; border-radius: var(--radius-sm); background: transparent; color: var(--ink); transition: background var(--speed) var(--ease), transform var(--speed) var(--ease); }
     .day-cell.outside { opacity: .28; }
-    .day-cell.selected { background: var(--blue-soft); border-color: #c7daff; }
+    .day-cell.selected { background: var(--blue-soft); border-color: var(--blue); }
     .day-cell.holiday .day-number, .day-cell.sunday .day-number { color: var(--red); }
     .day-number { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; font-size: 13px; font-weight: 680; line-height: 1; }
     .day-cell.today .day-number { background: var(--blue); color: white; }
@@ -100,33 +108,34 @@
     .preview-top { display: flex; align-items: flex-start; gap: 10px; justify-content: space-between; }
     .preview-top h2 { margin: 0; font-size: 19px; letter-spacing: -.03em; font-weight: 750; }
     .preview-content { margin: 14px 0 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-    .tag { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; min-height: 30px; border-radius: 12px; font-size: 12px; font-weight: 660; line-height: 1.25; overflow-wrap: anywhere; }
-    .tag.work { background: var(--green-soft); color: #146339; }
-    .tag.paid { background: var(--blue-soft); color: #194f9e; }
-    .tag.unpaid { background: var(--purple-soft); color: #61408f; }
-    .tag.sick { background: var(--red-soft); color: #a52e2c; }
-    .tag.note { background: var(--yellow-soft); color: #79580b; }
-    .tag.holiday { background: #f1f2f5; color: #545c6b; }
+    .tag { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; min-height: 30px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 660; line-height: 1.25; overflow-wrap: anywhere; }
+    .tag.work { background: var(--green-soft); color: var(--green-ink); }
+    .tag.paid { background: var(--blue-soft); color: var(--blue-ink); }
+    .tag.unpaid { background: var(--purple-soft); color: var(--purple-ink); }
+    .tag.sick { background: var(--red-soft); color: var(--red-ink); }
+    .tag.note { background: var(--yellow-soft); color: var(--yellow-ink); }
+    .tag.holiday { background: var(--neutral-soft); color: var(--neutral-ink); }
     .quick-area { border-top: 1px solid var(--line); margin-top: 13px; padding-top: 12px; }
     .quick-row { display: flex; flex-wrap: wrap; gap: 7px; }
-    .quick-chip { min-height: 35px; border: 0; padding: 8px 12px; background: #edf4ff; color: #245eaf; border-radius: 999px; font-size: 12px; font-weight: 690; }
+    .quick-chip { min-height: 44px; border: 0; padding: 9px 14px; background: var(--blue-soft); color: var(--blue); border-radius: var(--radius-pill); font-size: 13px; font-weight: 660; }
     .inline-action { color: var(--blue); border: 0; background: none; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; font-size: 13px; font-weight: 730; white-space: nowrap; }
     .stats-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
-    .stat-tile { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); border-radius: var(--radius-md); padding: 14px; min-width: 0; }
-    .stat-tile strong { display: block; font-size: clamp(17px,5vw,23px); letter-spacing: -.03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stats-panel { padding: 12px; }
+    .stat-tile { background: var(--surface-alt); border-radius: var(--radius-md); padding: 14px; min-width: 0; }
+    .stat-tile strong { display: block; font-size: clamp(17px,5vw,23px); letter-spacing: -.03em; overflow-wrap: anywhere; }
     .stat-tile span { display: block; color: var(--muted); font-size: 12px; margin-top: 6px; line-height: 1.3; }
     .event-list { display: flex; flex-direction: column; gap: 9px; }
-    .event { width: 100%; border: 0; border-left: 4px solid; border-radius: 14px; display: flex; align-items: center; gap: 10px; padding: 12px 12px; text-align: left; color: var(--ink); }
+    .event { width: 100%; border: 0; border-left: 3px solid; border-radius: var(--radius-sm); display: flex; align-items: center; gap: 10px; padding: 13px 14px; text-align: left; color: var(--ink); }
     .event.work { background: var(--green-soft); border-color: var(--green); }
     .event.paid { background: var(--blue-soft); border-color: var(--blue); }
     .event.unpaid { background: var(--purple-soft); border-color: var(--purple); }
     .event.sick { background: var(--red-soft); border-color: var(--red); }
     .event.note { background: var(--yellow-soft); border-color: var(--yellow); }
-    .event.holiday { background: #eff1f5; border-color: #8895a6; }
+    .event.holiday { background: var(--neutral-soft); border-color: var(--muted); }
     .event .event-text { flex: 1; min-width: 0; }
     .event strong, .event small { display: block; white-space: normal; overflow-wrap: anywhere; }
     .event strong { font-size: 14px; }
-    .event small { color: #596275; margin-top: 4px; font-size: 12px; line-height: 1.35; }
+    .event small { color: var(--muted); margin-top: 4px; font-size: 12px; line-height: 1.35; }
     .day-hero { margin: 4px 0 13px; padding: 17px; }
     .day-hero strong { font-size: 35px; display: block; letter-spacing: -.06em; }
     .day-hero span { font-size: 13px; color: var(--muted); }
@@ -135,20 +144,20 @@
     .date-nav strong { font-size: clamp(16px,5vw,21px); text-align: center; min-width: 0; }
     .fab { position: fixed; right: max(20px, calc((100vw - 835px)/2)); bottom: calc(20px + env(safe-area-inset-bottom)); width: 58px; height: 58px; border: 0; display: grid; place-items: center; border-radius: 22px; background: var(--blue); color: #fff; box-shadow: 0 7px 19px rgb(39 90 182 / 25%); z-index: 11; }
     .fab .icon { width: 28px; height: 28px; }
-    .fab-pop { position: fixed; z-index: 11; right: max(20px, calc((100vw - 835px)/2)); bottom: calc(86px + env(safe-area-inset-bottom)); width: min(235px, calc(100vw - 40px)); padding: 8px; border-radius: 20px; background: #fff; border: 1px solid var(--line); box-shadow: 0 11px 36px rgb(30 50 90 / 19%); display: grid; gap: 3px; }
+    .fab-pop { position: fixed; z-index: 11; right: max(20px, calc((100vw - 835px)/2)); bottom: calc(86px + env(safe-area-inset-bottom)); width: min(235px, calc(100vw - 40px)); padding: 8px; border-radius: 20px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 11px 36px rgb(30 50 90 / 19%); display: grid; gap: 3px; }
     .fab-pop button { display: flex; align-items: center; gap: 10px; min-height: 48px; width: 100%; border: 0; background: transparent; padding: 8px 10px; border-radius: 12px; text-align: left; color: var(--ink); font-weight: 620; }
 
     /* 4. Ekrany administracyjne i formularze. */
     .nav-list { overflow: hidden; }
-    .nav-item { width: 100%; min-height: 58px; border: 0; border-bottom: 1px solid var(--line); background: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 13px; text-align: left; color: var(--ink); font-weight: 630; }
+    .nav-item { width: 100%; min-height: 58px; border: 0; border-bottom: 1px solid var(--line); background: var(--surface); padding: 12px 16px; display: flex; align-items: center; gap: 13px; text-align: left; color: var(--ink); font-weight: 630; }
     .nav-item:last-child { border-bottom: 0; }
     .nav-item .leading-icon { color: var(--blue); background: var(--blue-soft); width: 37px; height: 37px; border-radius: 13px; display: grid; place-items: center; }
     .nav-item span:nth-child(2) { flex: 1; }
     .settings-panel { padding: 17px; }
     .field { display: block; margin: 0 0 13px; }
-    .field > span { display: block; color: #485366; font-size: 13px; font-weight: 670; margin-bottom: 7px; }
-    .field input:not([type=checkbox]), .field select, .field textarea, .fieldlike {
-      min-height: 48px; width: 100%; max-width: 100%; border: 1px solid #d5dce8; border-radius: 15px; background: #f7f9fc; padding: 11px 12px; color: var(--ink); outline-offset: 1px;
+    .field > span { display: block; color: var(--muted); font-size: 13px; font-weight: 670; margin-bottom: 7px; }
+    .field input:not([type=checkbox]), .field select, .field textarea {
+      min-height: 48px; width: 100%; max-width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-alt); padding: 11px 12px; color: var(--ink); outline-offset: 1px;
     }
     .field textarea { min-height: 110px; line-height: 1.48; resize: vertical; }
     .field-row { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
@@ -157,12 +166,10 @@
     .soft-divider { border: 0; border-top: 1px solid var(--line); margin: 17px 0; }
     .data-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px solid var(--line); }
     .data-row strong { flex: 1; min-width: 0; font-size: 14px; }
-    .note-box { background: var(--blue-soft); border-radius: 15px; padding: 12px; color: #30517e; font-size: 13px; line-height: 1.45; }
-    .stats-switch { display: flex; background: #e7ebf2; padding: 4px; border-radius: 16px; gap: 4px; margin-bottom: 13px; }
-    .stats-switch button { flex: 1; min-height: 40px; border: 0; background: transparent; border-radius: 12px; color: #586478; font-weight: 670; }
-    .stats-switch button.active { background: #fff; color: var(--blue); box-shadow: var(--shadow); }
+    .segment { display: flex; gap: 4px; margin-bottom: 13px; padding: 4px; border-radius: var(--radius-pill); background: var(--surface-alt); }
+    .segment button { flex: 1; min-width: 0; min-height: 44px; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--muted); padding: 8px; font-weight: 670; }
+    .segment button[aria-pressed="true"] { background: var(--surface); color: var(--blue); box-shadow: var(--shadow); }
     .stats-period { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 6px; margin-bottom: 14px; }
-    .stats-period strong { text-align: center; font-size: 19px; }
 
     /* 5. Jeden system modalny: formularze, potwierdzenie, import. */
     dialog { color: var(--ink); background: var(--surface); border: 0; box-shadow: 0 14px 45px rgb(16 31 59 / 24%); }
@@ -175,14 +182,17 @@
     .sheet-body .btn-row { margin-bottom: 4px; }
     .confirm-dialog { border-radius: 24px; margin: auto; width: min(420px, calc(100% - 28px)); max-width: calc(100vw - 28px); padding: 22px; }
     .confirm-dialog h2 { margin: 0 0 10px; font-size: 20px; }
-    .confirm-dialog p { white-space: pre-line; line-height: 1.5; color: #4f5b6b; font-size: 14px; }
-    .error-text { display: block; color: #a52e2c; font-size: 13px; margin: 10px 0; }
+    .confirm-dialog p { white-space: pre-line; line-height: 1.5; color: var(--muted); font-size: 14px; }
+    .error-text { display: block; color: var(--red-ink); font-size: 13px; margin: 10px 0; }
+    .sync-warning { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 14px 16px; margin-bottom: 13px; border-radius: var(--radius-md); background: var(--yellow-soft); color: var(--yellow-ink); font-size: 13px; }
+    .sync-warning span { flex: 1 1 210px; }
+    .sync-warning .btn { flex: 0 0 auto; }
     .toast { position: fixed; z-index: 30; left: 50%; transform: translate(-50%,-10px); top: calc(16px + env(safe-area-inset-top)); background: #27354d; color: #fff; padding: 12px 17px; border-radius: 15px; box-shadow: 0 6px 24px rgb(0 0 0 / 17%); font-size: 13px; width: max-content; max-width: min(530px, calc(100vw - 30px)); line-height: 1.4; opacity: 0; pointer-events: none; transition: opacity var(--speed) var(--ease), transform var(--speed) var(--ease); }
     .toast.show { opacity: 1; transform: translate(-50%,0); }
-    .import-summary { white-space: pre-wrap; font-size: 13px; background: var(--surface-alt); border: 1px solid var(--line); padding: 12px; border-radius: 13px; line-height: 1.55; margin-bottom: 12px; }
+    .import-summary { white-space: pre-wrap; font-size: 13px; background: var(--surface-alt); border: 1px solid var(--line); padding: 12px; border-radius: var(--radius-sm); line-height: 1.55; margin-bottom: 12px; }
     @media (max-width: 350px) { .app { padding-inline: 8px; } .calendar-panel { padding-inline: 2px; } .day-cell { min-height: 39px; border-radius: 12px; } .day-number { height: 24px; width: 24px; font-size: 12px; } .marker { width: 4px; height: 4px; } .preview-panel { padding: 12px; } .field-row { grid-template-columns: 1fr; } }
     @media (min-width: 620px) { .app { padding-inline: 28px; } .calendar-panel { padding-inline: 15px; } .day-cell { max-height: 76px; } .stats-grid { grid-template-columns: repeat(4,minmax(0,1fr)); } .sheet { margin: auto; max-height: 92dvh; border-radius: 26px; } .sheet-inner { max-height: 92dvh; } }
-    @media (hover: hover) and (pointer:fine) { .icon-btn:hover, .day-cell:hover, .month-label:hover { background: #e9eef7; } .btn:hover { filter: brightness(.97); } .quick-chip:hover { background: #d8e8ff; } .nav-item:hover, .fab-pop button:hover { background: #f6f8fb; } }
+    @media (hover: hover) and (pointer:fine) { .icon-btn:hover, .day-cell:hover, .month-label:hover { background: var(--blue-soft); } .btn:hover { filter: brightness(.97); } .quick-chip:hover { filter: brightness(.96); } .nav-item:hover, .fab-pop button:hover { background: var(--surface-alt); } }
     @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration: .01ms; transition-duration: .01ms; scroll-behavior: auto; } }
   </style>
 </head>
@@ -218,6 +228,7 @@
         <button id="menuBtn" class="icon-btn" type="button" title="Więcej" aria-label="Więcej"><svg class="icon"><use href="#i-more"/></svg></button>
       </div>
     </header>
+    <aside id="syncWarning" class="sync-warning" role="alert" hidden><span>Nowa baza została zmieniona w innej karcie. Bieżący formularz pozostaje bez zmian, ale zapis jest wstrzymany do odświeżenia danych.</span><button id="syncReload" class="btn secondary small" type="button">Wczytaj aktualne dane</button></aside>
 
     <main id="main">
       <section id="homeScreen" class="screen" aria-label="Kalendarz">
@@ -241,7 +252,7 @@
         </section>
         <section aria-label="Podsumowanie miesiąca">
           <h2 class="section-title">W tym miesiącu</h2>
-          <div id="homeStats" class="stats-grid"></div>
+          <div id="homeStats" class="panel stats-panel stats-grid"></div>
         </section>
       </section>
 
@@ -257,9 +268,9 @@
       </section>
 
       <section id="statsScreen" class="screen" hidden aria-label="Statystyki">
-        <div class="stats-switch" role="group" aria-label="Zakres statystyk"><button id="statsMonthly" type="button">Miesiąc</button><button id="statsYearly" type="button">Rok</button></div>
+        <div class="segment" role="group" aria-label="Zakres statystyk"><button id="statsMonthly" type="button" aria-pressed="true">Miesiąc</button><button id="statsYearly" type="button" aria-pressed="false">Rok</button></div>
         <div class="stats-period"><button id="statsPrev" class="icon-btn" type="button" aria-label="Poprzedni okres"><svg class="icon"><use href="#i-back"/></svg></button><button id="statsPeriodTitle" class="month-label" type="button" style="text-align:center" aria-label="Wybierz okres statystyk"></button><button id="statsNext" class="icon-btn" type="button" aria-label="Następny okres"><svg class="icon"><use href="#i-next"/></svg></button></div>
-        <input id="statsMonthPicker" class="sr-only" type="month" aria-label="Wybierz miesiąc lub rok statystyk" tabindex="-1"><div id="statsGrid" class="stats-grid space-bottom"></div>
+        <input id="statsMonthPicker" class="sr-only" type="month" aria-label="Wybierz miesiąc lub rok statystyk" tabindex="-1"><div id="statsGrid" class="panel stats-panel stats-grid space-bottom"></div>
         <div class="panel settings-panel"><p class="help">Raport PDF zachowuje układ i tabelę znane z poprzedniej aplikacji.</p><button id="reportBtn" class="btn wide" type="button"><svg class="icon"><use href="#i-download"/></svg> Raport miesięczny PDF</button><div id="yearReportNote" class="help" hidden>W widoku rocznym raport dotyczy miesiąca wybranego w kalendarzu.</div></div>
       </section>
 
@@ -290,7 +301,7 @@
       </section>
 
       <section id="backupScreen" class="screen" hidden aria-label="Kopia i przywracanie">
-        <div class="panel settings-panel space-bottom"><h2 class="section-title">Kopia zapasowa</h2><p class="help">Pobierz pełną kopię wpisów i ustawień. Dane nowej wersji są odseparowane od poprzedniej aplikacji.</p><button id="exportBtn" class="btn wide" type="button"><svg class="icon"><use href="#i-download"/></svg> Pobierz kopię JSON</button><p id="lastBackupText" class="help"></p></div>
+        <div class="panel settings-panel space-bottom"><h2 class="section-title">Kopia zapasowa</h2><p class="help">Pobierz pełną kopię wpisów i ustawień. Dane nowej wersji są odseparowane od poprzedniej aplikacji.</p><button id="exportBtn" class="btn wide" type="button"><svg class="icon"><use href="#i-download"/></svg> Pobierz kopię JSON</button><button id="rawExportBtn" class="btn secondary wide" type="button" hidden>Pobierz surowe dane uszkodzonej bazy</button><p id="lastBackupText" class="help"></p></div>
         <div class="panel settings-panel"><h2 class="section-title">Przywróć lub scal</h2><p class="help">Wczytaj plik JSON z poprzedniej lub nowej wersji. Najpierw zobaczysz podgląd, liczbę duplikatów i konflikty. Nic nie zostanie zastąpione automatycznie.</p><button id="importBtn" class="btn secondary wide" type="button">Wybierz plik JSON</button><input id="importInput" type="file" accept=".json,application/json" hidden></div>
       </section>
 
@@ -313,7 +324,7 @@
   <script>
   "use strict";
   (() => {
-    /* 6. Model danych. Nie ma żadnego dostępu do produkcyjnego klucza. */
+    /* 6. Dane nowej aplikacji, normalizacja i pojedyncza kontrolowana ścieżka zapisu. */
     const STORAGE_KEY = "worktime_next_v1";
     const BACKUP_KEY = "worktime_next_last_backup_iso";
     const EMPTY = () => ({
@@ -355,6 +366,8 @@
     const clone = object => structuredClone(object);
     let db = EMPTY();
     let storageLocked = false;
+    let lastSavedRaw = null;
+    let storageConflict = false;
     let toastTimer = 0;
     let importData = null;
     const ui = { screen:"home", month:ym(todayISO()), selected:todayISO(), day:todayISO(), statsMode:"month", statsMonth:ym(todayISO()), statsYear:new Date().getFullYear(), overlay:"", form:null, draft:"", formInitialValues:"", settingsInitialValues:"", backupReminderShown:false };
@@ -440,8 +453,7 @@
           if (!shiftAbsRange(entry.date,start,end)) throw Error(`Błędny zakres ${entry.date}: ${shift.start}–${shift.end}.`);
           return {...shift,start,end};
         });
-        // Pusty leaveType nie może przesłonić historycznego vacation:true.
-        // Jawne unpaid/sick/paid ma pierwszeństwo nawet przy sprzecznym vacation.
+        // Jawny typ absencji jest nadrzędny; pusty historyczny typ z vacation:true oznacza płatny urlop.
         const leaveType=entry.leaveType==null || entry.leaveType===""
           ? (entry.vacation===true ? "paid" : "") : entry.leaveType;
         if (!["","paid","unpaid","sick"].includes(leaveType)) throw Error(`Nieznany rodzaj absencji ${entry.date}.`);
@@ -458,21 +470,37 @@
       return normalized;
     }
     function loadDatabase() {
+      let raw;
       try {
-        const text=localStorage.getItem(STORAGE_KEY);
-        return text===null ? EMPTY() : normalizeImported(JSON.parse(text));
+        raw=localStorage.getItem(STORAGE_KEY);
+        const loaded=raw===null ? EMPTY() : normalizeImported(JSON.parse(raw));
+        lastSavedRaw=raw;
+        storageLocked=false;
+        return loaded;
       } catch (error) {
+        // Capture the corrupted value only for explicit recovery; do not write during normalization.
+        if (raw!==undefined) lastSavedRaw=raw;
         storageLocked=true;
-        queueMicrotask(() => showConfirm({title:"Problem z danymi testowymi",message:`Nie mogę bezpiecznie odczytać nowej bazy (${error.message}). Zapis został wstrzymany, aby niczego nie nadpisać. Możesz wyeksportować surowy plik z narzędzi przeglądarki, zanim zdecydujesz się ją naprawiać.`,actions:[{text:"Rozumiem",value:"ok"}]}));
+        queueMicrotask(() => showConfirm({title:"Problem z bazą nowej aplikacji",message:`Nie można bezpiecznie odczytać bazy (${error.message}). Zapis jest wstrzymany. W ekranie kopii możesz pobrać jej surową zawartość. Nic nie zostało wyczyszczone.`,actions:[{text:"Rozumiem",value:"ok"}]}));
         return EMPTY();
       }
     }
-    function commit(next, success="Zapisano") {
-      if (storageLocked) { toast("Zapis wstrzymany: błędna baza. Nie nadpisuję jej."); return false; }
+    function markStorageConflict() {
+      storageConflict=true;
+      $("syncWarning").hidden=false;
+      toast("Dane zmieniły się w innej karcie. Nie nadpisuję nowszej kopii.");
+    }
+    function commit(next, success="Zapisano", allowLocked=false) {
+      if (storageLocked && !allowLocked) { toast("Zapis wstrzymany: błędna baza. Pobierz surowe dane."); return false; }
+      if (storageConflict) { markStorageConflict(); return false; }
       try {
+        if (localStorage.getItem(STORAGE_KEY)!==lastSavedRaw) { markStorageConflict(); return false; }
         const checked=normalizeImported(next);
-        localStorage.setItem(STORAGE_KEY,JSON.stringify(checked));
+        const raw=JSON.stringify(checked);
+        localStorage.setItem(STORAGE_KEY,raw);
         db=checked;
+        lastSavedRaw=raw;
+        storageLocked=false;
         if (success) toast(success);
         refreshAffectedViews();
         return true;
@@ -480,6 +508,19 @@
         toast(`Zmiany nie zostały zapisane: ${error.message}`);
         return false;
       }
+    }
+    function reloadChangedData() {
+      if (ui.overlay || hasUnsavedFormData()) {
+        toast("Najpierw zakończ edycję. Niezapisane pola nie zostaną odrzucone.");
+        return;
+      }
+      const fresh=loadDatabase();
+      if (storageLocked) return;
+      db=fresh;
+      storageConflict=false;
+      $("syncWarning").hidden=true;
+      setScreen(ui.screen);
+      toast("Wczytano aktualną bazę z tej przeglądarki.");
     }
     const emptyDay = date => ({date, note:"", shifts:[], vacation:false, leaveType:""});
     const getDay = date => db.entries.find(day => day.date===date) || null;
@@ -489,7 +530,8 @@
       return day;
     }
     function pruneDay(next,date) {
-      next.entries=next.entries.filter(day => day.date!==date || day.shifts.length || day.note.trim() || day.leaveType);
+      const usual=new Set(["date","shifts","note","vacation","leaveType"]);
+      next.entries=next.entries.filter(day => day.date!==date || day.shifts.length || day.note.trim() || day.leaveType || Object.keys(day).some(key=>!usual.has(key)));
     }
     const minutesBetween = (date,start,end) => {
       const range=shiftAbsRange(date,start,end);
@@ -497,7 +539,8 @@
     };
     const computeDayMinutes = day => (day?.shifts||[]).reduce((sum,shift) => sum+minutesBetween(day.date,shift.start,shift.end),0);
     const computeMonthMinutes = month => db.entries.filter(entry => ym(entry.date)===month).reduce((sum,entry) => sum+computeDayMinutes(entry),0);
-    function computeStats(monthOrYear, year=false, moneyRounding="month") {
+    const estimatedPay = minutes => round2(minutes / 60 * db.settings.rate);
+    function computeStats(monthOrYear, year=false) {
       const days=db.entries.filter(day => year ? Number(day.date.slice(0,4))===Number(monthOrYear) : ym(day.date)===monthOrYear);
       const totals={min:0,workDays:0,paid:0,unpaid:0,sick:0,notes:0,money:0};
       for (const day of days) {
@@ -509,10 +552,8 @@
       }
       if (year) for (let month=1;month<=12;month++) {
         const partial=db.entries.filter(d=>ym(d.date)===`${monthOrYear}-${pad2(month)}`).reduce((sum,d)=>sum+computeDayMinutes(d),0);
-        totals.money+=round2(partial/60*db.settings.rate);
-      } else totals.money=moneyRounding==="day"
-        ? days.reduce((sum,day)=>sum+round2(computeDayMinutes(day)/60*db.settings.rate),0)
-        : round2(totals.min/60*db.settings.rate);
+        totals.money+=estimatedPay(partial);
+      } else totals.money=estimatedPay(totals.min);
       return totals;
     }
     function computeLeaveBalance(year) {
@@ -570,6 +611,7 @@
       if (skipIndex>=0) day.shifts[skipIndex]={...day.shifts[skipIndex],start,end};
       else day.shifts.push({start,end});
       day.shifts.sort((a,b)=>a.start.localeCompare(b.start));
+      if (skipIndex<0) next.settings.lastShift={start,end};
       return commit(next,"Godziny zapisane");
     }
     function removeShift(date,index) {
@@ -719,11 +761,11 @@
     function renderStats() {
       const year=ui.statsMode==="year";
       const balance=computeLeaveBalance(year?ui.statsYear:Number(ui.statsMonth.slice(0,4)));
-      $("statsMonthly").classList.toggle("active",!year);
-      $("statsYearly").classList.toggle("active",year);
+      $("statsMonthly").setAttribute("aria-pressed",String(!year));
+      $("statsYearly").setAttribute("aria-pressed",String(year));
       $("statsPeriodTitle").textContent=(year?String(ui.statsYear):fmtMonthPL(ui.statsMonth))+" ⌄";
       $("statsMonthPicker").value=year?`${ui.statsYear}-01`:ui.statsMonth;
-      renderSummary("statsGrid",computeStats(year?ui.statsYear:ui.statsMonth,year,year?"month":"day"),true);
+      renderSummary("statsGrid",computeStats(year?ui.statsYear:ui.statsMonth,year),true);
       $("statsGrid").insertAdjacentHTML("beforeend",[
         statTile(balance.quota,"Roczny limit urlopu"),
         statTile(balance.used,"Wykorzystany urlop płatny (rok)"),
@@ -746,8 +788,11 @@
       ui.settingsInitialValues=snapshotInputs($("settingsScreen"));
     }
     function renderBackupInfo() {
-      const last=localStorage.getItem(BACKUP_KEY);
+      let last="";
+      try { last=localStorage.getItem(BACKUP_KEY); } catch { /* Database recovery remains accessible. */ }
       $("lastBackupText").textContent=last ? `Ostatnia próba pobrania: ${new Date(last).toLocaleString("pl-PL")}` : "Nie odnotowano pobrania kopii w nowej aplikacji.";
+      $("exportBtn").disabled=storageLocked;
+      $("rawExportBtn").hidden=!storageLocked;
     }
     function refreshAffectedViews() {
       if (ui.screen==="home") { renderCalendar();renderPreview();renderHomeStats(); }
@@ -961,7 +1006,7 @@
       $("formTitle").textContent=type;
       let content="";
       if (kind==="shift") {
-        const shift=day.shifts[edit] || db.settings.shiftTemplates[0] || {start:"06:00",end:"15:00"};
+        const shift=day.shifts[edit] || db.settings.lastShift || db.settings.shiftTemplates[0] || {start:"06:00",end:"15:00"};
         content=`<div class="eyebrow">${fmtDateLongPL(date)}</div><div class="field-row">${fieldTime("Od","formStart",shift.start)}${fieldTime("Do","formEnd",shift.end)}</div><p class="help">Możesz zapisać kilka niepokrywających się zakresów, również przez północ.</p><div class="btn-row"><button id="saveForm" type="button" class="btn">${edit>=0?"Zapisz zmiany":"Dodaj godziny"}</button>${edit>=0?'<button id="deleteForm" type="button" class="btn danger">Usuń zakres</button>':""}</div>`;
       } else if (kind==="leave") {
         const selectedType=day.leaveType||"paid";
@@ -969,7 +1014,7 @@
       } else if (kind==="note") {
         content=`<div class="eyebrow">${fmtDateLongPL(date)}</div><label class="field"><span>Treść notatki</span><textarea id="formNote" spellcheck="true" rows="5" placeholder="Wpisz notatkę...">${escapeHtml(day.note)}</textarea></label><p class="help">Notatka zapisze się dopiero po wybraniu przycisku poniżej.</p><div class="btn-row"><button id="saveForm" type="button" class="btn">Zapisz notatkę</button>${day.note?'<button id="deleteForm" type="button" class="btn danger">Usuń notatkę</button>':""}</div>`;
       } else if (kind==="bulk") {
-        content=`<label class="field"><span>Rodzaj wpisów</span><select id="bulkKind"><option value="hours">Godziny pracy</option><option value="leave">Urlop / L4</option></select></label><div class="field-row">${fieldDate("Od","formFrom",ui.selected)}${fieldDate("Do","formTo",ui.selected)}</div><div id="bulkFields"></div>${optionsHtml(currentRangeDefaults())}<p class="help">Konfliktujące godziny są pomijane i raportowane; istniejące notatki i inne wydarzenia pozostają bez zmian.</p><div class="btn-row"><button id="saveForm" type="button" class="btn">Wykonaj operację</button></div>`;
+        content=`<div class="segment" role="group" aria-label="Rodzaj wpisów zbiorczych"><button type="button" data-bulk-kind="hours" aria-pressed="true">Godziny pracy</button><button type="button" data-bulk-kind="leave" aria-pressed="false">Urlop / L4</button></div><input id="bulkKind" type="hidden" value="hours"><div class="field-row">${fieldDate("Od","formFrom",ui.selected)}${fieldDate("Do","formTo",ui.selected)}</div><div id="bulkFields"></div>${optionsHtml(currentRangeDefaults())}<p class="help">Konfliktujące godziny są pomijane i raportowane; istniejące notatki i inne wydarzenia pozostają bez zmian.</p><div class="btn-row"><button id="saveForm" type="button" class="btn">Wykonaj operację</button></div>`;
       }
       $("formBody").innerHTML=content+'<span id="formError" class="error-text" role="alert"></span>';
       if (kind==="bulk") renderBulkFields();
@@ -980,6 +1025,7 @@
     function renderBulkFields() {
       if (!$("bulkFields")) return;
       const kind=$("bulkKind").value;
+      $("formBody").querySelectorAll("[data-bulk-kind]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.bulkKind===kind)));
       $("bulkFields").innerHTML=kind==="hours" ? `<label class="field"><span>Operacja</span><select id="bulkMode"><option value="add">Dodaj wskazany zakres</option><option value="remove">Usuń wskazany zakres</option></select></label><div class="field-row">${fieldTime("Od godziny","formStart","06:00")}${fieldTime("Do godziny","formEnd","15:00")}</div>` : `<label class="field"><span>Operacja</span><select id="bulkMode"><option value="paid">Ustaw urlop płatny</option><option value="unpaid">Ustaw urlop bezpłatny</option><option value="sick">Ustaw L4</option><option value="remove">Usuń status absencji</option></select></label>`;
     }
     async function handleFormSave(deleting=false) {
@@ -1051,12 +1097,21 @@
     }
     function exportDatabase() {
       try {
+        if (storageLocked) throw Error("Baza jest uszkodzona. Pobierz jej surową zawartość zamiast pustej kopii.");
         download(`czas-pracy-kopia-${todayISO()}.json`,JSON.stringify(db,null,2),"application/json;charset=utf-8");
         // Kliknięcie łącza pobierania nie dowodzi, że system faktycznie zachował plik.
         toast("Zainicjowano pobieranie kopii. Sprawdź plik w folderze Pobrane.");
         try { localStorage.setItem(BACKUP_KEY,new Date().toISOString()); } catch { toast("Pobieranie uruchomione, lecz nie udało się zapisać daty przypomnienia."); }
         renderBackupInfo();
       } catch (error) { toast(`Nie udało się przygotować kopii: ${error.message}`); }
+    }
+    function exportRawDatabase() {
+      try {
+        const raw=localStorage.getItem(STORAGE_KEY);
+        if (raw===null) throw Error("Brak surowych danych pod kluczem nowej aplikacji.");
+        download(`czas-pracy-surowa-baza-${todayISO()}.txt`,raw,"text/plain;charset=utf-8");
+        toast("Rozpoczęto pobieranie surowej zawartości bazy. Sprawdź folder Pobrane.");
+      } catch (error) { toast(`Nie można pobrać surowej bazy: ${error.message}`); }
     }
     function analyzeMerge(imported) {
       const candidate=clone(db);
@@ -1119,14 +1174,8 @@
       if (!approved) return;
       let ok=false;
       if (mode==="replace") {
-        try {
-          // Wyraźnie potwierdzony import może zastąpić także uszkodzoną NOWĄ bazę.
-          const checked=normalizeImported(imported);
-          localStorage.setItem(STORAGE_KEY,JSON.stringify(checked));
-          db=checked;storageLocked=false;ok=true;
-          toast("Zastąpiono bazę danych z pliku JSON.");
-          refreshAffectedViews();
-        } catch (error) { toast(`Zastąpienie nieudane: ${error.message}`); }
+        // Explicitly approved recovery still checks that no other tab changed the raw database.
+        ok=commit(imported,"Zastąpiono bazę danych z pliku JSON.",true);
       } else ok=commit(analysis.candidate,"Scalono dane; zachowano istniejące konflikty.");
       if (ok) requestCloseOverlay();
     }
@@ -1142,15 +1191,14 @@
       }
     }
 
-    /* 12. Raport: zatwierdzony generator HTML/CSS wydruku z wersji 4.5.22.
-       Nie zmieniamy typografii, kolumn ani danych tabeli. */
+    /* 12. Generator wydruku zachowuje układ HTML/CSS źródła A; kwoty są wspólne ze statystykami. */
   function buildReportHTML(monthYM) {
     const [Y, M] = monthYM.split("-").map(Number);
     const dim = new Date(Y, M, 0).getDate();
 
     const monthLabelReminder = fmtMonthPL(monthYM);
     const sumMin = computeMonthMinutes(monthYM);
-    const money = round2((sumMin / 60) * (db.settings.rate || 0));
+    const money = computeStats(monthYM).money;
 
     const leaveStats = { paid:0, unpaid:0, sick:0 };
     let workDays = 0;
@@ -1614,6 +1662,8 @@
         commit(next,"Usunięto szablon");
       });
       $("exportBtn").addEventListener("click",exportDatabase);
+      $("rawExportBtn").addEventListener("click",exportRawDatabase);
+      $("syncReload").addEventListener("click",reloadChangedData);
       $("importBtn").addEventListener("click",()=>$("importInput").click());
       $("importInput").addEventListener("change",async event=>{
         const file=event.target.files?.[0];
@@ -1627,11 +1677,13 @@
       $("checkUpdatesBtn").addEventListener("click",checkPwaUpdates);
       $("formBack").addEventListener("click",requestCloseOverlay);
       $("formBody").addEventListener("click",event=>{
+        const choice=event.target.closest("[data-bulk-kind]");
+        if (choice && $("bulkKind") && $("bulkKind").value!==choice.dataset.bulkKind) {
+          $("bulkKind").value=choice.dataset.bulkKind;
+          renderBulkFields();
+        }
         if (event.target.closest("#saveForm")) handleFormSave();
         if (event.target.closest("#deleteForm")) handleFormSave(true);
-      });
-      $("formBody").addEventListener("change",event=>{
-        if (event.target.id==="bulkKind") renderBulkFields();
       });
       $("formBody").addEventListener("focusin",event=>{
         if (event.target.matches("input,textarea,select")) event.target.scrollIntoView({block:"nearest"});
@@ -1645,11 +1697,10 @@
         if (hasUnsavedFormData()) { event.preventDefault();event.returnValue=""; }
       });
       window.addEventListener("storage",event=>{
-        if (event.key!==STORAGE_KEY) return;
-        if (hasUnsavedNote()) {toast("Dane zmieniono w innej karcie. Zapisz notatkę w kopii przed odświeżeniem.");return;}
-        if (ui.overlay) {toast("Baza zmieniła się w innej karcie. Zamknij formularz i odśwież aplikację.");return;}
-        db=loadDatabase();refreshAffectedViews();
-        toast("Wczytano zmiany z drugiej karty.");
+        if (event.key!==STORAGE_KEY && event.key!==null) return;
+        // Never replace draft fields or settings that are currently being edited.
+        if (ui.overlay || hasUnsavedFormData()) { markStorageConflict(); return; }
+        reloadChangedData();
       });
     }
     function changeStatPeriod(delta) {
@@ -1684,7 +1735,7 @@
       commit(next,`Usunięto ${count} wpisów z ${fmtMonthPL(month)}.`);
     }
 
-    /* 14. Inicjalizacja: tylko lokalne dane nowego projektu. */
+    /* 14. Inicjalizacja lokalnych danych nowej aplikacji. */
     db=loadDatabase();
     bindEvents();
     if (history.state?.cpNext && SCREENS[history.state.screen]) {
