@@ -3,608 +3,1147 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
-  <meta name="theme-color" content="#f3f4f7">
-  <meta name="description" content="Lokalna ewidencja godzin pracy, absencji i notatek.">
-  <title>Czas pracy 1.0.0</title>
-  <!-- Manifest i Service Worker zostaną dołączone w osobnym etapie. -->
+  <meta name="theme-color" content="#f4f6fa">
+  <meta name="color-scheme" content="light">
+  <title>Czas pracy</title>
+  <link rel="manifest" href="./manifest.webmanifest">
   <style>
-    /* 1–2. System wizualny */
+    /* 1. Kolory, rytm, typografia — jeden system komponentów One UI. */
     :root {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
       color-scheme: light;
-      --bg: #f3f4f7; --surface: #fff; --soft: #eef1f6; --ink: #171b24;
-      --muted: #606878; --line: #e1e5ec; --blue: #1565d8; --blue-soft: #eaf2ff;
-      --green: #246e45; --green-soft: #edf7ef; --purple: #775098; --purple-soft: #f2edf8;
-      --red: #b43744; --red-soft: #fff0f1; --yellow: #826300; --yellow-soft: #fff8db;
-      --radius: 24px; --small-radius: 14px; --pill-radius: 999px;
-      --shadow: 0 3px 18px #22304b08; --gap: 16px; --space: 24px;
-      --font: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      --motion: 160ms; --viewport-height: 100dvh;
+      --bg: #f4f6fa;
+      --surface: #fff;
+      --surface-alt: #f9fafe;
+      --ink: #171b26;
+      --muted: #697384;
+      --line: #e5e9f1;
+      --blue: #2868d6;
+      --blue-soft: #e8f0ff;
+      --green: #21804b;
+      --green-soft: #e7f6ec;
+      --purple: #7b54b7;
+      --purple-soft: #f2ebfb;
+      --red: #c94742;
+      --red-soft: #ffece9;
+      --yellow: #ab790a;
+      --yellow-soft: #fff6dc;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 13px;
+      --shadow: 0 3px 18px rgb(27 44 80 / 5%);
+      --ease: cubic-bezier(.2,.8,.2,1);
+      --speed: 190ms;
     }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--ink); font: 1rem/1.5 var(--font); }
-    button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; touch-action: manipulation; }
-    button, input, select, textarea { -webkit-tap-highlight-color: transparent; }
-    button { color: inherit; }
-    h1, h2, h3, p { margin: 0; }
-    h1 { font-size: 1.25rem; letter-spacing: -.035em; }
-    h2 { font-size: 1.15rem; letter-spacing: -.025em; }
-    h3 { font-size: 1rem; }
-    svg { width: 24px; height: 24px; flex: 0 0 auto; }
-    :focus-visible { outline: 3px solid #1565d880; outline-offset: 3px; }
-    /* 3. Wspólne komponenty */
-    .app { max-width: 960px; margin: auto; padding: 0 max(12px, env(safe-area-inset-right)) 36px max(12px, env(safe-area-inset-left)); }
-    .header { display: flex; align-items: center; gap: 12px; min-height: 72px; padding-top: env(safe-area-inset-top); }
-    .header h1 { flex: 1; }
-    .version { color: var(--muted); font-size: .72rem; }
-    .icon-button { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; border: 0; border-radius: 50%; background: var(--soft); }
-    .button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 48px; padding: 11px 20px; border: 0; border-radius: var(--pill-radius); background: var(--blue); color: white; font-weight: 650; text-align: center; }
-    .button.secondary { background: var(--blue-soft); color: var(--blue); }
-    .button.danger { background: var(--red-soft); color: var(--red); }
-    .button:disabled { opacity: .5; cursor: default; }
-    .card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: var(--space); min-width: 0; }
-    .stack { display: grid; gap: var(--gap); }
-    .row { display: flex; gap: 12px; align-items: center; }
-    .spread { justify-content: space-between; }
-    .wrap { flex-wrap: wrap; }
-    .muted { color: var(--muted); font-size: .9rem; }
-    .eyebrow { color: var(--muted); font-size: .78rem; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; }
-    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
-    .field { display: grid; gap: 7px; font-weight: 600; min-width: 0; }
-    .field input, .field select, .field textarea { width: 100%; min-width: 0; min-height: 48px; padding: 12px; border: 1px solid var(--line); border-radius: var(--small-radius); background: var(--soft); color: var(--ink); font-weight: 400; }
-    .field textarea { resize: vertical; min-height: 180px; }
-    .field small { color: var(--muted); font-weight: 400; }
-    .fields { display: grid; gap: 18px; }
-    .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .check { display: flex; gap: 10px; align-items: center; min-height: 44px; }
-    .check input { width: 22px; height: 22px; accent-color: var(--blue); }
-    .segment { display: flex; gap: 4px; padding: 4px; border-radius: var(--pill-radius); background: var(--soft); }
-    .segment button { flex: 1; min-height: 44px; border: 0; border-radius: var(--pill-radius); background: transparent; padding: 8px 12px; font-weight: 600; }
-    .segment button[aria-pressed="true"] { background: var(--surface); color: var(--blue); box-shadow: var(--shadow); }
-    .pill { border: 0; border-radius: var(--pill-radius); padding: 10px 14px; min-height: 44px; background: var(--soft); font-size: .9rem; font-weight: 600; }
-    .notice { padding: 16px; border-radius: var(--small-radius); background: var(--yellow-soft); color: var(--yellow); margin-bottom: 16px; overflow-wrap: anywhere; }
-    .notice.error { background: var(--red-soft); color: var(--red); }
-    .error-text { color: var(--red); margin: 12px 0; white-space: pre-line; overflow-wrap: anywhere; }
-    .event { display: flex; width: 100%; align-items: center; gap: 12px; padding: 14px 16px; border: 0; border-radius: var(--small-radius); text-align: left; background: var(--soft); }
-    .event-text { flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-    .event-text strong { display: block; }
-    .hours { background: var(--green-soft); color: var(--green); }
-    .paid { background: var(--blue-soft); color: var(--blue); }
-    .unpaid { background: var(--purple-soft); color: var(--purple); }
-    .sick { background: var(--red-soft); color: var(--red); }
-    .note { background: var(--yellow-soft); color: var(--yellow); }
-    .menu-item { width: 100%; display: flex; align-items: center; gap: 14px; padding: 18px 4px; min-height: 56px; border: 0; border-bottom: 1px solid var(--line); background: transparent; font-weight: 600; text-align: left; }
-    .menu-item:last-child { border-bottom: 0; }
-    .menu-item span { flex: 1; }
-    /* 4. Kalendarz, podgląd, dzień i statystyki */
-    .home { display: grid; gap: 16px; }
-    .calendar-header { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 8px; }
-    .month-label { background: transparent; border: 0; font-size: 1.1rem; font-weight: 700; padding: 10px 0; min-height: 44px; }
-    .calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 3px; margin: 12px 0; }
-    .weekday { text-align: center; padding: 8px 0; font-size: .72rem; color: var(--muted); }
-    .date-cell { border: 1px solid transparent; background: transparent; border-radius: var(--small-radius); min-width: 0; min-height: 48px; padding: 5px 1px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
-    .date-cell .number { min-width: 25px; border-radius: var(--pill-radius); font-weight: 600; line-height: 1.6; }
-    .date-cell.weekend { color: var(--muted); }
-    .date-cell.holiday { color: var(--red); }
-    .date-cell.outside { opacity: .4; }
-    .date-cell.today .number { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; color: var(--blue); }
-    .date-cell[aria-pressed="true"] { background: var(--blue-soft); border-color: #a9caff; opacity: 1; }
-    .dots { display: flex; gap: 3px; height: 5px; }
-    .dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; }
-    .dot.hours { background: var(--green); } .dot.paid { background: var(--blue); }
-    .dot.unpaid { background: var(--purple); } .dot.sick { background: var(--red); } .dot.note { background: #d7a30b; }
-    .legend { display: flex; flex-wrap: wrap; gap: 5px 12px; color: var(--muted); font-size: .7rem; }
-    .legend span { display: inline-flex; align-items: center; gap: 5px; }
-    .preview-button { border: 0; padding: 0; background: transparent; text-align: left; width: 100%; }
-    .preview-button .preview-body { display: grid; gap: 10px; margin-top: 16px; }
-    .preview-note { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-wrap; overflow-wrap: anywhere; }
-    .preview-open { color: var(--blue); font-size: .85rem; font-weight: 600; margin-top: 14px; }
-    .templates { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 16px; }
-    .templates .row { margin-top: 10px; gap: 8px; }
-    .metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; margin-top: 18px; }
-    .metric strong { display: block; font-size: 1.4rem; letter-spacing: -.04em; overflow-wrap: anywhere; }
-    .metric span { color: var(--muted); font-size: .82rem; }
-    .day-nav { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 10px; align-items: center; text-align: center; }
-    .day-nav p { font-weight: 650; }
-    .fab { position: fixed; right: max(20px, calc((100vw - 920px) / 2), env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); width: 60px; height: 60px; border: 0; border-radius: 22px; background: var(--blue); color: white; box-shadow: 0 6px 24px #1565d833; }
-    .fab svg { width: 28px; height: 28px; }
-    .day-screen { padding-bottom: 80px; }
-    .template-row { padding: 10px 0; border-bottom: 1px solid var(--line); }
-    /* 5. Dialog, dostępność i responsywność */
-    dialog { border: 0; border-radius: var(--radius); padding: 24px; background: var(--surface); color: var(--ink); width: min(440px, calc(100% - 32px)); max-height: calc(var(--viewport-height) - 32px); overflow-y: auto; box-shadow: 0 18px 80px #17233d30; }
-    dialog::backdrop { background: #17233d65; }
-    dialog p { white-space: pre-line; overflow-wrap: anywhere; margin-top: 12px; }
-    #toast { position: fixed; z-index: 10; bottom: max(24px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); padding: 14px 20px; border-radius: 20px; background: #263043; color: white; width: max-content; max-width: calc(100% - 32px); box-shadow: var(--shadow); pointer-events: none; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { background: var(--bg); }
+    body { margin: 0; min-width: 0; min-height: 100dvh; background: var(--bg); color: var(--ink); }
     body:has(dialog[open]) { overflow: hidden; }
-    button { transition: background-color var(--motion), transform var(--motion); }
-    button:active:not(:disabled) { transform: scale(.98); }
-    @media (hover: hover) and (pointer: fine) { button:hover:not(:disabled) { filter: brightness(.97); } }
-    @media (min-width: 720px) { .home { grid-template-columns: 1.15fr 1fr; align-items: start; } .calendar-card { grid-row: span 2; } .date-cell { min-height: 60px; } .form-card { max-width: 640px; margin: auto; width: 100%; } }
-    @media (max-width: 359px) { :root { --space: 16px; --gap: 12px; } .calendar { gap: 1px; } .date-cell { border-radius: 10px; } .header { gap: 8px; } .version { display: none; } }
-    @media (prefers-reduced-motion: reduce) { :root { --motion: 0ms; } }
-    [hidden] { display: none; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    button, a, input, select, textarea { touch-action: manipulation; }
+    :focus-visible { outline: 3px solid #84b1ff; outline-offset: 2px; }
+    [hidden] { display: none !important; }
+    .sr-only { position: absolute; width: 1px; height: 1px; clip: rect(0,0,0,0); overflow: hidden; white-space: nowrap; }
+    .icon { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; flex: 0 0 auto; }
+    .icon.sm { width: 17px; height: 17px; }
+    .app { width: min(100%, 850px); margin: 0 auto; padding: 0 14px calc(100px + env(safe-area-inset-bottom)); }
+    .app-header { position: sticky; top: 0; z-index: 12; min-height: 66px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 0; background: var(--bg); }
+    .header-left, .header-right { display: flex; align-items: center; gap: 4px; min-width: 0; }
+    .header-left { flex: 1; }
+    .header-title { font-size: clamp(20px, 5.5vw, 26px); letter-spacing: -.04em; font-weight: 720; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .icon-btn { display: inline-grid; place-items: center; flex: 0 0 auto; border: 0; border-radius: 50%; background: transparent; color: var(--ink); width: 44px; height: 44px; padding: 0; }
+    .btn { border: 0; background: var(--blue); color: #fff; min-height: 44px; padding: 11px 18px; border-radius: 16px; font-weight: 660; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: transform var(--speed) var(--ease), background var(--speed) var(--ease); text-align: center; }
+    .btn:active, .icon-btn:active, .day-cell:active, .event:active, .nav-item:active { transform: scale(.975); }
+    .btn.secondary { background: var(--blue-soft); color: #1b56ad; }
+    .btn.ghost { background: #eef1f6; color: #354154; }
+    .btn.danger { background: var(--red-soft); color: #a02a29; }
+    .btn.small { min-height: 38px; padding: 8px 12px; border-radius: 13px; font-size: 13px; }
+    .btn.wide { width: 100%; }
+    .btn-row { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
+    .btn-row > .btn { flex: 1 1 auto; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+    .space-bottom { margin-bottom: 13px; }
+    .eyebrow { color: var(--muted); font-size: 12px; font-weight: 660; margin-bottom: 5px; }
+    .section-title { margin: 0 0 12px; font-size: 17px; font-weight: 700; letter-spacing: -.02em; }
+    .help { font-size: 13px; line-height: 1.45; color: var(--muted); }
+    .screen { animation: appear var(--speed) var(--ease); }
+    @keyframes appear { from { opacity: .5; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* 2. Kalendarz miesięczny — stałe wymiary komórek niezależnie od liczby wpisów. */
+    .month-head { display: flex; align-items: center; gap: 4px; padding: 4px 2px 14px; }
+    .month-label { flex: 1; min-width: 0; border: 0; background: none; color: var(--ink); font-size: clamp(19px,5vw,24px); font-weight: 735; letter-spacing: -.04em; text-align: left; padding: 8px 7px; border-radius: 12px; }
+    .month-label .icon { vertical-align: middle; margin-left: 5px; }
+    .calendar-panel { padding: 12px 6px 14px; }
+    .weekday-row, .calendar-grid { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); }
+    .weekday-row { margin-bottom: 8px; }
+    .weekday-row span { text-align: center; padding: 5px 0; color: var(--muted); font-size: 12px; font-weight: 665; }
+    .weekday-row span:last-child { color: var(--red); }
+    .day-cell { aspect-ratio: 1 / .98; min-height: 43px; padding: 5px 1px 4px; display: flex; flex-direction: column; gap: 3px; align-items: center; justify-content: flex-start; position: relative; border: 1px solid transparent; border-radius: 15px; background: transparent; color: var(--ink); transition: background var(--speed) var(--ease), transform var(--speed) var(--ease); }
+    .day-cell.outside { opacity: .28; }
+    .day-cell.selected { background: var(--blue-soft); border-color: #c7daff; }
+    .day-cell.holiday .day-number, .day-cell.sunday .day-number { color: var(--red); }
+    .day-number { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; font-size: 13px; font-weight: 680; line-height: 1; }
+    .day-cell.today .day-number { background: var(--blue); color: white; }
+    .markers { min-height: 7px; display: flex; gap: 3px; align-items: center; justify-content: center; max-width: 100%; }
+    .marker { width: 5px; height: 5px; display: block; flex: 0 0 auto; border-radius: 50%; }
+    .marker.work { background: var(--green); }
+    .marker.paid { background: var(--blue); }
+    .marker.unpaid { background: var(--purple); }
+    .marker.sick { background: var(--red); }
+    .marker.note { background: var(--yellow); }
+    .marker.more { background: var(--muted); width: 4px; }
+
+    /* 3. Podgląd dnia, wydarzenia, skróty, statystyki. */
+    .preview-panel { padding: 16px; }
+    .preview-top { display: flex; align-items: flex-start; gap: 10px; justify-content: space-between; }
+    .preview-top h2 { margin: 0; font-size: 19px; letter-spacing: -.03em; font-weight: 750; }
+    .preview-content { margin: 14px 0 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .tag { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; min-height: 30px; border-radius: 12px; font-size: 12px; font-weight: 660; line-height: 1.25; overflow-wrap: anywhere; }
+    .tag.work { background: var(--green-soft); color: #146339; }
+    .tag.paid { background: var(--blue-soft); color: #194f9e; }
+    .tag.unpaid { background: var(--purple-soft); color: #61408f; }
+    .tag.sick { background: var(--red-soft); color: #a52e2c; }
+    .tag.note { background: var(--yellow-soft); color: #79580b; }
+    .tag.holiday { background: #f1f2f5; color: #545c6b; }
+    .quick-area { border-top: 1px solid var(--line); margin-top: 13px; padding-top: 12px; }
+    .quick-row { display: flex; flex-wrap: wrap; gap: 7px; }
+    .quick-chip { min-height: 35px; border: 0; padding: 8px 12px; background: #edf4ff; color: #245eaf; border-radius: 999px; font-size: 12px; font-weight: 690; }
+    .inline-action { color: var(--blue); border: 0; background: none; display: inline-flex; align-items: center; gap: 4px; padding: 8px 0; font-size: 13px; font-weight: 730; white-space: nowrap; }
+    .stats-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .stat-tile { background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); border-radius: var(--radius-md); padding: 14px; min-width: 0; }
+    .stat-tile strong { display: block; font-size: clamp(17px,5vw,23px); letter-spacing: -.03em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stat-tile span { display: block; color: var(--muted); font-size: 12px; margin-top: 6px; line-height: 1.3; }
+    .event-list { display: flex; flex-direction: column; gap: 9px; }
+    .event { width: 100%; border: 0; border-left: 4px solid; border-radius: 14px; display: flex; align-items: center; gap: 10px; padding: 12px 12px; text-align: left; color: var(--ink); }
+    .event.work { background: var(--green-soft); border-color: var(--green); }
+    .event.paid { background: var(--blue-soft); border-color: var(--blue); }
+    .event.unpaid { background: var(--purple-soft); border-color: var(--purple); }
+    .event.sick { background: var(--red-soft); border-color: var(--red); }
+    .event.note { background: var(--yellow-soft); border-color: var(--yellow); }
+    .event.holiday { background: #eff1f5; border-color: #8895a6; }
+    .event .event-text { flex: 1; min-width: 0; }
+    .event strong, .event small { display: block; white-space: normal; overflow-wrap: anywhere; }
+    .event strong { font-size: 14px; }
+    .event small { color: #596275; margin-top: 4px; font-size: 12px; line-height: 1.35; }
+    .day-hero { margin: 4px 0 13px; padding: 17px; }
+    .day-hero strong { font-size: 35px; display: block; letter-spacing: -.06em; }
+    .day-hero span { font-size: 13px; color: var(--muted); }
+    .day-detail-panel { padding: 15px; }
+    .date-nav { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 4px; padding-bottom: 13px; }
+    .date-nav strong { font-size: clamp(16px,5vw,21px); text-align: center; min-width: 0; }
+    .fab { position: fixed; right: max(20px, calc((100vw - 835px)/2)); bottom: calc(20px + env(safe-area-inset-bottom)); width: 58px; height: 58px; border: 0; display: grid; place-items: center; border-radius: 22px; background: var(--blue); color: #fff; box-shadow: 0 7px 19px rgb(39 90 182 / 25%); z-index: 11; }
+    .fab .icon { width: 28px; height: 28px; }
+    .fab-pop { position: fixed; z-index: 11; right: max(20px, calc((100vw - 835px)/2)); bottom: calc(86px + env(safe-area-inset-bottom)); width: min(235px, calc(100vw - 40px)); padding: 8px; border-radius: 20px; background: #fff; border: 1px solid var(--line); box-shadow: 0 11px 36px rgb(30 50 90 / 19%); display: grid; gap: 3px; }
+    .fab-pop button { display: flex; align-items: center; gap: 10px; min-height: 48px; width: 100%; border: 0; background: transparent; padding: 8px 10px; border-radius: 12px; text-align: left; color: var(--ink); font-weight: 620; }
+
+    /* 4. Ekrany administracyjne i formularze. */
+    .nav-list { overflow: hidden; }
+    .nav-item { width: 100%; min-height: 58px; border: 0; border-bottom: 1px solid var(--line); background: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 13px; text-align: left; color: var(--ink); font-weight: 630; }
+    .nav-item:last-child { border-bottom: 0; }
+    .nav-item .leading-icon { color: var(--blue); background: var(--blue-soft); width: 37px; height: 37px; border-radius: 13px; display: grid; place-items: center; }
+    .nav-item span:nth-child(2) { flex: 1; }
+    .settings-panel { padding: 17px; }
+    .field { display: block; margin: 0 0 13px; }
+    .field > span { display: block; color: #485366; font-size: 13px; font-weight: 670; margin-bottom: 7px; }
+    .field input:not([type=checkbox]), .field select, .field textarea, .fieldlike {
+      min-height: 48px; width: 100%; max-width: 100%; border: 1px solid #d5dce8; border-radius: 15px; background: #f7f9fc; padding: 11px 12px; color: var(--ink); outline-offset: 1px;
+    }
+    .field textarea { min-height: 110px; line-height: 1.48; resize: vertical; }
+    .field-row { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .check { padding: 8px 0; display: flex; align-items: center; gap: 11px; min-height: 43px; color: var(--ink); font-size: 14px; font-weight: 570; }
+    .check input { width: 19px; height: 19px; margin: 0; accent-color: var(--blue); }
+    .soft-divider { border: 0; border-top: 1px solid var(--line); margin: 17px 0; }
+    .data-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .data-row strong { flex: 1; min-width: 0; font-size: 14px; }
+    .note-box { background: var(--blue-soft); border-radius: 15px; padding: 12px; color: #30517e; font-size: 13px; line-height: 1.45; }
+    .stats-switch { display: flex; background: #e7ebf2; padding: 4px; border-radius: 16px; gap: 4px; margin-bottom: 13px; }
+    .stats-switch button { flex: 1; min-height: 40px; border: 0; background: transparent; border-radius: 12px; color: #586478; font-weight: 670; }
+    .stats-switch button.active { background: #fff; color: var(--blue); box-shadow: var(--shadow); }
+    .stats-period { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 6px; margin-bottom: 14px; }
+    .stats-period strong { text-align: center; font-size: 19px; }
+
+    /* 5. Jeden system modalny: formularze, potwierdzenie, import. */
+    dialog { color: var(--ink); background: var(--surface); border: 0; box-shadow: 0 14px 45px rgb(16 31 59 / 24%); }
+    dialog::backdrop { background: rgb(18 29 48 / 42%); }
+    .sheet { margin: auto auto 0; width: min(100%, 600px); max-width: 100vw; max-height: min(94dvh, 920px); border-radius: 26px 26px 0 0; padding: 0; }
+    .sheet-inner { max-height: min(94dvh, 920px); display: flex; flex-direction: column; min-height: 0; }
+    .sheet-head { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; padding: 10px 14px 8px; border-bottom: 1px solid var(--line); }
+    .sheet-head h2 { font-size: 18px; font-weight: 735; margin: 0; flex: 1; }
+    .sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 18px 18px calc(22px + env(safe-area-inset-bottom)); }
+    .sheet-body .btn-row { margin-bottom: 4px; }
+    .confirm-dialog { border-radius: 24px; margin: auto; width: min(420px, calc(100% - 28px)); max-width: calc(100vw - 28px); padding: 22px; }
+    .confirm-dialog h2 { margin: 0 0 10px; font-size: 20px; }
+    .confirm-dialog p { white-space: pre-line; line-height: 1.5; color: #4f5b6b; font-size: 14px; }
+    .error-text { display: block; color: #a52e2c; font-size: 13px; margin: 10px 0; }
+    .toast { position: fixed; z-index: 30; left: 50%; transform: translate(-50%,-10px); top: calc(16px + env(safe-area-inset-top)); background: #27354d; color: #fff; padding: 12px 17px; border-radius: 15px; box-shadow: 0 6px 24px rgb(0 0 0 / 17%); font-size: 13px; width: max-content; max-width: min(530px, calc(100vw - 30px)); line-height: 1.4; opacity: 0; pointer-events: none; transition: opacity var(--speed) var(--ease), transform var(--speed) var(--ease); }
+    .toast.show { opacity: 1; transform: translate(-50%,0); }
+    .import-summary { white-space: pre-wrap; font-size: 13px; background: var(--surface-alt); border: 1px solid var(--line); padding: 12px; border-radius: 13px; line-height: 1.55; margin-bottom: 12px; }
+    @media (max-width: 350px) { .app { padding-inline: 8px; } .calendar-panel { padding-inline: 2px; } .day-cell { min-height: 39px; border-radius: 12px; } .day-number { height: 24px; width: 24px; font-size: 12px; } .marker { width: 4px; height: 4px; } .preview-panel { padding: 12px; } .field-row { grid-template-columns: 1fr; } }
+    @media (min-width: 620px) { .app { padding-inline: 28px; } .calendar-panel { padding-inline: 15px; } .day-cell { max-height: 76px; } .stats-grid { grid-template-columns: repeat(4,minmax(0,1fr)); } .sheet { margin: auto; max-height: 92dvh; border-radius: 26px; } .sheet-inner { max-height: 92dvh; } }
+    @media (hover: hover) and (pointer:fine) { .icon-btn:hover, .day-cell:hover, .month-label:hover { background: #e9eef7; } .btn:hover { filter: brightness(.97); } .quick-chip:hover { background: #d8e8ff; } .nav-item:hover, .fab-pop button:hover { background: #f6f8fb; } }
+    @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration: .01ms; transition-duration: .01ms; scroll-behavior: auto; } }
   </style>
 </head>
 <body>
-  <!-- 6. Stała struktura: jeden nagłówek, jeden obszar widoku, jeden dialog -->
+  <!-- Lokalny sprite SVG: wspólna grubość kreski, brak bibliotek/CDN. -->
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M13 5.5 18.5 11M3 21l4.5-1 12-12a2.2 2.2 0 0 0-3.1-3.1l-12 12L3 21Z"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.7V12l3.8 2.3"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18"/></symbol>
+    <symbol id="i-notes" viewBox="0 0 24 24"><path d="M7 3h8l4 4v14H5V3h2Z M15 3v5h5M8 13h8M8 17h6"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M12 2 14 4l3-.1.8 3 2.7 1.5-1 3.2 1 3.2-2.7 1.5-.8 3-3-.1-2 2-2-2-3 .1-.8-3-2.7-1.5 1-3.2-1-3.2 2.7-1.5.8-3 3 .1 2-2Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 20h18M6 17v-6m6 6V5m6 12V9"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path d="M5 7h14l-4-4m4 4-4 4M19 17H5l4 4m-4-4 4-4"/></symbol>
+  </svg>
   <div class="app">
-    <header class="header">
-      <button class="icon-button" id="back" type="button" aria-label="Wstecz" hidden></button>
-      <h1 id="heading">Czas pracy</h1>
-      <span class="version">1.0.0 · wersja testowa</span>
-      <button class="icon-button" id="more" type="button" aria-label="Więcej"></button>
+    <header class="app-header">
+      <div class="header-left">
+        <button id="backBtn" class="icon-btn" type="button" aria-label="Wstecz" hidden><svg class="icon"><use href="#i-back"/></svg></button>
+        <strong id="headerTitle" class="header-title">Czas pracy</strong>
+      </div>
+      <div class="header-right">
+        <button id="todayBtn" class="icon-btn" type="button" title="Dzisiaj" aria-label="Przejdź do dzisiaj"><svg class="icon"><use href="#i-calendar"/></svg></button>
+        <button id="statsBtn" class="icon-btn" type="button" title="Statystyki" aria-label="Statystyki"><svg class="icon"><use href="#i-chart"/></svg></button>
+        <button id="menuBtn" class="icon-btn" type="button" title="Więcej" aria-label="Więcej"><svg class="icon"><use href="#i-more"/></svg></button>
+      </div>
     </header>
-    <aside id="storage-warning" class="notice error" role="alert" hidden></aside>
-    <aside id="backup-reminder" class="notice" hidden>Warto wykonać kopię danych. <button class="pill" type="button" data-action="backup-screen">Kopia i przywracanie</button></aside>
-    <main id="screen" tabindex="-1"></main>
-    <noscript>Włącz JavaScript, aby używać ewidencji czasu pracy.</noscript>
+
+    <main id="main">
+      <section id="homeScreen" class="screen" aria-label="Kalendarz">
+        <div class="month-head">
+          <button id="monthTitle" class="month-label" type="button" aria-label="Wybierz miesiąc">Październik 2026 <svg class="icon sm"><use href="#i-chevron"/></svg></button>
+          <button id="prevMonth" class="icon-btn" type="button" aria-label="Poprzedni miesiąc"><svg class="icon"><use href="#i-back"/></svg></button>
+          <button id="nextMonth" class="icon-btn" type="button" aria-label="Następny miesiąc"><svg class="icon"><use href="#i-next"/></svg></button>
+          <input id="monthPicker" class="sr-only" type="month" aria-label="Miesiąc" tabindex="-1">
+        </div>
+        <div class="panel calendar-panel space-bottom">
+          <div class="weekday-row" aria-hidden="true"><span>Pn</span><span>Wt</span><span>Śr</span><span>Czw</span><span>Pt</span><span>Sb</span><span>Nd</span></div>
+          <div id="calendarGrid" class="calendar-grid" role="group" aria-label="Dni miesiąca"></div>
+        </div>
+        <section id="previewPanel" class="panel preview-panel space-bottom" aria-label="Podgląd dnia">
+          <div class="preview-top">
+            <div><div class="eyebrow">Wybrany dzień</div><h2 id="previewTitle"></h2></div>
+            <button id="openDayBtn" class="inline-action" type="button">Otwórz <svg class="icon sm"><use href="#i-next"/></svg></button>
+          </div>
+          <div id="previewContent" class="preview-content" aria-live="polite"></div>
+          <div id="quickPreview" class="quick-area"><div class="eyebrow">Dodaj szybkie godziny</div><div id="previewChips" class="quick-row"></div></div>
+        </section>
+        <section aria-label="Podsumowanie miesiąca">
+          <h2 class="section-title">W tym miesiącu</h2>
+          <div id="homeStats" class="stats-grid"></div>
+        </section>
+      </section>
+
+      <section id="dayScreen" class="screen" hidden aria-label="Szczegóły dnia">
+        <nav class="date-nav" aria-label="Nawigacja między dniami">
+          <button id="prevDay" class="icon-btn" type="button" aria-label="Poprzedni dzień"><svg class="icon"><use href="#i-back"/></svg></button>
+          <strong id="dayDate"></strong>
+          <button id="nextDay" class="icon-btn" type="button" aria-label="Następny dzień"><svg class="icon"><use href="#i-next"/></svg></button>
+        </nav>
+        <div class="panel day-hero"><span>Łącznie przepracowano</span><strong id="dayTotal">0h 00m</strong><span id="dayHoliday"></span></div>
+        <div class="panel day-detail-panel space-bottom"><h2 class="section-title">Wydarzenia</h2><div id="dayEvents" class="event-list"></div></div>
+        <div id="dayQuickBlock" class="panel preview-panel"><div class="section-title">Szybkie szablony</div><div id="dayChips" class="quick-row"></div></div>
+      </section>
+
+      <section id="statsScreen" class="screen" hidden aria-label="Statystyki">
+        <div class="stats-switch" role="group" aria-label="Zakres statystyk"><button id="statsMonthly" type="button">Miesiąc</button><button id="statsYearly" type="button">Rok</button></div>
+        <div class="stats-period"><button id="statsPrev" class="icon-btn" type="button" aria-label="Poprzedni okres"><svg class="icon"><use href="#i-back"/></svg></button><button id="statsPeriodTitle" class="month-label" type="button" style="text-align:center" aria-label="Wybierz okres statystyk"></button><button id="statsNext" class="icon-btn" type="button" aria-label="Następny okres"><svg class="icon"><use href="#i-next"/></svg></button></div>
+        <input id="statsMonthPicker" class="sr-only" type="month" aria-label="Wybierz miesiąc lub rok statystyk" tabindex="-1"><div id="statsGrid" class="stats-grid space-bottom"></div>
+        <div class="panel settings-panel"><p class="help">Raport PDF zachowuje układ i tabelę znane z poprzedniej aplikacji.</p><button id="reportBtn" class="btn wide" type="button"><svg class="icon"><use href="#i-download"/></svg> Raport miesięczny PDF</button><div id="yearReportNote" class="help" hidden>W widoku rocznym raport dotyczy miesiąca wybranego w kalendarzu.</div></div>
+      </section>
+
+      <section id="menuScreen" class="screen" hidden aria-label="Menu aplikacji">
+        <h2 class="section-title">Zarządzanie</h2>
+        <div class="panel nav-list">
+          <button class="nav-item" data-goto="bulk" type="button"><span class="leading-icon"><svg class="icon"><use href="#i-clock"/></svg></span><span>Wpisy zbiorcze</span><svg class="icon sm"><use href="#i-next"/></svg></button>
+          <button class="nav-item" data-goto="settings" type="button"><span class="leading-icon"><svg class="icon"><use href="#i-settings"/></svg></span><span>Ustawienia</span><svg class="icon sm"><use href="#i-next"/></svg></button>
+          <button class="nav-item" data-goto="backup" type="button"><span class="leading-icon"><svg class="icon"><use href="#i-download"/></svg></span><span>Kopia i przywracanie</span><svg class="icon sm"><use href="#i-next"/></svg></button>
+          <button class="nav-item" data-goto="tools" type="button"><span class="leading-icon"><svg class="icon"><use href="#i-swap"/></svg></span><span>Narzędzia</span><svg class="icon sm"><use href="#i-next"/></svg></button>
+          <button class="nav-item" data-goto="about" type="button"><span class="leading-icon"><svg class="icon"><use href="#i-info"/></svg></span><span>O aplikacji</span><svg class="icon sm"><use href="#i-next"/></svg></button>
+        </div>
+      </section>
+
+      <section id="settingsScreen" class="screen" hidden aria-label="Ustawienia">
+        <div class="panel settings-panel space-bottom">
+          <h2 class="section-title">Rozliczenia i absencje</h2>
+          <div class="field-row"><label class="field"><span>Stawka godzinowa (zł)</span><input id="settingRate" type="number" min="0" max="100000" step="0.01" inputmode="decimal"></label><label class="field"><span>Roczny limit urlopu (dni)</span><input id="settingQuota" type="number" min="0" max="365" step="1" inputmode="numeric"></label></div>
+          <h2 class="section-title">Domyślne wpisy zbiorcze</h2>
+          <label class="check"><input id="settingSat" type="checkbox">Uwzględniaj soboty</label>
+          <label class="check"><input id="settingSun" type="checkbox">Uwzględniaj niedziele</label>
+          <label class="check"><input id="settingHolidays" type="checkbox">Uwzględniaj święta</label>
+          <hr class="soft-divider">
+          <label class="field"><span>Przypomnienie o kopii co (dni)</span><input id="settingReminder" type="number" min="1" max="365" step="1" inputmode="numeric"></label>
+          <button id="saveSettingsBtn" class="btn wide" type="button">Zapisz ustawienia</button>
+        </div>
+        <div class="panel settings-panel"><h2 class="section-title">Szablony godzin</h2><p class="help">Maksymalnie 8 skrótów do szybkiego dodawania.</p><div id="templateList"></div><hr class="soft-divider"><div class="field-row"><label class="field"><span>Od</span><input id="templateStart" type="time" value="06:00"></label><label class="field"><span>Do</span><input id="templateEnd" type="time" value="15:00"></label></div><button id="addTemplateBtn" class="btn secondary wide" type="button">Dodaj szablon</button></div>
+      </section>
+
+      <section id="backupScreen" class="screen" hidden aria-label="Kopia i przywracanie">
+        <div class="panel settings-panel space-bottom"><h2 class="section-title">Kopia zapasowa</h2><p class="help">Pobierz pełną kopię wpisów i ustawień. Dane nowej wersji są odseparowane od poprzedniej aplikacji.</p><button id="exportBtn" class="btn wide" type="button"><svg class="icon"><use href="#i-download"/></svg> Pobierz kopię JSON</button><p id="lastBackupText" class="help"></p></div>
+        <div class="panel settings-panel"><h2 class="section-title">Przywróć lub scal</h2><p class="help">Wczytaj plik JSON z poprzedniej lub nowej wersji. Najpierw zobaczysz podgląd, liczbę duplikatów i konflikty. Nic nie zostanie zastąpione automatycznie.</p><button id="importBtn" class="btn secondary wide" type="button">Wybierz plik JSON</button><input id="importInput" type="file" accept=".json,application/json" hidden></div>
+      </section>
+
+      <section id="toolsScreen" class="screen" hidden aria-label="Narzędzia">
+        <div class="panel settings-panel space-bottom"><h2 class="section-title">Wyczyść wybrany miesiąc</h2><label class="field"><span>Miesiąc</span><input id="clearMonthInput" type="month"></label><p class="help">Usunie godziny, notatki i absencje tylko z podanego miesiąca. Tej operacji nie można cofnąć bez kopii JSON.</p><button id="clearMonthBtn" class="btn danger wide" type="button">Wyczyść miesiąc</button></div>
+        <div class="panel settings-panel"><h2 class="section-title">Aktualizacja</h2><p id="updateHelp" class="help">Sprawdź, czy jest dostępna nowa wersja aplikacji. Aktualizacja nie zmienia zapisanych wpisów.</p><button id="checkUpdatesBtn" class="btn ghost wide" type="button">Sprawdź aktualizacje</button></div>
+      </section>
+
+      <section id="aboutScreen" class="screen" hidden aria-label="O aplikacji"><div class="panel settings-panel"><h2 class="section-title">Czas pracy — Next</h2><p class="help">Nowa implementacja HTML/CSS/JS inspirowana ergonomią Samsung One UI. Jeden plik, bez zewnętrznych bibliotek. Instalacja i działanie offline wymagają opublikowania przygotowanych plików manifest.webmanifest, sw.js i ikon.</p><p class="help">Pamięć danych: <code>worktime_next_v1</code>. Nie odczytuje ani nie zmienia klucza produkcyjnego <code>worktime_pwa_v1</code>.</p></div></section>
+    </main>
   </div>
-  <dialog id="confirmation" aria-labelledby="confirmation-title">
-    <h2 id="confirmation-title"></h2>
-    <p id="confirmation-message"></p>
-    <div class="actions" id="confirm-actions">
-      <button class="button secondary" id="confirm-cancel" type="button">Anuluj</button>
-      <button class="button" id="confirm-ok" type="button">Potwierdź</button>
-    </div>
-  </dialog>
-  <div id="toast" role="status" aria-live="polite" hidden></div>
+
+  <button id="fab" class="fab" type="button" aria-label="Dodaj wydarzenie" aria-expanded="false" hidden><svg class="icon"><use href="#i-plus"/></svg></button>
+  <div id="fabMenu" class="fab-pop" hidden><button data-add="shift" type="button"><svg class="icon"><use href="#i-clock"/></svg> Dodaj godziny</button><button data-add="leave" type="button"><svg class="icon"><use href="#i-calendar"/></svg> Dodaj urlop / L4</button><button data-add="note" type="button"><svg class="icon"><use href="#i-notes"/></svg> Dodaj notatkę</button></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="formDialog" class="sheet" aria-labelledby="formTitle"><div class="sheet-inner"><header class="sheet-head"><button id="formBack" class="icon-btn" type="button" aria-label="Wstecz"><svg class="icon"><use href="#i-back"/></svg></button><h2 id="formTitle"></h2></header><div class="sheet-body" id="formBody"></div></div></dialog>
+  <dialog id="confirmDialog" class="confirm-dialog" aria-labelledby="confirmTitle"><h2 id="confirmTitle"></h2><p id="confirmMessage"></p><div id="confirmActions" class="btn-row"></div></dialog>
+  <dialog id="importDialog" class="sheet" aria-labelledby="importTitle"><div class="sheet-inner"><header class="sheet-head"><button id="importBack" class="icon-btn" type="button" aria-label="Wstecz"><svg class="icon"><use href="#i-back"/></svg></button><h2 id="importTitle">Podgląd importu</h2></header><div class="sheet-body"><div id="importSummary" class="import-summary"></div><p class="help">Scalanie zachowuje dotychczasowe notatki i absencje; dopisuje tylko brakujące dane. Konfliktujące zakresy godzin są pomijane. Zastąpienie usuwa obecną bazę po dodatkowym potwierdzeniu.</p><div class="btn-row"><button id="mergeImportBtn" class="btn secondary" type="button">Scal bez konfliktów</button><button id="replaceImportBtn" class="btn danger" type="button">Zastąp bazę</button></div></div></div></dialog>
   <script>
+  "use strict";
   (() => {
-    'use strict';
-    // 1. Konfiguracja. Żaden odczyt ani zapis nie dotyka bazy starej aplikacji.
-    const CONFIG = Object.freeze({ version: '1.0.0', storageKey: 'worktime_next_v1', backupKey: 'worktime_next_v1_last_backup_iso' });
-    const pad2 = n => String(n).padStart(2, '0');
-    const round2 = num => Math.round((num + Number.EPSILON) * 100) / 100;
-    const clone = value => JSON.parse(JSON.stringify(value));
+    /* 6. Model danych. Nie ma żadnego dostępu do produkcyjnego klucza. */
+    const STORAGE_KEY = "worktime_next_v1";
+    const BACKUP_KEY = "worktime_next_last_backup_iso";
+    const EMPTY = () => ({
+      settings: {
+        rate: 0,
+        leaveQuota: 26,
+        defaultIncludeSat: false,
+        defaultIncludeSun: false,
+        defaultIncludeHolidays: false,
+        backupReminderDays: 5,
+        shiftTemplates: [
+          { start: "06:00", end: "14:00" },
+          { start: "14:00", end: "22:00" },
+          { start: "22:00", end: "06:00" }
+        ]
+      },
+      entries: []
+    });
     const $ = id => document.getElementById(id);
-    const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
-    const ym = iso => iso.slice(0, 7);
-    const isoFromDate = date => `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+    const pad2 = n => String(n).padStart(2, "0");
+    const ym = dateISO => dateISO.slice(0, 7);
     const todayISO = () => isoFromDate(new Date());
-    function parseISODate(iso) {
-      if (typeof iso !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return null;
-      const [y, m, d] = iso.split('-').map(Number);
-      const date = new Date(y, m - 1, d);
-      return date.getFullYear() === y && date.getMonth() === m - 1 && date.getDate() === d ? date : null;
+    const round2 = n => Math.round((n + Number.EPSILON) * 100) / 100;
+    const fmtHM = min => `${Math.floor(min / 60)}:${pad2(min % 60)}`;
+    const fmtDuration = min => `${Math.floor(min / 60)}h ${pad2(min % 60)}m`;
+    const pln = n => Number(n).toLocaleString("pl-PL", { style: "currency", currency: "PLN" });
+    const escapeHtml = value => String(value ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+    const fmtMonthPL = monthYM => new Intl.DateTimeFormat("pl-PL", {month:"long", year:"numeric"}).format(dateFromISO(`${monthYM}-01`)).replace(/^./, letter => letter.toUpperCase());
+    const fmtDateLongPL = iso => new Intl.DateTimeFormat("pl-PL", {day:"numeric", month:"long", year:"numeric"}).format(dateFromISO(iso));
+    const fmtWeekdayLongPL = iso => new Intl.DateTimeFormat("pl-PL", {weekday:"long"}).format(dateFromISO(iso));
+    const DOW_SHORT = ["Nd", "Pn", "Wt", "Śr", "Czw", "Pt", "Sb"];
+    const fmtWeekdayPL = iso => DOW_SHORT[dateFromISO(iso).getDay()];
+    const fmtDMYText = iso => `${iso.slice(8,10)}-${["sty","lut","mar","kwi","maj","cze","lip","sie","wrz","paź","lis","gru"][Number(iso.slice(5,7))-1]}-${iso.slice(0,4)}`;
+    const icon = (name, small=false) => `<svg class="icon${small ? " sm" : ""}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+    const dayLabel = iso => `${fmtWeekdayLongPL(iso).replace(/^./, c => c.toUpperCase())}, ${fmtDateLongPL(iso)}`;
+    const LEAVE = { paid:"Urlop płatny", unpaid:"Urlop bezpłatny", sick:"Zwolnienie L4" };
+    const leaveLabel = type => LEAVE[type] || "";
+    const plainObject = value => value !== null && typeof value === "object" && !Array.isArray(value);
+    const clone = object => structuredClone(object);
+    let db = EMPTY();
+    let storageLocked = false;
+    let toastTimer = 0;
+    let importData = null;
+    const ui = { screen:"home", month:ym(todayISO()), selected:todayISO(), day:todayISO(), statsMode:"month", statsMonth:ym(todayISO()), statsYear:new Date().getFullYear(), overlay:"", form:null, draft:"", formInitialValues:"", settingsInitialValues:"", backupReminderShown:false };
+
+    function dateFromISO(iso) {
+      const [y,m,d] = String(iso).split("-").map(Number);
+      return new Date(y, m-1, d);
     }
-    function moveDay(iso, count) {
-      const date = parseISODate(iso);
-      if (!date) throw new Error('Nieprawidłowa data.');
-      date.setDate(date.getDate() + count);
-      return isoFromDate(date);
+    function isoFromDate(date) {
+      return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}`;
     }
-    function moveMonth(month, count) {
-      const [y, m] = month.split('-').map(Number);
-      return ym(isoFromDate(new Date(y, m - 1 + count, 1)));
+    function isValidDateISO(value) {
+      if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+      const date = dateFromISO(value);
+      return Number.isFinite(date.getTime()) && isoFromDate(date) === value;
     }
-    const fmtMonthPL = month => {
-      const label = new Intl.DateTimeFormat('pl-PL', { month: 'long', year: 'numeric' }).format(parseISODate(`${month}-01`));
-      return label.charAt(0).toUpperCase() + label.slice(1);
-    };
-    const DOW_SHORT = ['Nd', 'Pn', 'Wt', 'Śr', 'Czw', 'Pt', 'Sb'];
-    const fmtWeekdayPL = iso => DOW_SHORT[parseISODate(iso).getDay()];
-    const dateLabel = iso => new Intl.DateTimeFormat('pl-PL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(parseISODate(iso));
-    const fmtHM = minutes => `${Math.floor(minutes / 60)}:${pad2(minutes % 60)}`;
-    const pln = value => value.toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' });
-    const leaveLabel = type => ({ paid: 'Urlop płatny', unpaid: 'Urlop bezpłatny', sick: 'Zwolnienie L4' }[type] || '');
-    const escapeHtml = value => String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
-    function normalizeTime(value) {
-      const match = typeof value === 'string' && value.trim().match(/^(\d{1,2}):(\d{1,2})$/);
-      if (!match || Number(match[1]) > 23 || Number(match[2]) > 59) return '';
-      return `${pad2(Number(match[1]))}:${pad2(Number(match[2]))}`;
+    function addDays(iso, increment) { const date = dateFromISO(iso); date.setDate(date.getDate()+increment); return isoFromDate(date); }
+    function addMonths(month, inc) { const date = dateFromISO(`${month}-01`); date.setMonth(date.getMonth()+inc); return isoFromDate(date).slice(0,7); }
+    function normalizeTimeHHMM(value) {
+      const match = String(value ?? "").trim().match(/^(\d{1,2}):(\d{1,2})$/);
+      if (!match) return "";
+      const h=Number(match[1]), m=Number(match[2]);
+      return h<=23 && m<=59 ? `${pad2(h)}:${pad2(m)}` : "";
     }
-    // 7. Model kopii JSON, walidacja i przechowywanie
-    function emptyDB() {
-      return { settings: { rate: 0, leaveQuota: 26, defaultIncludeSat: false, defaultIncludeSun: false,
-        defaultIncludeHolidays: false, backupReminderDays: 5,
-        shiftTemplates: [{ start: '06:00', end: '15:00' }, { start: '06:00', end: '16:00' }] }, entries: [] };
-    }
-    function normalizedShift(shift) {
-      if (!object(shift)) throw new Error('Nieprawidłowy zakres godzin.');
-      const start = normalizeTime(shift.start), end = normalizeTime(shift.end);
-      if (!start || !end || start === end) throw new Error('Godziny muszą być poprawne i różne.');
-      return { ...shift, start, end };
-    }
-    function prepareDB(source) {
-      if (!object(source) || !object(source.settings) || !Array.isArray(source.entries)) throw new Error('Kopia musi zawierać obiekt settings i tablicę entries.');
-      const result = clone(source);
-      result.settings = { ...emptyDB().settings, ...result.settings };
-      for (const key of ['rate', 'leaveQuota', 'backupReminderDays']) {
-        const value = result.settings[key];
-        if (!['number', 'string'].includes(typeof value) || String(value).trim() === '') throw new Error(`Nieprawidłowe ustawienie ${key}.`);
-        result.settings[key] = Number(value);
-        if (!Number.isFinite(result.settings[key]) || result.settings[key] < (key === 'backupReminderDays' ? 1 : 0)) throw new Error(`Nieprawidłowe ustawienie ${key}.`);
-      }
-      for (const key of ['defaultIncludeSat', 'defaultIncludeSun', 'defaultIncludeHolidays']) {
-        if (typeof result.settings[key] !== 'boolean') throw new Error(`Ustawienie ${key} musi mieć wartość true lub false.`);
-      }
-      if (!Array.isArray(result.settings.shiftTemplates)) throw new Error('Nieprawidłowa lista szablonów.');
-      result.settings.shiftTemplates = result.settings.shiftTemplates.map(normalizedShift);
-      if (result.settings.lastShift !== undefined) result.settings.lastShift = normalizedShift(result.settings.lastShift);
-      for (const day of result.entries) {
-        if (!object(day) || !parseISODate(day.date)) throw new Error('Kopia zawiera nieprawidłową datę.');
-        if (day.note !== undefined && typeof day.note !== 'string') throw new Error(`Nieprawidłowa notatka ${day.date}.`);
-        if (day.vacation !== undefined && typeof day.vacation !== 'boolean') throw new Error(`Nieprawidłowy urlop ${day.date}.`);
-        if (day.shifts !== undefined && !Array.isArray(day.shifts)) throw new Error(`Nieprawidłowe godziny ${day.date}.`);
-        day.note ??= '';
-        // Konwersja starszych wpisów odbywa się przed uzupełnianiem brakujących pól.
-        if (day.start !== undefined || day.end !== undefined) {
-          const legacy = normalizedShift({ start: day.start, end: day.end });
-          if (!day.shifts?.length) day.shifts = [legacy];
-          else if (!day.shifts.some(s => normalizeTime(s.start) === legacy.start && normalizeTime(s.end) === legacy.end)) throw new Error(`Niejednoznaczne stare i nowe godziny ${day.date}.`);
-          delete day.start;
-          delete day.end;
-        }
-        day.shifts = (day.shifts || []).map(normalizedShift);
-        if (day.leaveType == null || (day.leaveType === '' && day.vacation === true)) day.leaveType = day.vacation ? 'paid' : '';
-        if (!['', 'paid', 'unpaid', 'sick'].includes(day.leaveType)) throw new Error(`Nieznana absencja ${day.date}: ${day.leaveType}. Import został zatrzymany.`);
-        if (day.vacation === true && day.leaveType !== 'paid') throw new Error(`Sprzeczna absencja ${day.date}.`);
-        day.vacation = day.leaveType === 'paid';
-        for (const shift of day.shifts) if (!shiftAbsRange(day.date, shift.start, shift.end)) throw new Error(`Nieprawidłowa zmiana ${day.date}.`);
-      }
-      // Nieznane pola są zachowane. Powtórzone daty są rozstrzygane osobno przy imporcie.
-      return result;
-    }
-    function createStore(storage) {
-      let raw = null, value = emptyDB(), error = '';
-      function load() {
-        try {
-          raw = storage.getItem(CONFIG.storageKey);
-          const incoming = raw === null ? emptyDB() : prepareDB(JSON.parse(raw));
-          if (new Set(incoming.entries.map(d => d.date)).size !== incoming.entries.length) throw new Error('Baza zawiera powtórzone daty. Pobierz surową kopię i użyj importu.');
-          value = incoming;
-          error = '';
-        } catch (exception) { error = exception.message; }
-        return value;
-      }
-      load();
-      return {
-        get db() { return value; }, get error() { return error; }, get raw() { return raw; }, reload: load,
-        commit(next) {
-          if (error) throw new Error('Zapis zablokowany po błędzie odczytu. Zachowaj surową kopię danych.');
-          if (storage.getItem(CONFIG.storageKey) !== raw) throw new Error('Dane zmieniły się w innej karcie. Odśwież aplikację przed zapisem.');
-          const prepared = prepareDB(next);
-          if (new Set(prepared.entries.map(d => d.date)).size !== prepared.entries.length) throw new Error('Powtórzone daty w bazie.');
-          const serialized = JSON.stringify(prepared);
-          storage.setItem(CONFIG.storageKey, serialized);
-          value = prepared;
-          raw = serialized;
-        }
-      };
-    }
-    // 8. Wspólne obliczenia czasu, konfliktów, świąt i statystyk
     function shiftAbsRange(iso, start, end) {
-      const date = parseISODate(iso);
-      start = normalizeTime(start); end = normalizeTime(end);
-      if (!date || !start || !end || start === end) return null;
-      const [sh, sm] = start.split(':').map(Number), [eh, em] = end.split(':').map(Number);
-      const a = new Date(date.getFullYear(), date.getMonth(), date.getDate(), sh, sm).getTime();
-      let b = new Date(date.getFullYear(), date.getMonth(), date.getDate(), eh, em).getTime();
-      if (b < a) b = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1, eh, em).getTime();
-      return b > a ? { startMs: a, endMs: b } : null;
+      start = normalizeTimeHHMM(start); end = normalizeTimeHHMM(end);
+      if (!isValidDateISO(iso) || !start || !end || start===end) return null;
+      const [y,m,d] = iso.split("-").map(Number);
+      const [sh,sm] = start.split(":").map(Number), [eh,em] = end.split(":").map(Number);
+      const a = new Date(y,m-1,d,sh,sm,0,0).getTime();
+      let b = new Date(y,m-1,d,eh,em,0,0).getTime();
+      if (b<a) b=new Date(y,m-1,d+1,eh,em,0,0).getTime();
+      return b>a ? {startMs:a,endMs:b} : null;
     }
-    function minutesBetween(iso, start, end) {
-      const range = shiftAbsRange(iso, start, end);
-      return range ? Math.round((range.endMs - range.startMs) / 60000) : 0;
-    }
-    const computeDayMinutes = day => (day?.shifts || []).reduce((sum, shift) => sum + minutesBetween(day.date, shift.start, shift.end), 0);
-    function validateShift(database, iso, start, end, skipIndex = -1) {
-      const candidate = shiftAbsRange(iso, start, end);
-      if (!candidate) throw new Error('Podaj poprawne i różne godziny wejścia i wyjścia.');
-      const relevant = new Set([moveDay(iso, -1), iso, moveDay(iso, 1)]);
+    const rangesOverlap = (a,b) => !!(a && b && Math.max(a.startMs,b.startMs)<Math.min(a.endMs,b.endMs));
+    function validateShiftNoOverlap(database, iso, start, end, options={}) {
+      if (start===end) return {ok:false, message:"Godzina wejścia i wyjścia nie mogą być takie same."};
+      const range=shiftAbsRange(iso,start,end);
+      if (!range) return {ok:false,message:"Wprowadź prawidłowe godziny HH:MM."};
+      const neighbors = new Set([addDays(iso,-1),iso,addDays(iso,1)]);
       for (const day of database.entries) {
-        if (!relevant.has(day.date)) continue;
-        day.shifts.forEach((shift, index) => {
-          if (day.date === iso && index === skipIndex) return;
-          const range = shiftAbsRange(day.date, shift.start, shift.end);
-          if (range && Math.max(range.startMs, candidate.startMs) < Math.min(range.endMs, candidate.endMs)) throw new Error(`Konflikt z ${day.date}: ${shift.start}–${shift.end}. Zakresy stykające się są dozwolone.`);
+        if (!neighbors.has(day.date)) continue;
+        for (let i=0;i<day.shifts.length;i++) {
+          if (day.date===options.skipDate && i===options.skipIndex) continue;
+          const shift=day.shifts[i];
+          if (rangesOverlap(range,shiftAbsRange(day.date,shift.start,shift.end))) {
+            return {ok:false,message:`Zakres nakłada się na ${fmtDMYText(day.date)} ${shift.start}–${shift.end}.`};
+          }
+        }
+      }
+      return {ok:true};
+    }
+    function normalizeImported(raw) {
+      if (!plainObject(raw) || !plainObject(raw.settings) || !Array.isArray(raw.entries)) throw Error("Brak poprawnej struktury settings/entries.");
+      const settings = {...EMPTY().settings, ...raw.settings};
+      for (const key of ["rate", "leaveQuota", "backupReminderDays"]) {
+        const n=Number(settings[key]);
+        if (!Number.isFinite(n) || n<0) throw Error(`Nieprawidłowe ustawienie: ${key}.`);
+        settings[key]=n;
+      }
+      if (settings.backupReminderDays<1 || settings.backupReminderDays>365) throw Error("Częstotliwość kopii musi mieścić się w zakresie 1–365 dni.");
+      if (!Number.isInteger(settings.leaveQuota) || settings.leaveQuota>365) throw Error("Nieprawidłowy limit urlopu.");
+      for (const key of ["defaultIncludeSat", "defaultIncludeSun", "defaultIncludeHolidays"]) settings[key]=!!settings[key];
+      if (!Array.isArray(settings.shiftTemplates)) throw Error("Nieprawidłowe szablony godzin.");
+      if (settings.shiftTemplates.length>8) throw Error("Plik zawiera ponad 8 szablonów. Popraw kopię przed importem.");
+      settings.shiftTemplates=settings.shiftTemplates.map((template,index) => {
+        if (!plainObject(template)) throw Error(`Uszkodzony szablon numer ${index+1}.`);
+        const start=normalizeTimeHHMM(template.start), end=normalizeTimeHHMM(template.end);
+        if (!shiftAbsRange(todayISO(),start,end)) throw Error(`Nieprawidłowy zakres w szablonie ${index+1}.`);
+        return {...template,start,end};
+      });
+      const entries=[];
+      const dates=new Set();
+      for (const entry of raw.entries) {
+        if (!plainObject(entry) || !isValidDateISO(entry.date)) throw Error("W kopii występuje nieprawidłowa data wpisu.");
+        if (dates.has(entry.date)) throw Error(`Powtórzony wpis dnia ${entry.date} w pliku.`);
+        dates.add(entry.date);
+        const shifts=Array.isArray(entry.shifts) ? entry.shifts : (entry.shifts===undefined || entry.shifts===null) && entry.start && entry.end ? [{start:entry.start,end:entry.end}] : null;
+        if (!shifts) throw Error(`Niepoprawna struktura godzin ${entry.date}.`);
+        const normalizedShifts=shifts.map(shift => {
+          if (!plainObject(shift)) throw Error(`Błędny zakres ${entry.date}.`);
+          const start=normalizeTimeHHMM(shift.start), end=normalizeTimeHHMM(shift.end);
+          if (!shiftAbsRange(entry.date,start,end)) throw Error(`Błędny zakres ${entry.date}: ${shift.start}–${shift.end}.`);
+          return {...shift,start,end};
         });
+        // Pusty leaveType nie może przesłonić historycznego vacation:true.
+        // Jawne unpaid/sick/paid ma pierwszeństwo nawet przy sprzecznym vacation.
+        const leaveType=entry.leaveType==null || entry.leaveType===""
+          ? (entry.vacation===true ? "paid" : "") : entry.leaveType;
+        if (!["","paid","unpaid","sick"].includes(leaveType)) throw Error(`Nieznany rodzaj absencji ${entry.date}.`);
+        if (entry.note!=null && typeof entry.note!=="string") throw Error(`Nieprawidłowa notatka ${entry.date}.`);
+        entries.push({...entry,note:entry.note||"",shifts:normalizedShifts,leaveType,vacation:leaveType==="paid"});
+      }
+      entries.sort((a,b) => a.date.localeCompare(b.date));
+      const normalized={...raw,settings,entries};
+      for (const entry of entries) for (let i=0;i<entry.shifts.length;i++) {
+        const shift=entry.shifts[i];
+        const check=validateShiftNoOverlap(normalized,entry.date,shift.start,shift.end,{skipDate:entry.date,skipIndex:i});
+        if (!check.ok) throw Error(`Konflikt we wczytywanym pliku: ${check.message}`);
+      }
+      return normalized;
+    }
+    function loadDatabase() {
+      try {
+        const text=localStorage.getItem(STORAGE_KEY);
+        return text===null ? EMPTY() : normalizeImported(JSON.parse(text));
+      } catch (error) {
+        storageLocked=true;
+        queueMicrotask(() => showConfirm({title:"Problem z danymi testowymi",message:`Nie mogę bezpiecznie odczytać nowej bazy (${error.message}). Zapis został wstrzymany, aby niczego nie nadpisać. Możesz wyeksportować surowy plik z narzędzi przeglądarki, zanim zdecydujesz się ją naprawiać.`,actions:[{text:"Rozumiem",value:"ok"}]}));
+        return EMPTY();
       }
     }
-    function easterSunday(year) {
-      const a = year % 19, b = Math.floor(year / 100), c = year % 100;
-      const d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
-      const g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
-      const i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
-      const m = Math.floor((a + 11 * h + 22 * l) / 451);
-      return new Date(year, Math.floor((h + l - 7 * m + 114) / 31) - 1, (h + l - 7 * m + 114) % 31 + 1);
-    }
-    const holidayCache = new Map();
-    function holidays(year) {
-      if (holidayCache.has(year)) return holidayCache.get(year);
-      const result = new Map([
-        ['01-01', 'Nowy Rok'], ['01-06', 'Święto Trzech Króli'], ['05-01', 'Święto Pracy'], ['05-03', 'Święto Konstytucji 3 Maja'],
-        ['08-15', 'Wniebowzięcie NMP'], ['11-01', 'Wszystkich Świętych'], ['11-11', 'Narodowe Święto Niepodległości'],
-        ['12-24', 'Wigilia'], ['12-25', 'Boże Narodzenie (1. dzień)'], ['12-26', 'Boże Narodzenie (2. dzień)']
-      ].map(([date, label]) => [`${year}-${date}`, label]));
-      const easter = isoFromDate(easterSunday(year));
-      for (const [offset, label] of [[0, 'Wielkanoc'], [1, 'Poniedziałek Wielkanocny'], [49, 'Zielone Świątki'], [60, 'Boże Ciało']]) result.set(moveDay(easter, offset), label);
-      holidayCache.set(year, result);
-      return result;
-    }
-    const holiday = iso => holidays(Number(iso.slice(0, 4))).get(iso) || '';
-    function skipDate(iso, options) {
-      const dow = parseISODate(iso).getDay();
-      return (dow === 6 && !options.includeSat) || (dow === 0 && !options.includeSun) || (!!holiday(iso) && !options.includeHolidays);
-    }
-    function dateRange(from, to) {
-      if (!parseISODate(from) || !parseISODate(to) || from > to) throw new Error('Podaj poprawny zakres dat Od–Do.');
-      const result = [];
-      for (let iso = from; iso <= to; iso = moveDay(iso, 1)) {
-        result.push(iso);
-        if (result.length > 36600) throw new Error('Zakres jest zbyt długi (maksymalnie 100 lat).');
+    function commit(next, success="Zapisano") {
+      if (storageLocked) { toast("Zapis wstrzymany: błędna baza. Nie nadpisuję jej."); return false; }
+      try {
+        const checked=normalizeImported(next);
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(checked));
+        db=checked;
+        if (success) toast(success);
+        refreshAffectedViews();
+        return true;
+      } catch (error) {
+        toast(`Zmiany nie zostały zapisane: ${error.message}`);
+        return false;
       }
-      return result;
     }
-    function monthStats(database, month) {
-      const totals = { min: 0, money: 0, workDays: 0, paid: 0, unpaid: 0, sick: 0, notes: 0 };
-      for (const day of database.entries.filter(d => ym(d.date) === month)) {
-        const min = computeDayMinutes(day);
-        totals.min += min;
-        totals.money += round2(min / 60 * database.settings.rate);
-        totals.workDays += Number(min > 0);
-        totals.notes += Number(!!day.note.trim());
-        if (day.leaveType) totals[day.leaveType]++;
-      }
-      // Dwie zasady zaokrąglania wynikają z zatwierdzonej wersji 4.5.22.
-      totals.reportMoney = round2(totals.min / 60 * database.settings.rate);
-      totals.absences = totals.paid + totals.unpaid + totals.sick;
-      return totals;
-    }
-    function yearStats(database, year) {
-      const totals = { min: 0, money: 0, workDays: 0, paid: 0, unpaid: 0, sick: 0, notes: 0, absences: 0 };
-      for (let month = 1; month <= 12; month++) {
-        const stats = monthStats(database, `${year}-${pad2(month)}`);
-        for (const key of Object.keys(totals)) totals[key] += key === 'money' ? stats.reportMoney : stats[key];
-      }
-      totals.remainingLeave = Math.max(0, database.settings.leaveQuota - totals.paid);
-      return totals;
-    }
-    // 9. Operacje są wykonywane na kopii; UI przyjmuje stan dopiero po udanym zapisie.
-    const dayIn = (database, iso) => database.entries.find(day => day.date === iso);
-    function ensureDay(database, iso) {
-      let day = dayIn(database, iso);
-      if (!day) { day = { date: iso, note: '', shifts: [], vacation: false, leaveType: '' }; database.entries.push(day); }
+    const emptyDay = date => ({date, note:"", shifts:[], vacation:false, leaveType:""});
+    const getDay = date => db.entries.find(day => day.date===date) || null;
+    function editableDay(next,date) {
+      let day=next.entries.find(entry => entry.date===date);
+      if (!day) { day=emptyDay(date); next.entries.push(day); next.entries.sort((a,b) => a.date.localeCompare(b.date)); }
       return day;
     }
-    function setShift(database, iso, start, end, index = -1) {
-      const shift = normalizedShift({ start, end });
-      validateShift(database, iso, shift.start, shift.end, index);
-      const day = ensureDay(database, iso);
-      if (index < 0) { day.shifts.push(shift); database.settings.lastShift = shift; }
-      else {
-        if (!day.shifts[index]) throw new Error('Zakres już nie istnieje. Otwórz formularz ponownie.');
-        day.shifts[index] = { ...day.shifts[index], ...shift };
-      }
-      day.shifts.sort((a, b) => a.start.localeCompare(b.start));
+    function pruneDay(next,date) {
+      next.entries=next.entries.filter(day => day.date!==date || day.shifts.length || day.note.trim() || day.leaveType);
     }
-    function setLeave(database, iso, type) {
-      if (!['', 'paid', 'unpaid', 'sick'].includes(type)) throw new Error('Nieprawidłowa absencja.');
-      const day = ensureDay(database, iso);
-      day.leaveType = type; day.vacation = type === 'paid';
-    }
-    function planBulk(database, spec) {
-      const result = clone(database), counts = { changed: 0, skipped: 0, conflicts: 0 };
-      if (!['hours-add', 'hours-remove', 'leave-add', 'leave-remove'].includes(spec.operation)) throw new Error('Nieprawidłowa operacja.');
-      if (spec.operation.startsWith('hours') && !shiftAbsRange(spec.from, spec.start, spec.end)) throw new Error('Podaj poprawne godziny.');
-      if (spec.operation === 'leave-add' && !['paid', 'unpaid', 'sick'].includes(spec.leaveType)) throw new Error('Wybierz absencję.');
-      for (const iso of dateRange(spec.from, spec.to)) {
-        if (skipDate(iso, spec)) { counts.skipped++; continue; }
-        const day = dayIn(result, iso);
-        if (spec.operation === 'hours-add') {
-          try { validateShift(result, iso, spec.start, spec.end); }
-          catch { counts.conflicts++; continue; }
-          const target = ensureDay(result, iso);
-          target.shifts.push(normalizedShift({ start: spec.start, end: spec.end }));
-          target.shifts.sort((a, b) => a.start.localeCompare(b.start));
-          counts.changed++;
-        } else if (spec.operation === 'hours-remove' && day) {
-          const remaining = day.shifts.filter(s => s.start !== normalizeTime(spec.start) || s.end !== normalizeTime(spec.end));
-          if (remaining.length !== day.shifts.length) { day.shifts = remaining; counts.changed++; }
-        } else if (spec.operation === 'leave-add') {
-          if (day?.leaveType !== spec.leaveType) { setLeave(result, iso, spec.leaveType); counts.changed++; }
-        } else if (spec.operation === 'leave-remove' && day?.leaveType) { setLeave(result, iso, ''); counts.changed++; }
-      }
-      return { db: result, ...counts };
-    }
-    // 15. Plan importu: zachowanie dodatkowych pól, jawne konflikty, bez częściowego zapisu.
-    function mergeExtras(target, source, known) {
-      for (const key of Object.keys(source)) {
-        if (known.includes(key)) continue;
-        if (!Object.hasOwn(target, key)) Object.defineProperty(target, key, { value: clone(source[key]), enumerable: true, writable: true, configurable: true });
-        else if (JSON.stringify(target[key]) !== JSON.stringify(source[key])) throw new Error(`Różne wartości dodatkowego pola „${key}”. Scalanie zatrzymane, dane niezmienione.`);
-      }
-    }
-    function mergeEntries(result, entries, notices) {
-      for (const source of entries) {
-        const day = ensureDay(result, source.date);
-        mergeExtras(day, source, ['date', 'note', 'shifts', 'leaveType', 'vacation']);
-        if (!day.note) day.note = source.note;
-        else if (source.note && day.note !== source.note) notices.push(`${day.date}: zachowano bieżącą notatkę; notatka z pliku nie zostanie wczytana.`);
-        if (!day.leaveType) { day.leaveType = source.leaveType; day.vacation = source.vacation; }
-        else if (source.leaveType && source.leaveType !== day.leaveType) notices.push(`${day.date}: zachowano bieżącą absencję; absencja z pliku nie zostanie wczytana.`);
-        for (const shift of source.shifts) {
-          const duplicate = day.shifts.find(s => s.start === shift.start && s.end === shift.end);
-          if (duplicate) { mergeExtras(duplicate, shift, ['start', 'end']); continue; }
-          validateShift(result, source.date, shift.start, shift.end);
-          day.shifts.push(clone(shift));
-        }
-        day.shifts.sort((a, b) => a.start.localeCompare(b.start));
-      }
-    }
-    function findConflicts(database) {
-      const result = [];
-      for (const day of database.entries) day.shifts.forEach((shift, index) => {
-        try { validateShift(database, day.date, shift.start, shift.end, index); }
-        catch (error) { result.push(`${day.date}: ${error.message}`); }
-      });
-      return [...new Set(result)];
-    }
-    function prepareImport(source) {
-      const prepared = prepareDB(source), result = { ...prepared, entries: [] }, notices = [];
-      const duplicates = prepared.entries.length - new Set(prepared.entries.map(d => d.date)).size;
-      const shiftCount = prepared.entries.reduce((sum, d) => sum + d.shifts.length, 0);
-      mergeEntries(result, prepared.entries, notices);
-      // Sprzeczne notatki/absencje powtórzonych dat wymagają poprawienia kopii.
-      if (notices.length) throw new Error(`Powtórzone daty zawierają sprzeczne dane:\n${notices.join('\n')}`);
-      if (findConflicts(result).length) throw new Error('Kopia zawiera nakładające się godziny. Popraw zakresy w kopii przed importem.');
-      return { db: result, duplicates, duplicateShifts: shiftCount - result.entries.reduce((sum, d) => sum + d.shifts.length, 0) };
-    }
-    function planMerge(current, incoming) {
-      const result = clone(current), notices = [];
-      mergeExtras(result, incoming, ['settings', 'entries']);
-      mergeExtras(result.settings, incoming.settings, ['rate', 'leaveQuota', 'defaultIncludeSat', 'defaultIncludeSun', 'defaultIncludeHolidays', 'backupReminderDays', 'shiftTemplates', 'lastShift']);
-      mergeEntries(result, incoming.entries, notices);
-      if (findConflicts(result).length) throw new Error('Scalanie tworzy konflikt godzin. Dane nie zostały zmienione.');
-      return { db: result, notices };
-    }
-    function unknownFields(database) {
-      const result = new Set();
-      const add = (source, known, prefix) => Object.keys(source).filter(k => !known.includes(k)).forEach(k => result.add(`${prefix}${k}`));
-      add(database, ['settings', 'entries'], '');
-      add(database.settings, ['rate', 'leaveQuota', 'defaultIncludeSat', 'defaultIncludeSun', 'defaultIncludeHolidays', 'backupReminderDays', 'shiftTemplates', 'lastShift'], 'settings.');
-      for (const day of database.entries) {
-        add(day, ['date', 'note', 'shifts', 'vacation', 'leaveType'], 'entries.');
-        day.shifts.forEach(s => add(s, ['start', 'end'], 'shifts.'));
-      }
-      for (const shift of database.settings.shiftTemplates) add(shift, ['start', 'end'], 'shiftTemplates.');
-      if (database.settings.lastShift) add(database.settings.lastShift, ['start', 'end'], 'lastShift.');
-      return [...result];
-    }
-    // Stały stan interfejsu i prywatna baza, bez globalnego API aplikacji.
-    let storage;
-    try { storage = window.localStorage; }
-    catch (error) { storage = { getItem() { throw error; }, setItem() { throw error; } }; }
-    const store = createStore(storage);
-    let db = store.db;
-    let selected = todayISO(), month = ym(selected), route = { view: 'home' }, sequence = 0;
-    let formSnapshot = '', pendingImport = null, dialogResolve = null, historyTarget = null, dialogAnswer = false, dialogClosing = false;
-    let toastTimer;
-    const paths = {
-      back: '<path d="m14 6-6 6 6 6"/>', next: '<path d="m9 6 6 6-6 6"/>', more: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
-      plus: '<path d="M12 5v14M5 12h14"/>', edit: '<path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15z"/>',
-      clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>', calendar: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 10h18"/>',
-      note: '<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h6"/>',
-      settings: '<circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>',
-      backup: '<path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/>', info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7v1"/>', trash: '<path d="M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7"/>'
+    const minutesBetween = (date,start,end) => {
+      const range=shiftAbsRange(date,start,end);
+      return range ? Math.round((range.endMs-range.startMs)/60000) : 0;
     };
-    const icon = name => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name] || paths.info}</svg>`;
-    const iconButton = (action, name, label) => `<button type="button" class="icon-button" data-action="${action}" aria-label="${label}">${icon(name)}</button>`;
-    function notify(message) {
-      clearTimeout(toastTimer);
-      $('toast').textContent = message; $('toast').hidden = false;
-      toastTimer = setTimeout(() => { $('toast').hidden = true; }, 5000);
-    }
-    function showStorageWarning() {
-      $('storage-warning').hidden = !store.error;
-      $('storage-warning').textContent = store.error ? `Nie można odczytać bazy: ${store.error} Zapis jest zablokowany; surowe dane pozostają w pamięci przeglądarki. Użyj „Kopia i przywracanie”.` : '';
-    }
-    function commit(next) {
-      store.commit(next); db = store.db;
-      updateReminder();
-    }
-    function mutate(operation) { const next = clone(db); operation(next); commit(next); }
-    function updateReminder() {
-      try {
-        const last = storage.getItem(CONFIG.backupKey);
-        const due = !last || !Number.isFinite(Date.parse(last)) || Date.now() - Date.parse(last) >= db.settings.backupReminderDays * 86400000;
-        $('backup-reminder').hidden = !due || !db.entries.some(d => d.shifts.length || d.leaveType || d.note);
-      } catch { $('backup-reminder').hidden = true; }
-    }
-    // 10. Kalendarz: stała wysokość komórki niezależnie od liczby wpisów.
-    function calendarMarkup() {
-      const first = `${month}-01`, start = moveDay(first, -(parseISODate(first).getDay() + 6) % 7);
-      const [y, m] = month.split('-').map(Number), days = new Date(y, m, 0).getDate();
-      const length = Math.ceil(((parseISODate(first).getDay() + 6) % 7 + days) / 7) * 7;
-      const weekdays = ['Pn', 'Wt', 'Śr', 'Czw', 'Pt', 'Sb', 'Nd'].map(d => `<span class="weekday">${d}</span>`).join('');
-      const cells = Array.from({ length }, (_, index) => {
-        const iso = moveDay(start, index), day = dayIn(db, iso), dow = parseISODate(iso).getDay();
-        const types = [day?.shifts.length ? 'hours' : '', day?.leaveType || '', day?.note.trim() ? 'note' : ''].filter(Boolean);
-        const status = types.map(t => t === 'hours' ? 'godziny pracy' : t === 'note' ? 'notatka' : leaveLabel(t)).join(', ');
-        const classes = ['date-cell', ym(iso) !== month ? 'outside' : '', dow === 0 || dow === 6 ? 'weekend' : '', holiday(iso) ? 'holiday' : '', iso === todayISO() ? 'today' : ''].filter(Boolean).join(' ');
-        return `<button type="button" class="${classes}" data-date="${iso}" aria-pressed="${iso === selected}" ${iso === todayISO() ? 'aria-current="date"' : ''} aria-label="${escapeHtml(dateLabel(iso) + (holiday(iso) ? ', ' + holiday(iso) : '') + (status ? ', ' + status : ', brak wpisów'))}"><span class="number">${Number(iso.slice(-2))}</span><span class="dots">${types.map(t => `<i class="dot ${t}"></i>`).join('')}</span></button>`;
-      }).join('');
-      return `<div class="calendar-header">${iconButton('prev-month', 'back', 'Poprzedni miesiąc')}<button type="button" class="month-label" data-action="month-picker">${fmtMonthPL(month)}</button>${iconButton('next-month', 'next', 'Następny miesiąc')}</div><div class="calendar" aria-label="Kalendarz miesięczny">${weekdays}${cells}</div><div class="row spread wrap"><div class="legend">${['hours', 'paid', 'unpaid', 'sick', 'note'].map(t => `<span><i class="dot ${t}"></i>${t === 'hours' ? 'Praca' : t === 'note' ? 'Notatka' : t === 'paid' ? 'Urlop' : t === 'unpaid' ? 'Bezpłatny' : 'L4'}</span>`).join('')}</div><button type="button" class="pill" data-action="today">Dzisiaj</button></div>`;
-    }
-    function templatesMarkup() {
-      if (!db.settings.shiftTemplates.length) return '';
-      return `<div class="templates"><h3>Szybkie szablony</h3><div class="row wrap">${db.settings.shiftTemplates.map((s, i) => `<button class="pill hours" type="button" data-template="${i}">${s.start}–${s.end}</button>`).join('')}</div></div>`;
-    }
-    // 11. Podgląd i pełny dzień korzystają z tego samego wybranego dnia.
-    function previewMarkup() {
-      const day = dayIn(db, selected), minutes = computeDayMinutes(day);
-      return `<button class="preview-button" type="button" data-action="open-day" aria-label="Otwórz dzień: ${escapeHtml(dateLabel(selected))}"><span class="eyebrow">Wybrany dzień</span><h2>${escapeHtml(dateLabel(selected))}</h2><div class="preview-body">${holiday(selected) ? `<p class="muted">${escapeHtml(holiday(selected))}</p>` : ''}${day?.shifts.length ? `<div class="event hours"><span class="event-text"><strong>${day.shifts.map(s => `${s.start}–${s.end}`).join(', ')}</strong>Łącznie ${fmtHM(minutes)}</span>${icon('clock')}</div>` : ''}${day?.leaveType ? `<div class="event ${day.leaveType}">${leaveLabel(day.leaveType)}</div>` : ''}${day?.note.trim() ? `<div class="event note"><span class="preview-note">${escapeHtml(day.note)}</span></div>` : ''}${!day || (!day.shifts.length && !day.leaveType && !day.note.trim()) ? '<p class="muted">Brak wpisów. Dodaj godziny szablonem lub otwórz dzień.</p>' : ''}</div><p class="preview-open">Otwórz dzień →</p></button>${templatesMarkup()}`;
-    }
-    function metricsMarkup(stats, annual = false, home = false) {
-      const items = [[fmtHM(stats.min), 'Przepracowane godziny'], [pln(home ? stats.reportMoney : stats.money), 'Szacowane wynagrodzenie'], [stats.workDays, 'Dni pracy'], [stats.absences, 'Dni nieobecności']];
-      if (!home) items.push([`${stats.paid} dni`, 'Urlop płatny'], [`${stats.unpaid} dni`, 'Urlop bezpłatny'], [`${stats.sick} dni`, 'Zwolnienie L4'], [stats.notes, 'Dni z notatką']);
-      if (annual) items.push([`${stats.remainingLeave} dni`, 'Pozostały urlop płatny']);
-      return `<div class="metrics">${items.map(([value, label]) => `<div class="metric"><strong>${value}</strong><span>${label}</span></div>`).join('')}</div>`;
-    }
-    function homeMarkup() {
-      return `<div class="home"><section class="card calendar-card" id="calendar-card">${calendarMarkup()}</section><section class="card" id="preview-card">${previewMarkup()}</section><section class="card" id="summary-card"><div class="row spread"><h2>Ten miesiąc</h2><button class="pill" type="button" data-action="stats">Statystyki</button></div><p class="muted">${fmtMonthPL(month)}</p>${metricsMarkup(monthStats(db, month), false, true)}</section></div>`;
-    }
-    function refreshHome() {
-      $('calendar-card').innerHTML = calendarMarkup();
-      $('preview-card').innerHTML = previewMarkup();
-      $('summary-card').innerHTML = `<div class="row spread"><h2>Ten miesiąc</h2><button class="pill" type="button" data-action="stats">Statystyki</button></div><p class="muted">${fmtMonthPL(month)}</p>${metricsMarkup(monthStats(db, month), false, true)}`;
-    }
-    function dayMarkup() {
-      const day = dayIn(db, selected), minutes = computeDayMinutes(day);
-      const event = (action, type, text) => `<button type="button" class="event ${type}" data-action="${action}"><span class="event-text">${text}</span>${icon('edit')}</button>`;
-      const events = [];
-      if (holiday(selected)) events.push(`<div class="event"><span class="event-text">${escapeHtml(holiday(selected))}</span>${icon('calendar')}</div>`);
-      if (day?.leaveType) events.push(event('leave', day.leaveType, `<strong>${leaveLabel(day.leaveType)}</strong>`));
-      day?.shifts.forEach((s, index) => events.push(`<button class="event hours" type="button" data-shift="${index}"><span class="event-text"><strong>${s.start}–${s.end}</strong>${fmtHM(minutesBetween(selected, s.start, s.end))}${s.end < s.start ? ' · koniec następnego dnia' : ''}</span>${icon('edit')}</button>`));
-      if (day?.note.trim()) events.push(event('note', 'note', escapeHtml(day.note)));
-      return `<div class="stack day-screen"><section class="card"><div class="day-nav">${iconButton('prev-day', 'back', 'Poprzedni dzień')}<p>${dateLabel(selected)}</p>${iconButton('next-day', 'next', 'Następny dzień')}</div><div class="metrics"><div class="metric"><strong>${fmtHM(minutes)}</strong><span>Łączny czas</span></div><div class="metric"><strong>${pln(round2(minutes / 60 * db.settings.rate))}</strong><span>Szacowane wynagrodzenie</span></div></div>${templatesMarkup()}</section><section class="card stack">${events.length ? events.join('') : '<p class="muted">Brak wpisów. Użyj przycisku +, aby dodać wydarzenie.</p>'}</section><button type="button" class="fab" data-action="fab" aria-label="Dodaj wydarzenie">${icon('plus')}</button></div>`;
-    }
-    // 12. Jeden wzorzec formularzy. Przyciski są częścią przewijanej treści.
-    const inputField = (name, label, type, value, extra = '') => `<label class="field">${label}<input name="${name}" type="${type}" value="${escapeHtml(value)}" ${extra}></label>`;
-    const leaveSelect = value => `<label class="field">Rodzaj absencji<select name="leaveType">${['paid', 'unpaid', 'sick'].map(t => `<option value="${t}" ${value === t ? 'selected' : ''}>${leaveLabel(t)}</option>`).join('')}</select></label>`;
-    const timeFields = shift => `<div class="pair">${inputField('start', 'Wejście', 'time', shift.start, 'required')}${inputField('end', 'Wyjście', 'time', shift.end, 'required')}</div><p class="muted">Koniec wcześniejszy niż początek oznacza zmianę przez północ.</p>`;
-    const submitActions = (text = 'Zapisz', remove = false) => `<p id="form-error" class="error-text" role="alert" hidden></p><div class="actions"><button class="button" type="submit">${text}</button>${remove ? '<button class="button danger" type="button" data-action="delete-event">Usuń</button>' : ''}</div>`;
-    function formMarkup() {
-      const day = dayIn(db, selected), last = db.settings.lastShift || db.settings.shiftTemplates[0] || { start: '06:00', end: '15:00' };
-      let fields = '';
-      if (route.kind === 'hours') fields = timeFields(route.index >= 0 ? day.shifts[route.index] : last) + submitActions(route.index >= 0 ? 'Zapisz' : 'Dodaj godziny', route.index >= 0);
-      if (route.kind === 'leave') fields = leaveSelect(day?.leaveType || 'paid') + submitActions('Zapisz absencję', !!day?.leaveType);
-      if (route.kind === 'note') fields = `<label class="field">Notatka<textarea name="note" placeholder="Co chcesz zapamiętać?">${escapeHtml(day?.note || '')}</textarea><small>Zapis nastąpi wyłącznie po kliknięciu „Zapisz”.</small></label>${submitActions('Zapisz', !!day?.note)}`;
-      if (route.kind === 'month') fields = inputField('month', 'Miesiąc', 'month', month, 'required min="0100-01" max="9998-12"') + submitActions('Wybierz miesiąc');
-      if (route.kind === 'bulk') {
-        fields = `<div class="segment" aria-label="Rodzaj wpisów zbiorczych"><button type="button" data-action="bulk-hours" aria-pressed="true">Godziny pracy</button><button type="button" data-action="bulk-leave" aria-pressed="false">Urlop / L4</button></div><input type="hidden" name="mode" value="hours"><div class="pair">${inputField('from', 'Od', 'date', selected, 'required')}${inputField('to', 'Do', 'date', selected, 'required')}</div><div id="bulk-hours">${timeFields(last)}</div><div id="bulk-leave" hidden>${leaveSelect('paid')}</div><div>${[['includeSat', 'Uwzględniaj soboty', 'defaultIncludeSat'], ['includeSun', 'Uwzględniaj niedziele', 'defaultIncludeSun'], ['includeHolidays', 'Uwzględniaj święta', 'defaultIncludeHolidays']].map(([name, label, key]) => `<label class="check"><input name="${name}" type="checkbox" ${db.settings[key] ? 'checked' : ''}>${label}</label>`).join('')}</div><p id="form-error" class="error-text" role="alert" hidden></p><div class="actions"><button class="button" type="submit" name="operation" value="add">Dodaj</button><button class="button danger" type="submit" name="operation" value="remove">Usuń</button></div>`;
+    const computeDayMinutes = day => (day?.shifts||[]).reduce((sum,shift) => sum+minutesBetween(day.date,shift.start,shift.end),0);
+    const computeMonthMinutes = month => db.entries.filter(entry => ym(entry.date)===month).reduce((sum,entry) => sum+computeDayMinutes(entry),0);
+    function computeStats(monthOrYear, year=false, moneyRounding="month") {
+      const days=db.entries.filter(day => year ? Number(day.date.slice(0,4))===Number(monthOrYear) : ym(day.date)===monthOrYear);
+      const totals={min:0,workDays:0,paid:0,unpaid:0,sick:0,notes:0,money:0};
+      for (const day of days) {
+        const min=computeDayMinutes(day);
+        totals.min+=min;
+        if (min>0) totals.workDays++;
+        if (day.note.trim()) totals.notes++;
+        if (day.leaveType in LEAVE) totals[day.leaveType]++;
       }
-      return `<section class="card form-card"><p class="muted">${route.kind === 'month' ? 'Kalendarz miesięczny' : route.kind === 'bulk' ? 'Zmiany zostaną pokazane przed zapisaniem.' : dateLabel(selected)}</p><form id="editor" class="fields" style="margin-top:20px">${fields}</form></section>`;
+      if (year) for (let month=1;month<=12;month++) {
+        const partial=db.entries.filter(d=>ym(d.date)===`${monthOrYear}-${pad2(month)}`).reduce((sum,d)=>sum+computeDayMinutes(d),0);
+        totals.money+=round2(partial/60*db.settings.rate);
+      } else totals.money=moneyRounding==="day"
+        ? days.reduce((sum,day)=>sum+round2(computeDayMinutes(day)/60*db.settings.rate),0)
+        : round2(totals.min/60*db.settings.rate);
+      return totals;
     }
-    function settingsMarkup() {
-      const s = db.settings;
-      return `<section class="card form-card stack"><form id="settings-form" class="fields">${inputField('rate', 'Stawka za godzinę (zł)', 'number', s.rate, 'required min="0" step="0.01" inputmode="decimal"')}${inputField('leaveQuota', 'Roczny limit urlopu (dni)', 'number', s.leaveQuota, 'required min="0" step="1"')}${inputField('backupReminderDays', 'Przypomnienie o kopii co (dni)', 'number', s.backupReminderDays, 'required min="1" step="1"')}<div>${[['defaultIncludeSat', 'Domyślnie uwzględniaj soboty'], ['defaultIncludeSun', 'Domyślnie uwzględniaj niedziele'], ['defaultIncludeHolidays', 'Domyślnie uwzględniaj święta']].map(([name, label]) => `<label class="check"><input name="${name}" type="checkbox" ${s[name] ? 'checked' : ''}>${label}</label>`).join('')}</div>${submitActions('Zapisz ustawienia')}</form><div><h2>Szablony godzin</h2><p class="muted">Maksymalnie osiem nowych szablonów.</p><div id="templates-list">${s.shiftTemplates.map((t, i) => `<div class="row spread template-row"><span>${t.start}–${t.end}</span><button type="button" class="icon-button" data-remove-template="${i}" aria-label="Usuń szablon ${t.start}–${t.end}">${icon('trash')}</button></div>`).join('')}</div></div><form id="template-form" class="fields">${timeFields({ start: '06:00', end: '15:00' })}<div class="actions"><button class="button secondary" type="submit">Dodaj szablon</button></div><p id="template-error" class="error-text" role="alert" hidden></p></form></section>`;
+    function computeLeaveBalance(year) {
+      const quota=Math.max(0,Number(db.settings.leaveQuota)||0);
+      const used=db.entries.filter(day=>day.date.slice(0,4)===String(year) && day.leaveType==="paid").length;
+      return {quota,used,remaining:Math.max(0,quota-used)};
     }
-    // 13. Statystyki bez wykresów, tabel ekranowych i CSV.
-    function statsMarkup() {
-      const annual = route.mode === 'year', year = route.year || Number(month.slice(0, 4));
-      return `<section class="card form-card stack"><div class="segment"><button type="button" data-action="stats-month" aria-pressed="${!annual}">Miesiąc</button><button type="button" data-action="stats-year" aria-pressed="${annual}">Rok</button></div>${annual ? inputField('stats-year', 'Rok', 'number', year, 'id="stats-year" min="100" max="9998" step="1"') : inputField('stats-month', 'Miesiąc', 'month', route.month || month, 'id="stats-month" min="0100-01" max="9998-12"')}${metricsMarkup(annual ? yearStats(db, year) : monthStats(db, route.month || month), annual)}${annual ? '<p class="muted">Raport PDF jest miesięczny. Wybierz miesiąc raportu.</p>' + inputField('report-month', 'Miesiąc raportu', 'month', route.reportMonth || month, 'id="report-month" min="0100-01" max="9998-12"') : ''}<button class="button secondary" type="button" data-action="report">${icon('backup')}Raport PDF</button></section>`;
+
+    /* 7. Polskie święta, łącznie z ruchomymi i Wigilią. */
+    const holidaysCache = new Map();
+    function easterSunday(year) {
+      const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4;
+      const f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30;
+      const i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451);
+      const month=Math.floor((h+l-7*m+114)/31),day=(h+l-7*m+114)%31+1;
+      return isoFromDate(new Date(year,month-1,day));
     }
-    function menuMarkup() {
-      return `<section class="card form-card">${[['bulk', 'calendar', 'Wpisy zbiorcze'], ['settings', 'settings', 'Ustawienia'], ['backup-screen', 'backup', 'Kopia i przywracanie'], ['tools', 'settings', 'Narzędzia'], ['about', 'info', 'Informacje o aplikacji']].map(([action, name, label]) => `<button class="menu-item" type="button" data-action="${action}">${icon(name)}<span>${label}</span>${icon('next')}</button>`).join('')}</section>`;
+    function polishHolidays(year) {
+      const result = new Map([
+        [`${year}-01-01`,"Nowy Rok"], [`${year}-01-06`,"Święto Trzech Króli"],
+        [`${year}-05-01`,"Święto Pracy"], [`${year}-05-03`,"Święto Konstytucji 3 Maja"],
+        [`${year}-08-15`,"Wniebowzięcie NMP"], [`${year}-11-01`,"Wszystkich Świętych"],
+        [`${year}-11-11`,"Narodowe Święto Niepodległości"], [`${year}-12-24`,"Wigilia"],
+        [`${year}-12-25`,"Boże Narodzenie (1. dzień)"], [`${year}-12-26`,"Boże Narodzenie (2. dzień)"]
+      ]);
+      const easter=easterSunday(year);
+      result.set(easter,"Wielkanoc");
+      result.set(addDays(easter,1),"Poniedziałek Wielkanocny");
+      result.set(addDays(easter,49),"Zielone Świątki");
+      result.set(addDays(easter,60),"Boże Ciało");
+      return result;
     }
-    function backupMarkup() {
-      return `<section class="card form-card stack"><h2>Kopia JSON</h2><p class="muted">Pełna kopia obejmuje ustawienia i wszystkie wpisy. Zachowaj pobrany plik poza przeglądarką.</p><button class="button" type="button" data-action="export">Pobierz kopię JSON</button>${store.error ? '<button class="button secondary" type="button" data-action="raw-export">Pobierz surowe dane z pamięci</button>' : ''}<hr><h2>Przywracanie</h2><p class="muted">Najpierw zobaczysz zakres, duplikaty i plan scalania. Sam wybór pliku nie zmienia danych.</p><label class="field">Wybierz kopię JSON<input id="import-file" type="file" accept=".json,application/json" ${store.error ? 'disabled' : ''}></label><div id="import-plan"></div></section>`;
+    function getHolidayMap(year) {
+      if (!holidaysCache.has(year)) holidaysCache.set(year,polishHolidays(year));
+      return holidaysCache.get(year);
     }
-    function renderImportPlan() {
-      if (!pendingImport || !$('import-plan')) return;
-      const incoming = pendingImport.db, dates = incoming.entries.map(d => d.date).sort();
-      const duplicateDates = incoming.entries.filter(d => dayIn(db, d.date)).length;
-      let merge;
-      try { merge = planMerge(db, incoming); } catch (error) { merge = { error: error.message }; }
-      pendingImport.merge = merge;
-      const extras = unknownFields(incoming);
-      $('import-plan').innerHTML = `<div class="notice"><strong>Podgląd kopii</strong><p>Daty: ${dates[0] || 'brak'} – ${dates.at(-1) || 'brak'}<br>Wpisy dni: ${incoming.entries.length}<br>Daty już w bazie: ${duplicateDates}<br>Połączone powtórzone daty w pliku: ${pendingImport.duplicates}</p></div><p class="muted">Scalanie zachowa obecne ustawienia. Uzupełni puste notatki i absencje. Konflikty godzin blokują całe scalanie.</p>${extras.length ? `<p class="notice">Kopia zawiera dodatkowe pola: ${escapeHtml(extras.join(', '))}. Zastąpienie zachowa je wszystkie. Scalanie pozostawia bieżące szablony i ostatni zakres godzin, wraz z ich dodatkowymi polami.</p>` : ''}${merge.error ? `<p class="error-text">${escapeHtml(merge.error)}</p>` : merge.notices.length ? `<p class="notice">${escapeHtml(merge.notices.join('\n'))}</p>` : '<p class="muted">Plan scalania nie zawiera konfliktów.</p>'}<div class="actions"><button class="button" type="button" data-action="import-merge" ${merge.error ? 'disabled' : ''}>Scal dane</button><button class="button danger" type="button" data-action="import-replace">Zastąp bazę</button><button class="button secondary" type="button" data-action="import-cancel">Anuluj import</button></div>`;
-      if (pendingImport.duplicateShifts) $('import-plan').insertAdjacentHTML('afterbegin', `<p class="muted">Pominięte identyczne zakresy w pliku: ${pendingImport.duplicateShifts}.</p>`);
+    function shouldSkipDay(iso,options) {
+      const dow=dateFromISO(iso).getDay();
+      return (dow===6 && !options.includeSat) || (dow===0 && !options.includeSun) || (getHolidayMap(Number(iso.slice(0,4))).has(iso) && !options.includeHolidays);
     }
-    // 14. Szablon raportu 4.5.22 zostaje zachowany dokładnie; ma wspólne obliczenia.
-    const getDay = iso => dayIn(db, iso);
-    const computeMonthMinutes = monthYM => monthStats(db, monthYM).min;
+    const rangeDates = (from,to,limit=3660) => {
+      if (!isValidDateISO(from) || !isValidDateISO(to) || from>to) throw Error("Niepoprawny zakres dat.");
+      const dates=[];
+      for (let iso=from;iso<=to;iso=addDays(iso,1)) {
+        if (dates.length===limit) throw Error("Zakres obejmuje zbyt dużo dni (maksymalnie 3660).");
+        dates.push(iso);
+      }
+      return dates;
+    };
+    function addShift(date,start,end,skipIndex=-1) {
+      const next=clone(db);
+      const day=editableDay(next,date);
+      const check=validateShiftNoOverlap(next,date,start,end,{skipDate:date,skipIndex});
+      if (!check.ok) { toast(check.message); return false; }
+      if (skipIndex>=0) day.shifts[skipIndex]={...day.shifts[skipIndex],start,end};
+      else day.shifts.push({start,end});
+      day.shifts.sort((a,b)=>a.start.localeCompare(b.start));
+      return commit(next,"Godziny zapisane");
+    }
+    function removeShift(date,index) {
+      const next=clone(db),day=editableDay(next,date);
+      if (!day.shifts[index]) return false;
+      day.shifts.splice(index,1); pruneDay(next,date);
+      return commit(next,"Usunięto zakres godzin");
+    }
+    function setNote(date,text) {
+      const next=clone(db),day=editableDay(next,date);
+      day.note=text.trim(); pruneDay(next,date);
+      return commit(next,"Notatka zapisana");
+    }
+    function setLeave(from,to,type,options) {
+      if (!["","paid","unpaid","sick"].includes(type)) throw Error("Niepoprawny rodzaj absencji.");
+      const next=clone(db);
+      let count=0,skipped=0;
+      for (const date of rangeDates(from,to)) {
+        if (shouldSkipDay(date,options)) { skipped++; continue; }
+        const day=editableDay(next,date);
+        if (day.leaveType===type) continue;
+        day.leaveType=type; day.vacation=type==="paid";
+        pruneDay(next,date); count++;
+      }
+      return commit(next,`Zmieniono status w ${count} dniach, pominięto ${skipped} dni.`);
+    }
+    function changeBulk(from,to,kind,mode,start,end,options) {
+      const next=clone(db);
+      let changed=0,skipped=0,conflicts=0;
+      for (const date of rangeDates(from,to)) {
+        if (shouldSkipDay(date,options)) { skipped++; continue; }
+        let day=next.entries.find(entry=>entry.date===date);
+        if (kind==="hours" && mode==="remove") {
+          if (!day) continue;
+          const before=day.shifts.length;
+          day.shifts=day.shifts.filter(s=>!(s.start===start && s.end===end));
+          if (before!==day.shifts.length) { changed++; pruneDay(next,date); }
+        } else if (kind==="hours") {
+          const check=validateShiftNoOverlap(next,date,start,end);
+          if (!check.ok) { conflicts++; continue; }
+          day=editableDay(next,date);
+          day.shifts.push({start,end});day.shifts.sort((a,b)=>a.start.localeCompare(b.start));changed++;
+        } else if (mode==="remove") {
+          if (!day || !day.leaveType) continue;
+          day.leaveType="";day.vacation=false;changed++;pruneDay(next,date);
+        } else {
+          day=editableDay(next,date);
+          if (day.leaveType===mode) continue;
+          day.leaveType=mode;day.vacation=mode==="paid";changed++;
+        }
+      }
+      return commit(next,`Zmieniono ${changed} dni, pominięto ${skipped} wolnych i ${conflicts} konfliktów.`);
+    }
+
+    /* 8. Częściowe renderowanie: miesiąc, karta dnia, wyniki, ekran szczegółowy. */
+    function toast(text) {
+      const node=$("toast");
+      clearTimeout(toastTimer);
+      node.textContent=String(text);
+      node.classList.add("show");
+      toastTimer=setTimeout(()=>node.classList.remove("show"),4200);
+    }
+    function statTile(value,label) {
+      return `<div class="stat-tile"><strong>${escapeHtml(value)}</strong><span>${escapeHtml(label)}</span></div>`;
+    }
+    function renderSummary(container, stats, showDetails=false) {
+      const absences=stats.paid+stats.unpaid+stats.sick;
+      $(container).innerHTML=[
+        statTile(fmtDuration(stats.min),"Przepracowano"),
+        statTile(pln(stats.money),"Szacowana wypłata"),
+        statTile(stats.workDays,"Dni pracy"),
+        statTile(absences,"Dni nieobecności"),
+        ...(showDetails ? [statTile(stats.paid,"Urlop płatny"),statTile(stats.unpaid,"Urlop bezpłatny"),statTile(stats.sick,"L4"),statTile(stats.notes,"Dni z notatką")] : [])
+      ].join("");
+    }
+    function getMarkers(day) {
+      if (!day) return [];
+      return [
+        ...(day.shifts.length ? ["work"]:[]),
+        ...(day.leaveType ? [day.leaveType] : []),
+        ...(day.note.trim() ? ["note"] : [])
+      ];
+    }
+    function renderCalendar() {
+      $("monthTitle").innerHTML=`${escapeHtml(fmtMonthPL(ui.month))} ${icon("chevron",true)}`;
+      $("monthPicker").value=ui.month;
+      const [year,month]=ui.month.split("-").map(Number);
+      const first=new Date(year,month-1,1).getDay();
+      const leading=(first+6)%7;
+      const last=new Date(year,month,0).getDate();
+      const dayMap=new Map(db.entries.filter(day=>ym(day.date)===ui.month).map(day=>[day.date,day]));
+      const holidayMap=getHolidayMap(year);
+      let html="";
+      const outsideCell=iso => `<button type="button" class="day-cell outside" data-date="${iso}" aria-label="${escapeHtml(fmtDateLongPL(iso))}, poza bieżącym miesiącem"><span class="day-number">${Number(iso.slice(-2))}</span><span class="markers"></span></button>`;
+      for (let blank=leading;blank>0;blank--) html+=outsideCell(addDays(`${ui.month}-01`,-blank));
+      for (let d=1;d<=last;d++) {
+        const iso=`${ui.month}-${pad2(d)}`;
+        const day=dayMap.get(iso);
+        const marks=getMarkers(day);
+        const week=dateFromISO(iso).getDay();
+        const holiday=holidayMap.get(iso);
+        const classes=["day-cell",iso===todayISO()?"today":"",iso===ui.selected?"selected":"",holiday?"holiday":"",week===0?"sunday":""].filter(Boolean).join(" ");
+        const title=[fmtDateLongPL(iso),holiday||"",marks.map(m=>m==="work"?"Godziny":m==="note"?"Notatka":LEAVE[m]).join(", ")].filter(Boolean).join(". ");
+        html+=`<button type="button" class="${classes}" data-date="${iso}" aria-pressed="${iso===ui.selected}" title="${escapeHtml(title)}" aria-label="${escapeHtml(title)}"><span class="day-number">${d}</span><span class="markers">${marks.slice(0,3).map(mark=>`<i class="marker ${mark}"></i>`).join("")}${marks.length>3?'<i class="marker more"></i>':""}</span></button>`;
+      }
+      const trailing=(7-(leading+last)%7)%7;
+      for (let day=1;day<=trailing;day++) html+=outsideCell(addDays(`${ui.month}-${pad2(last)}`,day));
+      $("calendarGrid").innerHTML=html;
+    }
+    function quickChips() {
+      return db.settings.shiftTemplates.map(t=>`<button type="button" class="quick-chip" data-quick="${escapeHtml(t.start)}|${escapeHtml(t.end)}" aria-label="Dodaj ${escapeHtml(t.start)} do ${escapeHtml(t.end)}">${escapeHtml(t.start)}–${escapeHtml(t.end)}</button>`).join("");
+    }
+    function renderPreview() {
+      const iso=ui.selected;
+      const day=getDay(iso);
+      const marks=[];
+      if (day) {
+        for (const shift of day.shifts) marks.push(`<span class="tag work">${icon("clock",true)} ${escapeHtml(shift.start)}–${escapeHtml(shift.end)}</span>`);
+        if (day.leaveType) marks.push(`<span class="tag ${day.leaveType}">${escapeHtml(LEAVE[day.leaveType])}</span>`);
+        if (day.note.trim()) marks.push(`<span class="tag note">${icon("notes",true)} ${escapeHtml(day.note)}</span>`);
+      }
+      const holiday=getHolidayMap(Number(iso.slice(0,4))).get(iso);
+      if (holiday) marks.push(`<span class="tag holiday">${escapeHtml(holiday)}</span>`);
+      if (day?.shifts.length) marks.push(`<span class="tag work"><strong>Razem: ${fmtDuration(computeDayMinutes(day))}</strong></span>`);
+      $("previewTitle").textContent=dayLabel(iso);
+      $("previewContent").innerHTML=marks.join("") || '<p class="help" style="margin:0">Brak wpisów w tym dniu.</p>';
+      $("quickPreview").hidden=!db.settings.shiftTemplates.length;
+      $("previewChips").innerHTML=quickChips();
+    }
+    function renderHomeStats() { renderSummary("homeStats",computeStats(ui.month)); }
+    function renderDay() {
+      const iso=ui.day,day=getDay(iso),holiday=getHolidayMap(Number(iso.slice(0,4))).get(iso);
+      $("dayDate").textContent=dayLabel(iso);
+      $("dayTotal").textContent=fmtDuration(computeDayMinutes(day));
+      $("dayHoliday").textContent=holiday || "";
+      const events=[];
+      if (day) {
+        for (const [i,shift] of day.shifts.entries()) events.push(`<button class="event work" type="button" data-edit="shift" data-index="${i}"><span class="event-text"><strong>${escapeHtml(shift.start)}–${escapeHtml(shift.end)}</strong><small>${fmtDuration(minutesBetween(iso,shift.start,shift.end))}</small></span>${icon("edit",true)}</button>`);
+        if (day.leaveType) events.push(`<button class="event ${day.leaveType}" type="button" data-edit="leave"><span class="event-text"><strong>${LEAVE[day.leaveType]}</strong><small>Dotknij, aby edytować lub usunąć status</small></span>${icon("edit",true)}</button>`);
+        if (day.note.trim()) events.push(`<button class="event note" type="button" data-edit="note"><span class="event-text"><strong>Notatka</strong><small>${escapeHtml(day.note)}</small></span>${icon("edit",true)}</button>`);
+      }
+      if (holiday) events.push(`<div class="event holiday"><span class="event-text"><strong>${escapeHtml(holiday)}</strong><small>Święto informacyjne</small></span></div>`);
+      $("dayEvents").innerHTML=events.join("")||'<p class="help">Brak wpisów. Użyj przycisku +, aby dodać wydarzenie.</p>';
+      $("dayChips").innerHTML=quickChips();
+      $("dayQuickBlock").hidden=!db.settings.shiftTemplates.length;
+    }
+    function renderStats() {
+      const year=ui.statsMode==="year";
+      const balance=computeLeaveBalance(year?ui.statsYear:Number(ui.statsMonth.slice(0,4)));
+      $("statsMonthly").classList.toggle("active",!year);
+      $("statsYearly").classList.toggle("active",year);
+      $("statsPeriodTitle").textContent=(year?String(ui.statsYear):fmtMonthPL(ui.statsMonth))+" ⌄";
+      $("statsMonthPicker").value=year?`${ui.statsYear}-01`:ui.statsMonth;
+      renderSummary("statsGrid",computeStats(year?ui.statsYear:ui.statsMonth,year,year?"month":"day"),true);
+      $("statsGrid").insertAdjacentHTML("beforeend",[
+        statTile(balance.quota,"Roczny limit urlopu"),
+        statTile(balance.used,"Wykorzystany urlop płatny (rok)"),
+        statTile(balance.remaining,"Pozostało urlopu płatnego")
+      ].join(""));
+      $("yearReportNote").hidden=!year;
+    }
+    function renderTemplates() {
+      $("templateList").innerHTML=db.settings.shiftTemplates.length ? db.settings.shiftTemplates.map((t,i)=>`<div class="data-row"><strong>${escapeHtml(t.start)}–${escapeHtml(t.end)}</strong><button class="btn small danger" type="button" data-remove-template="${i}">Usuń</button></div>`).join("") : '<p class="help">Brak zapisanych szablonów.</p>';
+    }
+    function renderSettings() {
+      const s=db.settings;
+      $("settingRate").value=s.rate;
+      $("settingQuota").value=s.leaveQuota;
+      $("settingSat").checked=s.defaultIncludeSat;
+      $("settingSun").checked=s.defaultIncludeSun;
+      $("settingHolidays").checked=s.defaultIncludeHolidays;
+      $("settingReminder").value=s.backupReminderDays;
+      renderTemplates();
+      ui.settingsInitialValues=snapshotInputs($("settingsScreen"));
+    }
+    function renderBackupInfo() {
+      const last=localStorage.getItem(BACKUP_KEY);
+      $("lastBackupText").textContent=last ? `Ostatnia próba pobrania: ${new Date(last).toLocaleString("pl-PL")}` : "Nie odnotowano pobrania kopii w nowej aplikacji.";
+    }
+    function refreshAffectedViews() {
+      if (ui.screen==="home") { renderCalendar();renderPreview();renderHomeStats(); }
+      if (ui.screen==="day") renderDay();
+      if (ui.screen==="stats") renderStats();
+      if (ui.screen==="settings") renderTemplates();
+      if (ui.screen==="backup") renderBackupInfo();
+    }
+
+    /* 9. Historia ekranu i pojedynczy punkt sterowania dialogami. */
+    const SCREENS={home:"Czas pracy",day:"Dzień",stats:"Statystyki",menu:"Więcej",settings:"Ustawienia",backup:"Kopia i przywracanie",tools:"Narzędzia",about:"O aplikacji"};
+    const snapshot = () => ({cpNext:true,screen:ui.screen,month:ui.month,selected:ui.selected,day:ui.day,statsMode:ui.statsMode,statsMonth:ui.statsMonth,statsYear:ui.statsYear,overlay:ui.overlay});
+    function setScreen(name) {
+      ui.screen=name;
+      for (const key of Object.keys(SCREENS)) $(key+"Screen").hidden=key!==name;
+      $("headerTitle").textContent=SCREENS[name];
+      $("backBtn").hidden=name==="home";
+      $("fab").hidden=name!=="day";
+      closeFab();
+      $("todayBtn").hidden=!(["home","day"].includes(name));
+      $("statsBtn").hidden=name==="stats";
+      $("menuBtn").hidden=name==="menu";
+      if (name==="home") { renderCalendar();renderPreview();renderHomeStats(); }
+      if (name==="day") renderDay();
+      if (name==="stats") renderStats();
+      if (name==="settings") renderSettings();
+      if (name==="backup") renderBackupInfo();
+      if (name==="tools") $("clearMonthInput").value=ui.month;
+    }
+    function navigate(name, opts={}) {
+      if (ui.overlay) return;
+      if (!(name in SCREENS)) return;
+      Object.assign(ui,opts);
+      ui.screen=name;
+      history.pushState(snapshot(),"",location.pathname+location.search);
+      setScreen(name);
+      window.scrollTo({top:0,behavior:"instant"});
+    }
+    function replaceRoute() { history.replaceState(snapshot(),"",location.pathname+location.search); }
+    function selectDate(iso) {
+      if (!isValidDateISO(iso)) return;
+      ui.selected=iso;
+      if (ym(iso)!==ui.month) ui.month=ym(iso);
+      renderCalendar();renderPreview();renderHomeStats();replaceRoute();
+    }
+    function setMonth(month) {
+      if (!/^\d{4}-\d{2}$/.test(month) || !isValidDateISO(`${month}-01`)) return;
+      ui.month=month;
+      ui.selected=month===ym(todayISO())?todayISO():`${month}-01`;
+      renderCalendar();renderPreview();renderHomeStats();replaceRoute();
+    }
+    function openDay() { navigate("day",{day:ui.selected}); }
+    function switchDay(inc) { ui.day=addDays(ui.day,inc);renderDay();replaceRoute(); }
+    function goBack() {
+      if (ui.overlay) { requestCloseOverlay(); return; }
+      if (ui.screen==="home") return;
+      history.back();
+    }
+    function displayOverlayFromHistory(overlay) {
+      ui.overlay=overlay || "";
+      if (ui.overlay!=="form" && $("formDialog").open) $("formDialog").close();
+      if (ui.overlay!=="import" && $("importDialog").open) $("importDialog").close();
+      if (ui.overlay==="form" && !$("formDialog").open) $("formDialog").showModal();
+      if (ui.overlay==="import" && !$("importDialog").open) $("importDialog").showModal();
+    }
+    async function restoreHistory(event) {
+      const next=event.state?.cpNext ? event.state : {screen:"home",month:ui.month,selected:ui.selected,day:ui.day,statsMode:ui.statsMode,statsMonth:ui.statsMonth,statsYear:ui.statsYear,overlay:""};
+      const closingDirtyForm=ui.overlay==="form" && next.overlay!=="form" && hasUnsavedFormData();
+      if (closingDirtyForm) {
+        history.pushState(snapshot(),"",location.pathname+location.search);
+        const result=await showConfirm({title:"Odrzucić zmiany?",message:"Formularz zawiera niezapisane zmiany. Czy chcesz go zamknąć bez zapisywania?",actions:[{text:"Zostań",value:false},{text:"Odrzuć",value:true,tone:"danger"}]});
+        if (result===true) {
+          ui.draft="";
+          ui.form=null;
+          history.back();
+        }
+        return;
+      }
+      Object.assign(ui,{screen:next.screen||"home",month:next.month||ui.month,selected:next.selected||ui.selected,day:next.day||ui.day,statsMode:next.statsMode||ui.statsMode,statsMonth:next.statsMonth||ui.statsMonth,statsYear:next.statsYear||ui.statsYear});
+      displayOverlayFromHistory(next.overlay);
+      if (!next.overlay) { ui.form=null; importData=null; }
+      setScreen(ui.screen);
+    }
+    function openOverlay(kind) {
+      ui.overlay=kind;
+      history.pushState(snapshot(),"",location.pathname+location.search);
+      displayOverlayFromHistory(kind);
+    }
+    function hasUnsavedNote() {
+      return ui.form?.kind==="note" && $("formDialog").open && $("formNote")?.value!==ui.draft;
+    }
+    function snapshotInputs(container) {
+      return JSON.stringify(Array.from(container.querySelectorAll("input,select,textarea")).map(input=>[
+        input.id,input.type==="checkbox"?input.checked:input.value
+      ]));
+    }
+    function hasUnsavedFormData() {
+      return hasUnsavedNote() || (ui.overlay==="form" && $("formDialog").open && ui.form!==null &&
+        snapshotInputs($("formBody"))!==ui.formInitialValues) ||
+        (ui.screen==="settings" && snapshotInputs($("settingsScreen"))!==ui.settingsInitialValues);
+    }
+    function requestCloseOverlay() { if (ui.overlay) history.back(); }
+    function closeFab() { $("fabMenu").hidden=true; $("fab").setAttribute("aria-expanded","false"); }
+    /* Rejestracja dotyczy wyłącznie katalogu tej aplikacji; brak SW nie blokuje UI. */
+    const pwaScope=/^https?:$/.test(location.protocol)?new URL("./",location.href).href:"";
+    let swRegistrationPromise=null;
+    let swCheckPending=false;
+    let swNeedsRestart=false;
+    let swWasControlled=typeof navigator.serviceWorker!=="undefined" && !!navigator.serviceWorker.controller;
+    const swSupported=() => window.isSecureContext && "serviceWorker" in navigator;
+    function updatePwaMessage(message) { $("updateHelp").textContent=message; }
+    function registerPwa() {
+      if (swRegistrationPromise) return swRegistrationPromise;
+      if (!swSupported()) {
+        updatePwaMessage("Sprawdzanie aktualizacji wymaga HTTPS lub localhost oraz obsługi Service Worker.");
+        return null;
+      }
+      swRegistrationPromise=Promise.resolve().then(()=>navigator.serviceWorker.register("./sw.js",{scope:"./"}))
+        .then(registration=>{
+          if (registration.scope!==pwaScope) throw Error("Nieprawidłowy zakres Service Workera.");
+          registration.addEventListener("updatefound",()=>{
+            const worker=registration.installing;
+            if (!worker) return;
+            worker.addEventListener("statechange",()=>{
+              if (worker.state==="installed" && registration.waiting) {
+                swNeedsRestart=true;
+                updatePwaMessage("Nowa wersja została pobrana i czeka na aktywację. Zapisz formularze i uruchom aplikację ponownie; może być konieczne zamknięcie innych kart.");
+                toast("Nowa wersja oczekuje na aktywację. Sprawdź aktualizacje, aby uruchomić ponownie.");
+              }
+            });
+          });
+          return registration;
+        })
+        .catch(error=>{
+          updatePwaMessage(`Nie udało się zarejestrować Service Workera nowej aplikacji: ${error.message}`);
+          throw error;
+        });
+      return swRegistrationPromise;
+    }
+    if (swSupported()) {
+      navigator.serviceWorker.addEventListener("controllerchange",()=>{
+        // Pierwsze przejęcie kontroli nie oznacza samo w sobie nowej wersji.
+        if (swWasControlled) {
+          swNeedsRestart=true;
+          updatePwaMessage("Service Worker został zaktualizowany. Zapisz formularze i uruchom aplikację ponownie, aby wczytać nową wersję.");
+          toast("Aktualizacja gotowa. Ponowne uruchomienie pozostaje pod Twoją kontrolą.");
+        }
+        swWasControlled=true;
+      });
+    }
+    async function offerPwaRestart() {
+      if (hasUnsavedFormData()) {
+        updatePwaMessage("Aktualizacja jest dostępna, ale formularz zawiera niezapisane zmiany. Zapisz je przed ponownym uruchomieniem aplikacji.");
+        toast("Najpierw zapisz niezapisane zmiany w formularzu.");
+        return;
+      }
+      const approved=await showConfirm({
+        title:"Uruchomić aplikację ponownie?",
+        message:"Nowa wersja może wymagać ponownego uruchomienia. Jeśli inne karty aplikacji są otwarte, zamknij je przed odświeżeniem. Dane pozostają w pamięci urządzenia.",
+        actions:[{text:"Później",value:false},{text:"Uruchom ponownie",value:true,tone:"secondary"}]
+      });
+      if (!approved) return;
+      if (hasUnsavedFormData()) { toast("Ponowne uruchomienie wstrzymane: niezapisane zmiany."); return; }
+      location.reload();
+    }
+    async function checkPwaUpdates() {
+      if (swCheckPending) return;
+      if (!swSupported()) {
+        toast("Service Worker jest niedostępny w tym środowisku. Użyj HTTPS lub localhost.");
+        return;
+      }
+      swCheckPending=true;
+      $("checkUpdatesBtn").disabled=true;
+      try {
+        const registration=await registerPwa();
+        if (!registration || registration.scope!==pwaScope) throw Error("Brak rejestracji dla tej aplikacji.");
+        if (registration.waiting || swNeedsRestart) { await offerPwaRestart();return; }
+        await registration.update();
+        if (registration.waiting || swNeedsRestart) await offerPwaRestart();
+        else if (registration.installing) {
+          updatePwaMessage("Sprawdzanie zakończone; Service Worker jest instalowany. Gdy aktualizacja będzie gotowa, wyświetlę informację o ponownym uruchomieniu.");
+          toast("Trwa instalowanie Service Workera. Nie odświeżam aplikacji automatycznie.");
+        } else {
+          updatePwaMessage("Sprawdzanie zakończone. Przeglądarka nie zgłosiła aktualizacji; nie można jednoznacznie potwierdzić, że masz najnowszą wersję.");
+          toast("Sprawdzanie zakończone; brak potwierdzonej nowej wersji.");
+        }
+      } catch (error) {
+        updatePwaMessage(`Nie udało się sprawdzić aktualizacji: ${error.message}. Dane i formularze pozostają bez zmian.`);
+        toast("Nie udało się sprawdzić aktualizacji. Sprawdź połączenie i plik sw.js.");
+      } finally {
+        swCheckPending=false;
+        $("checkUpdatesBtn").disabled=false;
+      }
+    }
+    const formError = text => { $("formError").textContent=text; };
+    function fieldDate(label,id,value) { return `<label class="field"><span>${label}</span><input id="${id}" type="date" value="${escapeHtml(value)}" required></label>`; }
+    function fieldTime(label,id,value) { return `<label class="field"><span>${label}</span><input id="${id}" type="time" value="${escapeHtml(value)}" required></label>`; }
+    function optionsHtml(options) {
+      return `<div class="soft-divider"></div><div class="eyebrow">Uwzględnij w zakresie dat</div><label class="check"><input id="includeSat" type="checkbox" ${options.includeSat?"checked":""}> Soboty</label><label class="check"><input id="includeSun" type="checkbox" ${options.includeSun?"checked":""}> Niedziele</label><label class="check"><input id="includeHolidays" type="checkbox" ${options.includeHolidays?"checked":""}> Święta</label>`;
+    }
+    const getRangeOptions = () => ({includeSat:$("includeSat")?.checked||false,includeSun:$("includeSun")?.checked||false,includeHolidays:$("includeHolidays")?.checked||false});
+    const currentRangeDefaults = () => ({includeSat:db.settings.defaultIncludeSat,includeSun:db.settings.defaultIncludeSun,includeHolidays:db.settings.defaultIncludeHolidays});
+
+    /* 10. Formularze współdzielą jedną powłokę i jeden handler zapisu. */
+    function openForm(kind,edit=-1,options={}) {
+      const date=ui.day;
+      const day=getDay(date)||emptyDay(date);
+      const type=kind==="shift" ? (edit>=0?"Edytuj godziny":"Dodaj godziny") : kind==="leave" ? "Urlop i zwolnienie L4" : kind==="note" ? "Notatka dnia" : "Wpisy zbiorcze";
+      ui.form={kind,edit,date};
+      ui.draft=kind==="note" ? day.note : "";
+      $("formTitle").textContent=type;
+      let content="";
+      if (kind==="shift") {
+        const shift=day.shifts[edit] || db.settings.shiftTemplates[0] || {start:"06:00",end:"15:00"};
+        content=`<div class="eyebrow">${fmtDateLongPL(date)}</div><div class="field-row">${fieldTime("Od","formStart",shift.start)}${fieldTime("Do","formEnd",shift.end)}</div><p class="help">Możesz zapisać kilka niepokrywających się zakresów, również przez północ.</p><div class="btn-row"><button id="saveForm" type="button" class="btn">${edit>=0?"Zapisz zmiany":"Dodaj godziny"}</button>${edit>=0?'<button id="deleteForm" type="button" class="btn danger">Usuń zakres</button>':""}</div>`;
+      } else if (kind==="leave") {
+        const selectedType=day.leaveType||"paid";
+        content=`<div class="field-row">${fieldDate("Od","formFrom",date)}${fieldDate("Do","formTo",date)}</div><label class="field"><span>Rodzaj absencji</span><select id="formLeave"><option value="paid" ${selectedType==="paid"?"selected":""}>Urlop płatny</option><option value="unpaid" ${selectedType==="unpaid"?"selected":""}>Urlop bezpłatny</option><option value="sick" ${selectedType==="sick"?"selected":""}>Zwolnienie L4</option></select></label>${optionsHtml({...currentRangeDefaults(),...(day.leaveType?{includeSat:true,includeSun:true,includeHolidays:true}:{})})}<div class="btn-row"><button id="saveForm" type="button" class="btn">Zapisz status</button><button id="deleteForm" type="button" class="btn danger">Usuń status z zakresu</button></div>`;
+      } else if (kind==="note") {
+        content=`<div class="eyebrow">${fmtDateLongPL(date)}</div><label class="field"><span>Treść notatki</span><textarea id="formNote" spellcheck="true" rows="5" placeholder="Wpisz notatkę...">${escapeHtml(day.note)}</textarea></label><p class="help">Notatka zapisze się dopiero po wybraniu przycisku poniżej.</p><div class="btn-row"><button id="saveForm" type="button" class="btn">Zapisz notatkę</button>${day.note?'<button id="deleteForm" type="button" class="btn danger">Usuń notatkę</button>':""}</div>`;
+      } else if (kind==="bulk") {
+        content=`<label class="field"><span>Rodzaj wpisów</span><select id="bulkKind"><option value="hours">Godziny pracy</option><option value="leave">Urlop / L4</option></select></label><div class="field-row">${fieldDate("Od","formFrom",ui.selected)}${fieldDate("Do","formTo",ui.selected)}</div><div id="bulkFields"></div>${optionsHtml(currentRangeDefaults())}<p class="help">Konfliktujące godziny są pomijane i raportowane; istniejące notatki i inne wydarzenia pozostają bez zmian.</p><div class="btn-row"><button id="saveForm" type="button" class="btn">Wykonaj operację</button></div>`;
+      }
+      $("formBody").innerHTML=content+'<span id="formError" class="error-text" role="alert"></span>';
+      if (kind==="bulk") renderBulkFields();
+      ui.formInitialValues=snapshotInputs($("formBody"));
+      openOverlay("form");
+      closeFab();
+    }
+    function renderBulkFields() {
+      if (!$("bulkFields")) return;
+      const kind=$("bulkKind").value;
+      $("bulkFields").innerHTML=kind==="hours" ? `<label class="field"><span>Operacja</span><select id="bulkMode"><option value="add">Dodaj wskazany zakres</option><option value="remove">Usuń wskazany zakres</option></select></label><div class="field-row">${fieldTime("Od godziny","formStart","06:00")}${fieldTime("Do godziny","formEnd","15:00")}</div>` : `<label class="field"><span>Operacja</span><select id="bulkMode"><option value="paid">Ustaw urlop płatny</option><option value="unpaid">Ustaw urlop bezpłatny</option><option value="sick">Ustaw L4</option><option value="remove">Usuń status absencji</option></select></label>`;
+    }
+    async function handleFormSave(deleting=false) {
+      if (!ui.form) return;
+      const {kind,date,edit}=ui.form;
+      formError("");
+      let success=false;
+      try {
+        if (kind==="shift") {
+          if (deleting) {
+            if (!await confirmDestructive("Usunąć ten zakres godzin?")) return;
+            success=removeShift(date,edit);
+          } else success=addShift(date,normalizeTimeHHMM($("formStart").value),normalizeTimeHHMM($("formEnd").value),edit);
+        } else if (kind==="note") {
+          if (deleting && !await confirmDestructive("Usunąć notatkę tego dnia?")) return;
+          const text=deleting ? "" : $("formNote").value;
+          success=setNote(date,text);
+          if (success) ui.draft=text;
+        } else if (kind==="leave") {
+          const from=$("formFrom").value,to=$("formTo").value;
+          if (deleting && !await confirmDestructive("Usunąć status absencji z wybranego zakresu? Godziny i notatki zostaną zachowane.")) return;
+          success=setLeave(from,to,deleting?"":$("formLeave").value,getRangeOptions());
+        } else {
+          const kind=$("bulkKind").value,mode=$("bulkMode").value;
+          const from=$("formFrom").value,to=$("formTo").value;
+          const start=kind==="hours"?normalizeTimeHHMM($("formStart").value):"";
+          const end=kind==="hours"?normalizeTimeHHMM($("formEnd").value):"";
+          if (kind==="hours" && !shiftAbsRange(from,start,end)) throw Error("Uzupełnij prawidłowe godziny; początek i koniec nie mogą być identyczne.");
+          const dates=rangeDates(from,to);
+          const approved=await showConfirm({title:"Potwierdź wpisy zbiorcze",message:`Operacja: ${kind==="hours"?"godziny":"absencje"}, ${dates.length} dni w zakresie ${from}–${to}.\nMoże zmodyfikować wiele wpisów naraz.`,actions:[{text:"Anuluj",value:false},{text:"Kontynuuj",value:true}]});
+          if (!approved) return;
+          success=changeBulk(from,to,kind,mode,start,end,getRangeOptions());
+        }
+      } catch (error) { formError(error.message);return; }
+      if (success) { ui.form=null;requestCloseOverlay(); }
+    }
+    async function showConfirm({title,message,actions}) {
+      const dialog=$("confirmDialog");
+      $("confirmTitle").textContent=title;
+      $("confirmMessage").textContent=message;
+      $("confirmActions").innerHTML="";
+      return new Promise(resolve => {
+        let settled=false;
+        const settle=result => {if (settled) return;settled=true;dialog.removeEventListener("cancel",onCancel);dialog.close();resolve(result);};
+        const onCancel=event=>{event.preventDefault();settle(false);};
+        dialog.addEventListener("cancel",onCancel);
+        for (const action of actions) {
+          const button=document.createElement("button");
+          button.type="button";
+          button.className=`btn ${action.tone||"ghost"}`;
+          button.textContent=action.text;
+          button.addEventListener("click",()=>settle(action.value),{once:true});
+          $("confirmActions").append(button);
+        }
+        dialog.showModal();
+      });
+    }
+    const confirmDestructive = message => showConfirm({title:"Potwierdź usunięcie",message,actions:[{text:"Anuluj",value:false},{text:"Usuń",value:true,tone:"danger"}]});
+
+    /* 11. Eksport JSON i bezstratny import z analizą konfliktów. */
+    function download(filename,contents,mime) {
+      const blob=new Blob([contents],{type:mime});
+      const url=URL.createObjectURL(blob);
+      const anchor=document.createElement("a");
+      anchor.href=url;anchor.download=filename;
+      document.body.append(anchor);
+      anchor.click();anchor.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),30000);
+    }
+    function exportDatabase() {
+      try {
+        download(`czas-pracy-kopia-${todayISO()}.json`,JSON.stringify(db,null,2),"application/json;charset=utf-8");
+        // Kliknięcie łącza pobierania nie dowodzi, że system faktycznie zachował plik.
+        toast("Zainicjowano pobieranie kopii. Sprawdź plik w folderze Pobrane.");
+        try { localStorage.setItem(BACKUP_KEY,new Date().toISOString()); } catch { toast("Pobieranie uruchomione, lecz nie udało się zapisać daty przypomnienia."); }
+        renderBackupInfo();
+      } catch (error) { toast(`Nie udało się przygotować kopii: ${error.message}`); }
+    }
+    function analyzeMerge(imported) {
+      const candidate=clone(db);
+      let duplicateDays=0,addedDays=0,addedShifts=0,duplicateShifts=0,shiftConflicts=0,noteConflicts=0,leaveConflicts=0;
+      for (const entry of imported.entries) {
+        const exists=candidate.entries.some(day=>day.date===entry.date);
+        if (exists) duplicateDays++; else addedDays++;
+        const current=editableDay(candidate,entry.date);
+        for (const [field,value] of Object.entries(entry)) {
+          if (["date","note","shifts","vacation","leaveType","start","end"].includes(field)) continue;
+          if (!(field in current)) current[field]=clone(value);
+        }
+        if (entry.note.trim()) {
+          if (!current.note.trim()) current.note=entry.note;
+          else if (current.note!==entry.note) noteConflicts++;
+        }
+        if (entry.leaveType) {
+          if (!current.leaveType) {current.leaveType=entry.leaveType;current.vacation=entry.leaveType==="paid";}
+          else if (current.leaveType!==entry.leaveType) leaveConflicts++;
+        }
+        for (const shift of entry.shifts) {
+          if (current.shifts.some(s=>s.start===shift.start && s.end===shift.end)) {duplicateShifts++;continue;}
+          const check=validateShiftNoOverlap(candidate,entry.date,shift.start,shift.end);
+          if (!check.ok) {shiftConflicts++;continue;}
+          current.shifts.push(clone(shift));addedShifts++;
+        }
+        current.shifts.sort((a,b)=>a.start.localeCompare(b.start));
+        pruneDay(candidate,entry.date);
+      }
+      return {candidate,duplicateDays,addedDays,addedShifts,duplicateShifts,shiftConflicts,noteConflicts,leaveConflicts};
+    }
+    function extraFieldCounts(imported) {
+      let count=Object.keys(imported).filter(key=>!["settings","entries"].includes(key)).length;
+      count+=Object.keys(imported.settings).filter(key=>!(key in EMPTY().settings)).length;
+      for (const entry of imported.entries) count+=Object.keys(entry).filter(key=>!["date","note","shifts","vacation","leaveType","start","end"].includes(key)).length;
+      return count;
+    }
+    function importDescription(imported,analysis) {
+      const dates=imported.entries.map(day=>day.date).sort();
+      const extra=extraFieldCounts(imported);
+      return `Wpisy w pliku: ${imported.entries.length}\nDaty: ${dates[0]||"brak"} – ${dates.at(-1)||"brak"}\nDni już obecne: ${analysis.duplicateDays}\nNowe dni: ${analysis.addedDays}\nNowe zakresy godzin: ${analysis.addedShifts}\nDuplikaty zakresów: ${analysis.duplicateShifts}\nKonflikty zakresów: ${analysis.shiftConflicts}\nKonflikty notatek: ${analysis.noteConflicts}\nKonflikty absencji: ${analysis.leaveConflicts}\nDodatkowe pola historyczne: ${extra} (zostaną zachowane przy zastąpieniu; przy scalaniu dopisywane są tylko brakujące pola z wpisów, ale ustawienia z kopii nie zastępują obecnych).\n\nPrzy scalaniu pozostawiam obecne ustawienia. Przy zastąpieniu ustawienia pochodzą z pliku.`;
+    }
+    async function selectImportFile(file) {
+      if (!file) return;
+      if (file.size>15*1024*1024) {toast("Plik jest za duży (limit 15 MB).");return;}
+      try {
+        const raw=JSON.parse(await file.text());
+        const imported=normalizeImported(raw);
+        const analysis=analyzeMerge(imported);
+        importData={imported,analysis};
+        $("importSummary").textContent=importDescription(imported,analysis);
+        openOverlay("import");
+      } catch (error) { toast(`Nie można wczytać pliku: ${error.message}`); }
+    }
+    async function importAction(mode) {
+      if (!importData) return;
+      const {imported,analysis}=importData;
+      const description=mode==="replace" ? `Zastąpić WSZYSTKIE dane nowej aplikacji ${imported.entries.length} wpisami z pliku? Nie będzie można cofnąć tego bez osobnej kopii.` : `Scalić dane? Konfliktów godzin: ${analysis.shiftConflicts}; konfliktów notatek: ${analysis.noteConflicts}; konfliktów absencji: ${analysis.leaveConflicts}.\nKonfliktujące wartości pozostaną bez zmian. Zapisz osobną kopię przed scaleniem.`;
+      const approved=await showConfirm({title:mode==="replace"?"Zastąp bazę danych":"Scal dane",message:description,actions:[{text:"Anuluj",value:false},{text:mode==="replace"?"Zastąp":"Scal",value:true,tone:mode==="replace"?"danger":"secondary"}]});
+      if (!approved) return;
+      let ok=false;
+      if (mode==="replace") {
+        try {
+          // Wyraźnie potwierdzony import może zastąpić także uszkodzoną NOWĄ bazę.
+          const checked=normalizeImported(imported);
+          localStorage.setItem(STORAGE_KEY,JSON.stringify(checked));
+          db=checked;storageLocked=false;ok=true;
+          toast("Zastąpiono bazę danych z pliku JSON.");
+          refreshAffectedViews();
+        } catch (error) { toast(`Zastąpienie nieudane: ${error.message}`); }
+      } else ok=commit(analysis.candidate,"Scalono dane; zachowano istniejące konflikty.");
+      if (ok) requestCloseOverlay();
+    }
+    function backupReminder() {
+      if (ui.backupReminderShown || !db.entries.length) return;
+      let last="";
+      try {last=localStorage.getItem(BACKUP_KEY)||"";} catch {return;}
+      const days=Number(db.settings.backupReminderDays)||5;
+      const elapsed=last ? (Date.now()-Date.parse(last))/(864e5) : Infinity;
+      if (!Number.isNaN(elapsed) && elapsed>=days) {
+        ui.backupReminderShown=true;
+        toast(`Warto pobrać kopię JSON. ${last?`Od ostatniej próby pobrania minęło co najmniej ${days} dni.`:"Brak odnotowanego pobrania kopii."}`);
+      }
+    }
+
+    /* 12. Raport: zatwierdzony generator HTML/CSS wydruku z wersji 4.5.22.
+       Nie zmieniamy typografii, kolumn ani danych tabeli. */
   function buildReportHTML(monthYM) {
     const [Y, M] = monthYM.split("-").map(Number);
     const dim = new Date(Y, M, 0).getDate();
@@ -961,295 +1500,207 @@
 </body>
 </html>`;
   }
-    function reportPreflight(monthYM) {
-      const stats = monthStats(db, monthYM), [y, m] = monthYM.split('-').map(Number);
-      let missing = 0;
-      for (let day = 1; day <= new Date(y, m, 0).getDate(); day++) {
-        const iso = `${monthYM}-${pad2(day)}`, entry = getDay(iso);
-        if (!skipDate(iso, { includeSat: false, includeSun: false, includeHolidays: false }) && !computeDayMinutes(entry) && !entry?.leaveType && !entry?.note.trim()) missing++;
+
+    async function openReportPdf() {
+      const month=ui.statsMode==="year"?ui.month:ui.statsMonth;
+      const totals=computeStats(month);
+      let missing=0;
+      const [year,number]=month.split("-").map(Number);
+      const last=new Date(year,number,0).getDate();
+      for (let day=1;day<=last;day++) {
+        const iso=`${month}-${pad2(day)}`;
+        const dow=dateFromISO(iso).getDay();
+        if (dow===0||dow===6||getHolidayMap(year).has(iso)) continue;
+        const record=getDay(iso);
+        if (!computeDayMinutes(record) && !record?.leaveType) missing++;
       }
-      return { ...stats, missing };
+      const approved=await showConfirm({title:"Sprawdź przed eksportem",message:`${fmtMonthPL(month)}\nGodziny: ${fmtHM(totals.min)}\nWypłata: ${pln(totals.money)}\nBraki dni roboczych: ${missing}\nDni z notatką: ${totals.notes}\nUrlop/L4: ${totals.paid+totals.unpaid+totals.sick}`,actions:[{text:"Anuluj",value:false},{text:"Generuj PDF",value:true,tone:"secondary"}]});
+      if (!approved) return;
+      try {
+        const html=buildReportHTML(month);
+        const blob=new Blob([html],{type:"text/html;charset=utf-8"});
+        const url=URL.createObjectURL(blob);
+        const popup=window.open(url,"_blank");
+        setTimeout(()=>URL.revokeObjectURL(url),60000);
+        if (!popup) {
+          download(`czas-pracy_${month}_raport.html`,html,"text/html;charset=utf-8");
+          toast("Przeglądarka zablokowała okno — pobrano wersję HTML do wydruku / zapisu jako PDF.");
+        } else popup.focus();
+      } catch (error) {toast(`Nie udało się otworzyć raportu: ${error.message}`);}
     }
-    async function openReport() {
-      const reportMonth = route.mode === 'year' ? $('report-month').value : route.month || month;
-      if (!parseISODate(`${reportMonth}-01`)) throw new Error('Wybierz miesiąc raportu.');
-      const audit = reportPreflight(reportMonth);
-      if (!await confirmAction('Sprawdź przed eksportem', `${fmtMonthPL(reportMonth)}\nGodziny: ${fmtHM(audit.min)}\nWypłata: ${pln(audit.reportMoney)}\nBraki dni roboczych: ${audit.missing}\nDni z notatką: ${audit.notes}\nUrlop/L4: ${audit.absences}`, 'Generuj PDF')) return;
-      const html = buildReportHTML(reportMonth), blob = new Blob([html], { type: 'text/html;charset=utf-8' }), url = URL.createObjectURL(blob);
-      const reportWindow = window.open(url, '_blank');
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-      if (!reportWindow) { download(`czas-pracy_${reportMonth}_raport.html`, html, 'text/html;charset=utf-8'); notify('Zlecono pobranie raportu HTML. Otwórz go, aby wydrukować lub zapisać jako PDF.'); }
-    }
-    function download(name, text, type = 'application/json;charset=utf-8') {
-      const url = URL.createObjectURL(new Blob([text], { type })), link = document.createElement('a');
-      link.href = url; link.download = name; document.body.append(link); link.click(); link.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 60000);
-    }
-    function exportJSON() {
-      if (store.error) throw new Error('Odczyt bazy jest zablokowany. Pobierz surowe dane, aby zachować pełną kopię.');
-      download(`czas-pracy-backup_${todayISO()}.json`, JSON.stringify(db, null, 2));
-      try { storage.setItem(CONFIG.backupKey, new Date().toISOString()); updateReminder(); }
-      catch { notify('Zlecono pobranie kopii. Nie udało się zapisać daty przypomnienia. Sprawdź pobrane pliki.'); return; }
-      notify('Zlecono pobranie kopii JSON. Sprawdź, czy plik znajduje się w pobranych.');
-    }
-    // 16. Jeden stos historii dla widoków i dialogu; selected/month nie zapisują danych.
-    const routeTitles = { home: 'Czas pracy', day: 'Dzień pracy', menu: 'Więcej', settings: 'Ustawienia', backup: 'Kopia i przywracanie', tools: 'Narzędzia', about: 'O aplikacji', stats: 'Statystyki' };
-    function title() {
-      if (route.view !== 'form') return routeTitles[route.view];
-      return ({ hours: route.index >= 0 ? 'Edytuj godziny' : 'Dodaj godziny', leave: 'Urlop / L4', note: 'Notatka dnia', bulk: 'Wpisy zbiorcze', month: 'Wybierz miesiąc' })[route.kind];
-    }
-    function render(focus = false) {
-      $('heading').textContent = title();
-      $('back').hidden = route.view === 'home'; $('more').hidden = route.view !== 'home';
-      const markup = {
-        home: homeMarkup, day: dayMarkup, menu: menuMarkup, form: formMarkup, settings: settingsMarkup,
-        stats: statsMarkup, backup: backupMarkup,
-        tools: () => `<section class="card form-card stack"><h2>Wyczyść miesiąc</h2>${inputField('clear-month', 'Miesiąc', 'month', month, 'id="clear-month" required min="0100-01" max="9998-12"')}<p class="muted">Usuwa godziny, absencje i notatki wyłącznie z wybranego miesiąca. Najpierw pobierz kopię JSON.</p><button class="button danger" type="button" data-action="clear-month">Wyczyść miesiąc</button></section>`,
-        about: () => `<section class="card form-card stack"><h2>Czas pracy ${CONFIG.version}</h2><p>Lokalna ewidencja czasu pracy. Dane pozostają w tej przeglądarce; aplikacja nie używa kont ani chmury.</p><p class="muted">Nowy interfejs inspirowany ergonomią One UI. Wersja testowa korzysta z oddzielnej bazy. Instalacja PWA, aktualizacje i pełna praca offline wymagają późniejszego manifestu oraz Service Workera.</p></section>`
-      }[route.view];
-      $('screen').innerHTML = markup();
-      formSnapshot = formValue();
-      if (route.view !== 'backup') pendingImport = null;
-      else renderImportPlan();
-      showStorageWarning();
-      if (focus) { window.scrollTo(0, 0); $('screen').focus({ preventScroll: true }); }
-    }
-    function formValue() {
-      const form = $('editor') || $('settings-form');
-      return form ? JSON.stringify([...new FormData(form)]) : '';
-    }
-    const dirty = () => formValue() !== formSnapshot;
-    const historyState = () => ({ worktimeNext: true, sequence, route: clone(route) });
-    function syncHistory() { history.replaceState(historyState(), ''); }
-    function go(next) {
-      route = next; sequence++;
-      history.pushState(historyState(), '');
-      render(true);
-    }
-    function back() {
-      if (sequence > 0) history.back();
-      else { route = { view: 'home' }; syncHistory(); render(true); }
-    }
-    function replaceRoute(next) { route = next; syncHistory(); render(); }
-    function closeDialog(answer) {
-      if (!dialogResolve) return;
-      const resolve = dialogResolve; dialogResolve = null;
-      if ($('confirmation').open) $('confirmation').close();
-      resolve(answer);
-    }
-    function confirmAction(heading, message, accept = 'Potwierdź') {
-      if (dialogResolve) return Promise.resolve(false);
-      $('confirmation-title').textContent = heading;
-      $('confirmation-message').textContent = message;
-      $('confirm-actions').innerHTML = `<button class="button secondary" id="confirm-cancel" type="button">Anuluj</button><button class="button" id="confirm-ok" type="button">${escapeHtml(accept)}</button>`;
-      dialogAnswer = false;
-      dialogClosing = false;
-      $('confirmation').showModal();
-      history.pushState({ ...historyState(), overlay: true }, '');
-      return new Promise(resolve => { dialogResolve = resolve; });
-    }
-    function answerDialog(answer) {
-      if (!dialogResolve || dialogClosing) return;
-      // Promise rozwiązuje się dopiero po zdjęciu stanu dialogu z historii.
-      dialogClosing = true;
-      dialogAnswer = answer;
-      history.back();
-    }
-    function chooseEvent() {
-      const promise = confirmAction('Dodaj wydarzenie', 'Wybierz rodzaj wpisu.');
-      $('confirm-actions').innerHTML = `<div class="stack" style="width:100%">${[['hours', 'clock', 'Dodaj godziny'], ['leave', 'calendar', 'Dodaj urlop / L4'], ['note', 'note', 'Dodaj notatkę']].map(([kind, name, label]) => `<button type="button" class="menu-item" data-dialog-kind="${kind}">${icon(name)}<span>${label}</span></button>`).join('')}<button type="button" class="button secondary" id="confirm-cancel">Anuluj</button></div>`;
-      $('confirm-actions').querySelector('button').focus();
-      return promise;
-    }
-    window.addEventListener('popstate', event => {
-      const target = event.state;
-      if (dialogResolve) { closeDialog(dialogAnswer); return; }
-      if (historyTarget) {
-        if (!target?.worktimeNext || target.sequence !== historyTarget.sequence) return;
-        const action = historyTarget.action; historyTarget = null; action(); return;
-      }
-      if (dirty()) {
-        const current = historyState();
-        const targetSequence = target?.worktimeNext ? target.sequence : 0;
-        const delta = current.sequence - targetSequence || 1;
-        historyTarget = { sequence: current.sequence, action: async () => {
-          if (await confirmAction('Odrzucić zmiany?', 'Niezapisane zmiany formularza zostaną odrzucone.', 'Odrzuć')) {
-            formSnapshot = formValue(); history.go(-delta);
-          }
-        } };
-        history.go(delta); return;
-      }
-      if (target?.worktimeNext) { sequence = target.sequence; route = target.route; }
-      else { sequence = 0; route = { view: 'home' }; }
-      render(true);
-    });
-    async function deleteEvent() {
-      if (!await confirmAction('Usunąć wydarzenie?', 'Pozostałe godziny, absencja i notatka zostaną zachowane.', 'Usuń')) return;
-      mutate(next => {
-        const day = dayIn(next, selected);
-        if (route.kind === 'hours') day.shifts.splice(route.index, 1);
-        if (route.kind === 'leave') setLeave(next, selected, '');
-        if (route.kind === 'note') day.note = '';
+
+    /* 13. Delegacja zdarzeń: jedna odpowiedzialność na jedno zdarzenie. */
+    function bindEvents() {
+      $("calendarGrid").addEventListener("click", event => {
+        const button=event.target.closest("[data-date]");
+        if (button) selectDate(button.dataset.date);
       });
-      formSnapshot = formValue(); back(); notify('Wydarzenie usunięte.');
-    }
-    async function importCommit(replace) {
-      if (!pendingImport) return;
-      const candidate = replace ? pendingImport.db : planMerge(db, pendingImport.db).db;
-      const message = replace ? 'Wszystkie obecne wpisy i ustawienia zostaną zastąpione kopią. Najpierw pobierz kopię obecnej bazy. Tej operacji nie można cofnąć bez kopii.' : 'Zostaną dodane nowe godziny i uzupełnione puste notatki oraz absencje. Obecne ustawienia pozostaną. Różnice widoczne w podglądzie nie zostaną nadpisane.';
-      if (!await confirmAction(replace ? 'Zastąpić całą bazę?' : 'Scalić dane?', message, replace ? 'Zastąp bazę' : 'Scal')) return;
-      commit(candidate); pendingImport = null; render(); notify('Dane z kopii zapisane.');
-    }
-    async function action(name) {
-      switch (name) {
-        case 'more': go({ view: 'menu' }); break;
-        case 'back': back(); break;
-        case 'open-day': go({ view: 'day' }); break;
-        case 'prev-month': case 'next-month': {
-          month = moveMonth(month, name === 'prev-month' ? -1 : 1);
-          const [y, m] = month.split('-').map(Number);
-          selected = `${month}-${pad2(Math.min(Number(selected.slice(-2)), new Date(y, m, 0).getDate()))}`;
-          refreshHome(); break;
-        }
-        case 'today': selected = todayISO(); month = ym(selected); refreshHome(); break;
-        case 'month-picker': go({ view: 'form', kind: 'month' }); break;
-        case 'prev-day': case 'next-day': selected = moveDay(selected, name === 'prev-day' ? -1 : 1); month = ym(selected); render(); break;
-        case 'hours': go({ view: 'form', kind: 'hours', index: -1 }); break;
-        case 'leave': case 'note': go({ view: 'form', kind: name }); break;
-        case 'fab': { const kind = await chooseEvent(); if (kind) go({ view: 'form', kind, index: -1 }); break; }
-        case 'bulk': go({ view: 'form', kind: 'bulk' }); break;
-        case 'settings': go({ view: 'settings' }); break;
-        case 'tools': go({ view: 'tools' }); break;
-        case 'about': go({ view: 'about' }); break;
-        case 'backup-screen': go({ view: 'backup' }); break;
-        case 'stats': go({ view: 'stats', mode: 'month', month }); break;
-        case 'stats-month': replaceRoute({ view: 'stats', mode: 'month', month: route.month || month }); break;
-        case 'stats-year': replaceRoute({ view: 'stats', mode: 'year', year: Number((route.month || month).slice(0, 4)) }); break;
-        case 'bulk-hours': case 'bulk-leave': {
-          const hours = name === 'bulk-hours', form = $('editor'); form.elements.mode.value = hours ? 'hours' : 'leave';
-          $('bulk-hours').hidden = !hours; $('bulk-leave').hidden = hours;
-          form.elements.start.required = hours; form.elements.end.required = hours;
-          form.elements.start.disabled = !hours; form.elements.end.disabled = !hours;
-          form.elements.leaveType.disabled = hours;
-          document.querySelectorAll('[data-action^="bulk-"]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.action === name)));
-          break;
-        }
-        case 'delete-event': await deleteEvent(); break;
-        case 'export': exportJSON(); break;
-        case 'raw-export': download(`czas-pracy-surowe_${todayISO()}.json`, store.raw || ''); notify('Zlecono pobranie surowych danych. Sprawdź pobrane pliki.'); break;
-        case 'import-merge': await importCommit(false); break;
-        case 'import-replace': await importCommit(true); break;
-        case 'import-cancel': pendingImport = null; $('import-plan').innerHTML = ''; $('import-file').value = ''; break;
-        case 'report': await openReport(); break;
-        case 'clear-month': {
-          const period = $('clear-month').value;
-          if (!parseISODate(`${period}-01`)) throw new Error('Wybierz poprawny miesiąc.');
-          const count = db.entries.filter(d => ym(d.date) === period).length;
-          if (!await confirmAction('Wyczyścić miesiąc?', `${fmtMonthPL(period)}\nLiczba wpisów dni: ${count}.\nZostaną usunięte wszystkie godziny, absencje i notatki z tego miesiąca.`, 'Wyczyść')) return;
-          mutate(next => { next.entries = next.entries.filter(d => ym(d.date) !== period); }); notify('Wybrany miesiąc wyczyszczony.'); break;
-        }
-      }
-    }
-    document.addEventListener('click', event => {
-      const button = event.target.closest('button');
-      if (!button || button.disabled) return;
-      if (button.dataset.dialogKind) { answerDialog(button.dataset.dialogKind); return; }
-      if (button.id === 'confirm-ok') { answerDialog(true); return; }
-      if (button.id === 'confirm-cancel') { answerDialog(false); return; }
-      (async () => {
-        if (button.dataset.date) {
-          const oldMonth = month; selected = button.dataset.date; month = ym(selected);
-          if (oldMonth !== month) refreshHome();
-          else { document.querySelectorAll('[data-date]').forEach(cell => cell.setAttribute('aria-pressed', String(cell.dataset.date === selected))); $('preview-card').innerHTML = previewMarkup(); }
-        } else if (button.dataset.template !== undefined) {
-          const template = db.settings.shiftTemplates[Number(button.dataset.template)];
-          mutate(next => setShift(next, selected, template.start, template.end));
-          if (route.view === 'home') refreshHome(); else render(); notify('Godziny dodane.');
-        } else if (button.dataset.shift !== undefined) go({ view: 'form', kind: 'hours', index: Number(button.dataset.shift) });
-        else if (button.dataset.removeTemplate !== undefined) {
-          if (dirty()) throw new Error('Najpierw zapisz zmiany ustawień.');
-          mutate(next => next.settings.shiftTemplates.splice(Number(button.dataset.removeTemplate), 1)); render();
-        } else await action(button.dataset.action || button.id);
-      })().catch(error => notify(error.message));
-    });
-    $('confirmation').addEventListener('cancel', event => { event.preventDefault(); answerDialog(false); });
-    document.addEventListener('submit', event => {
-      event.preventDefault();
-      const form = event.target;
-      (async () => {
-        const data = new FormData(form), value = name => data.get(name);
-        if (form.id === 'settings-form') {
-          mutate(next => {
-            for (const name of ['rate', 'leaveQuota', 'backupReminderDays']) next.settings[name] = Number(value(name));
-            for (const name of ['defaultIncludeSat', 'defaultIncludeSun', 'defaultIncludeHolidays']) next.settings[name] = data.has(name);
-          });
-          formSnapshot = formValue(); notify('Ustawienia zapisane.'); return;
-        }
-        if (form.id === 'template-form') {
-          if (dirty()) throw new Error('Najpierw zapisz zmiany ustawień.');
-          const shift = normalizedShift({ start: value('start'), end: value('end') });
-          if (db.settings.shiftTemplates.length >= 8) throw new Error('Możesz mieć maksymalnie osiem szablonów.');
-          if (db.settings.shiftTemplates.some(t => t.start === shift.start && t.end === shift.end)) throw new Error('Ten szablon już istnieje.');
-          mutate(next => next.settings.shiftTemplates.push(shift)); render(); return;
-        }
-        if (form.id !== 'editor') return;
-        if (route.kind === 'month') {
-          const nextMonth = value('month');
-          if (!parseISODate(`${nextMonth}-01`)) throw new Error('Wybierz poprawny miesiąc.');
-          month = nextMonth; selected = `${month}-01`;
-        } else if (route.kind === 'bulk') {
-          const spec = { from: value('from'), to: value('to'), operation: `${value('mode')}-${event.submitter?.value || 'add'}`,
-            start: value('start'), end: value('end'), leaveType: value('leaveType'), includeSat: data.has('includeSat'), includeSun: data.has('includeSun'), includeHolidays: data.has('includeHolidays') };
-          const plan = planBulk(db, spec);
-          if (!await confirmAction('Potwierdź wpisy zbiorcze', `Zakres: ${spec.from} – ${spec.to}\nDni do zmiany: ${plan.changed}\nPominięte weekendy / święta: ${plan.skipped}\nPominięte konflikty godzin: ${plan.conflicts}\n${spec.operation.endsWith('remove') ? 'Usunięcie obejmuje wyłącznie wskazane godziny lub statusy.' : 'Istniejące godziny i notatki zostaną zachowane. Przy dodaniu absencji jej status w wybranych dniach zostanie zastąpiony.'}`, 'Zastosuj')) return;
-          commit(plan.db);
-        } else mutate(next => {
-          if (route.kind === 'hours') setShift(next, selected, value('start'), value('end'), route.index);
-          if (route.kind === 'leave') setLeave(next, selected, value('leaveType'));
-          if (route.kind === 'note') ensureDay(next, selected).note = value('note');
-        });
-        formSnapshot = formValue(); back(); notify('Zapisano.');
-      })().catch(error => {
-        const output = form.id === 'template-form' ? $('template-error') : $('form-error');
-        if (output) { output.textContent = error.message; output.hidden = false; } else notify(error.message);
+      $("monthTitle").addEventListener("click", () => {
+        const picker=$("monthPicker");
+        try { picker.showPicker(); } catch { picker.focus();picker.click(); }
       });
-    });
-    document.addEventListener('change', event => {
-      const input = event.target;
-      if (input.id === 'stats-month' && parseISODate(`${input.value}-01`)) replaceRoute({ ...route, month: input.value });
-      if (input.id === 'stats-year' && input.validity.valid && input.value) replaceRoute({ ...route, year: Number(input.value) });
-      if (input.id === 'report-month') { route.reportMonth = input.value; syncHistory(); }
-      if (input.id === 'import-file') {
-        const file = input.files[0]; pendingImport = null; $('import-plan').innerHTML = '';
-        $('import-plan').classList.remove('error-text');
-        if (!file) return;
-        file.text().then(text => {
-          if (route.view !== 'backup' || $('import-file') !== input || input.files[0] !== file) return;
-          pendingImport = prepareImport(JSON.parse(text.replace(/^\uFEFF/, ''))); renderImportPlan();
-        }).catch(error => {
-          if (route.view !== 'backup') return;
-          pendingImport = null; $('import-plan').textContent = `Import zatrzymany: ${error.message}`;
-          $('import-plan').classList.add('error-text');
-        });
-      }
-    });
-    // 17. Inicjalizacja bez zapisu bazy i bez rejestrowania Service Workera.
-    $('back').innerHTML = icon('back'); $('more').innerHTML = icon('more');
-    history.replaceState(historyState(), '');
-    window.addEventListener('beforeunload', event => { if (dirty()) { event.preventDefault(); event.returnValue = ''; } });
-    window.addEventListener('storage', event => {
-      if (event.key !== CONFIG.storageKey) return;
-      if (route.view === 'form' || route.view === 'settings' || dialogResolve || pendingImport) { notify('Dane zmieniły się w innej karcie. Zapis wymaga odświeżenia; najpierw zachowaj treść formularza.'); return; }
-      db = store.reload(); render(); updateReminder();
-    });
-    function updateViewport() {
-      if (!window.visualViewport) return;
-      document.documentElement.style.setProperty('--viewport-height', `${window.visualViewport.height}px`);
-      const field = document.activeElement;
-      if (field?.matches('input,textarea,select')) field.scrollIntoView({ block: 'nearest' });
+      $("monthPicker").addEventListener("change",event=>setMonth(event.target.value));
+      $("prevMonth").addEventListener("click",()=>setMonth(addMonths(ui.month,-1)));
+      $("nextMonth").addEventListener("click",()=>setMonth(addMonths(ui.month,1)));
+      $("openDayBtn").addEventListener("click",openDay);
+      $("previewPanel").addEventListener("click", event => {
+        if (event.target.closest("button,[data-quick]")) return;
+        openDay();
+      });
+      $("previewPanel").addEventListener("keydown", event => {
+        if (event.target!==$("previewPanel")) return;
+        if (event.key==="Enter" || event.key===" ") {event.preventDefault();openDay();}
+      });
+      $("previewPanel").tabIndex=0;
+      for (const id of ["previewChips","dayChips"]) $(id).addEventListener("click",event=>{
+        const button=event.target.closest("[data-quick]");
+        if (!button) return;
+        event.stopPropagation();
+        const [start,end]=button.dataset.quick.split("|");
+        addShift(ui.screen==="day"?ui.day:ui.selected,start,end);
+      });
+      $("prevDay").addEventListener("click",()=>switchDay(-1));
+      $("nextDay").addEventListener("click",()=>switchDay(1));
+      $("dayEvents").addEventListener("click",event=>{
+        const button=event.target.closest("[data-edit]");
+        if (button) openForm(button.dataset.edit,button.dataset.edit==="shift"?Number(button.dataset.index):-1);
+      });
+      $("fab").addEventListener("click",()=>{
+        $("fabMenu").hidden=!$("fabMenu").hidden;
+        $("fab").setAttribute("aria-expanded",String(!$("fabMenu").hidden));
+      });
+      $("fabMenu").addEventListener("click",event=>{
+        const button=event.target.closest("[data-add]");
+        if (button) openForm(button.dataset.add);
+      });
+      document.addEventListener("click",event=>{
+        if (!$("fab").contains(event.target) && !$("fabMenu").contains(event.target)) closeFab();
+      });
+      $("backBtn").addEventListener("click",goBack);
+      $("todayBtn").addEventListener("click",()=>{
+        if (ui.screen==="day") { ui.day=todayISO(); renderDay();replaceRoute(); }
+        else setMonth(ym(todayISO()));
+      });
+      $("statsBtn").addEventListener("click",()=>navigate("stats",{statsMonth:ui.month,statsYear:Number(ui.month.slice(0,4))}));
+      $("menuBtn").addEventListener("click",()=>navigate("menu"));
+      $("menuScreen").addEventListener("click",event=>{
+        const button=event.target.closest("[data-goto]");
+        if (!button) return;
+        if (button.dataset.goto==="bulk") openForm("bulk");
+        else navigate(button.dataset.goto);
+      });
+      $("statsMonthly").addEventListener("click",()=>{ui.statsMode="month";renderStats();replaceRoute();});
+      $("statsYearly").addEventListener("click",()=>{ui.statsMode="year";renderStats();replaceRoute();});
+      $("statsPrev").addEventListener("click",()=>changeStatPeriod(-1));
+      $("statsNext").addEventListener("click",()=>changeStatPeriod(1));
+      $("statsPeriodTitle").addEventListener("click",()=>{
+        const picker=$("statsMonthPicker");
+        try {picker.showPicker();} catch {picker.focus();picker.click();}
+      });
+      $("statsMonthPicker").addEventListener("change",event=>{
+        if (!isValidDateISO(`${event.target.value}-01`)) return;
+        ui.statsMonth=event.target.value;
+        ui.statsYear=Number(event.target.value.slice(0,4));
+        renderStats();replaceRoute();
+      });
+      $("reportBtn").addEventListener("click",openReportPdf);
+      $("saveSettingsBtn").addEventListener("click",saveSettings);
+      $("addTemplateBtn").addEventListener("click",addTemplate);
+      $("templateList").addEventListener("click",event=>{
+        const button=event.target.closest("[data-remove-template]");
+        if (!button) return;
+        const next=clone(db);
+        next.settings.shiftTemplates.splice(Number(button.dataset.removeTemplate),1);
+        commit(next,"Usunięto szablon");
+      });
+      $("exportBtn").addEventListener("click",exportDatabase);
+      $("importBtn").addEventListener("click",()=>$("importInput").click());
+      $("importInput").addEventListener("change",async event=>{
+        const file=event.target.files?.[0];
+        event.target.value="";
+        await selectImportFile(file);
+      });
+      $("importBack").addEventListener("click",requestCloseOverlay);
+      $("mergeImportBtn").addEventListener("click",()=>importAction("merge"));
+      $("replaceImportBtn").addEventListener("click",()=>importAction("replace"));
+      $("clearMonthBtn").addEventListener("click",clearMonth);
+      $("checkUpdatesBtn").addEventListener("click",checkPwaUpdates);
+      $("formBack").addEventListener("click",requestCloseOverlay);
+      $("formBody").addEventListener("click",event=>{
+        if (event.target.closest("#saveForm")) handleFormSave();
+        if (event.target.closest("#deleteForm")) handleFormSave(true);
+      });
+      $("formBody").addEventListener("change",event=>{
+        if (event.target.id==="bulkKind") renderBulkFields();
+      });
+      $("formBody").addEventListener("focusin",event=>{
+        if (event.target.matches("input,textarea,select")) event.target.scrollIntoView({block:"nearest"});
+      });
+      for (const name of ["formDialog","importDialog"]) $(name).addEventListener("cancel",event=>{
+        event.preventDefault();
+        requestCloseOverlay();
+      });
+      window.addEventListener("popstate",restoreHistory);
+      window.addEventListener("beforeunload",event=>{
+        if (hasUnsavedFormData()) { event.preventDefault();event.returnValue=""; }
+      });
+      window.addEventListener("storage",event=>{
+        if (event.key!==STORAGE_KEY) return;
+        if (hasUnsavedNote()) {toast("Dane zmieniono w innej karcie. Zapisz notatkę w kopii przed odświeżeniem.");return;}
+        if (ui.overlay) {toast("Baza zmieniła się w innej karcie. Zamknij formularz i odśwież aplikację.");return;}
+        db=loadDatabase();refreshAffectedViews();
+        toast("Wczytano zmiany z drugiej karty.");
+      });
     }
-    window.visualViewport?.addEventListener('resize', updateViewport);
-    updateViewport(); render(); updateReminder();
+    function changeStatPeriod(delta) {
+      if (ui.statsMode==="year") ui.statsYear+=delta;
+      else ui.statsMonth=addMonths(ui.statsMonth,delta);
+      renderStats();replaceRoute();
+    }
+    function saveSettings() {
+      const rate=Number($("settingRate").value),quota=Number($("settingQuota").value),reminder=Number($("settingReminder").value);
+      if (!Number.isFinite(rate)||rate<0||rate>100000||!Number.isInteger(quota)||quota<0||quota>365||!Number.isInteger(reminder)||reminder<1||reminder>365) {toast("Sprawdź stawkę, limit urlopu i częstotliwość kopii.");return;}
+      const next=clone(db);
+      Object.assign(next.settings,{rate,leaveQuota:quota,backupReminderDays:reminder,defaultIncludeSat:$("settingSat").checked,defaultIncludeSun:$("settingSun").checked,defaultIncludeHolidays:$("settingHolidays").checked});
+      if (commit(next,"Ustawienia zapisane")) ui.settingsInitialValues=snapshotInputs($("settingsScreen"));
+    }
+    function addTemplate() {
+      const start=normalizeTimeHHMM($("templateStart").value),end=normalizeTimeHHMM($("templateEnd").value);
+      if (!shiftAbsRange(todayISO(),start,end)) {toast("Sprawdź godziny szablonu.");return;}
+      if (db.settings.shiftTemplates.length>=8) {toast("Można zapisać maksymalnie 8 szablonów.");return;}
+      if (db.settings.shiftTemplates.some(t=>t.start===start&&t.end===end)) {toast("Ten szablon już istnieje.");return;}
+      const next=clone(db);
+      next.settings.shiftTemplates.push({start,end});
+      commit(next,"Dodano szablon");
+    }
+    async function clearMonth() {
+      const month=$("clearMonthInput").value;
+      if (!/^\d{4}-\d{2}$/.test(month) || !isValidDateISO(`${month}-01`)) {toast("Wybierz prawidłowy miesiąc.");return;}
+      const count=db.entries.filter(day=>ym(day.date)===month).length;
+      if (!count) {toast("Nie ma wpisów w tym miesiącu.");return;}
+      if (!await confirmDestructive(`Usunąć ${count} wpisów z miesiąca ${fmtMonthPL(month)}? Zachowaj kopię JSON przed usunięciem.`)) return;
+      const next=clone(db);
+      next.entries=next.entries.filter(day=>ym(day.date)!==month);
+      commit(next,`Usunięto ${count} wpisów z ${fmtMonthPL(month)}.`);
+    }
+
+    /* 14. Inicjalizacja: tylko lokalne dane nowego projektu. */
+    db=loadDatabase();
+    bindEvents();
+    if (history.state?.cpNext && SCREENS[history.state.screen]) {
+      Object.assign(ui,history.state);
+      ui.overlay="";  // Po przeładowaniu nie odtwarzamy formularzy bez ich danych roboczych.
+    }
+    setScreen(ui.screen);
+    replaceRoute();
+    if (!storageLocked) backupReminder();
+    // Próba podłączenia działa niezależnie od inicjalizacji danych i widoków.
+    const pwaStart=registerPwa();
+    if (pwaStart) pwaStart.catch(()=>{}); // Błąd pokazuje sekcja Narzędzia; aplikacja działa dalej.
+    // Kod testowy jest dostępny wyłącznie po uruchomieniu prototypu z parametrem ?test=1.
+    if (new URLSearchParams(location.search).get("test")==="1") {
+      Object.defineProperty(window,"__cpNextTest",{value:Object.freeze({normalizeImported,shiftAbsRange,validateShiftNoOverlap,computeDayMinutes,computeStats,computeLeaveBalance,polishHolidays,addDays,changeBulk,analyzeMerge,buildReportHTML,EMPTY,storageKey:STORAGE_KEY,checkPwaUpdates,hasUnsavedFormData,getDatabase:()=>clone(db),reset:()=>{db=EMPTY();refreshAffectedViews();}}),configurable:true});
+    }
   })();
   </script>
 </body>
