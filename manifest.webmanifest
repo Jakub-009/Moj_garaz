@@ -1,14 +1,15 @@
 {
-  "name": "Mój garaż",
-  "short_name": "Garaż",
-  "description": "Historia serwisu, przebiegu i kosztów pojazdów.",
+  "id": "/Moj_garaz/",
+  "name": "Czas pracy",
+  "short_name": "Czas pracy",
+  "description": "Ewidencja czasu pracy, urlopów i rozliczeń. Działa lokalnie i offline.",
+  "lang": "pl",
   "start_url": "/Moj_garaz/",
   "scope": "/Moj_garaz/",
   "display": "standalone",
-  "background_color": "#eef1f6",
-  "theme_color": "#eef1f6",
+  "background_color": "#f4f6fa",
+  "theme_color": "#f4f6fa",
   "orientation": "portrait",
-  "lang": "pl",
   "icons": [
     {
       "src": "/Moj_garaz/icon-192.png",
