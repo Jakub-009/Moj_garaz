@@ -60,7 +60,7 @@
     .panel { min-width: 0; background: var(--surface); border: 0; border-radius: var(--radius-lg); box-shadow: none; }
     .space-bottom { margin-bottom: 18px; }
     .eyebrow { margin-bottom: 6px; color: var(--muted); font-size: 13px; font-weight: 600; }
-    .section-title { margin: 0 0 14px; font-size: 18px; line-height: 1.3; font-weight: 745; letter-spacing: -.028em; }
+    .section-title { margin: 0 0 16px; font-size: 17px; line-height: 1.3; font-weight: 730; letter-spacing: -.022em; }
     .help { color: var(--muted); font-size: 13px; line-height: 1.55; }
     .screen { animation: appear var(--speed) var(--ease); }
     @keyframes appear { from { opacity: .7; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
@@ -102,6 +102,7 @@
     /* One UI: nagłówki sekcji poza kartami, a zawartość jako spokojne grupy wierszy. */
     .home-section-title { margin: 0 0 10px 12px; color: #35363b; font-size: 16px; line-height: 1.3; font-weight: 720; letter-spacing: -.018em; }
     .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel, .day-add-panel { padding: 0 22px; }
+    .day-detail-panel, .day-add-panel { padding-top: 20px; padding-bottom: 20px; }
     .home-group { margin-bottom: 22px; }
     #previewPanel { cursor: default; overflow: hidden; }
     .preview-date { margin: 0; padding: 20px 0 14px; font-size: 19px; line-height: 1.3; font-weight: 690; letter-spacing: -.025em; }
@@ -123,7 +124,7 @@
     .quick-area { margin: 0; padding: 14px 0 15px; border-top: 1px solid var(--line); cursor: auto; }
     .quick-area .eyebrow { margin: 0 0 9px; color: #5f6168; font-size: 13px; font-weight: 640; }
     .quick-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
-    .quick-chip { min-height: 38px; padding: 8px 13px; border: 0; border-radius: var(--radius-pill); background: var(--surface-alt); color: #28292e; font-size: 12px; font-weight: 650; }
+    .quick-chip { min-height: 36px; padding: 8px 13px; border: 0; border-radius: var(--radius-pill); background: var(--surface-alt); color: #28292e; font-size: 12px; font-weight: 640; }
     .preview-open-row, .summary-open-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 58px; padding: 10px 0; border: 0; border-top: 1px solid var(--line); background: transparent; color: var(--ink); text-align: left; font-size: 14px; font-weight: 590; }
     .preview-open-row .icon, .summary-open-row .icon { color: #73757d; width: 19px; height: 19px; }
     .summary-panel { padding-top: 3px; padding-bottom: 3px; }
@@ -142,27 +143,30 @@
     #statsGrid .stat-tile strong { order: 2; flex: 0 0 auto; font-size: 15px; font-weight: 680; text-align: right; }
     #statsGrid .stat-tile span { order: 1; margin: 0; color: #3b3c41; font-size: 14px; font-weight: 520; }
     .event-list, .add-list { display: grid; gap: 0; }
-    .event { display: flex; align-items: center; gap: 13px; width: 100%; min-height: 72px; padding: 12px 1px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; color: var(--ink); text-align: left; overflow-wrap: anywhere; }
+    .event { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 82px; padding: 16px 1px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; color: var(--ink); text-align: left; overflow-wrap: anywhere; }
     .event:last-child { border-bottom: 0; }
     .event .event-text { flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-    .event > .icon { color: #999da6; }
+    .event-action { display: inline-grid; place-items: center; flex: 0 0 auto; color: #9a9da5; }
+    .event-action .icon { width: 18px; height: 18px; }
     .event strong, .event small { display: block; overflow-wrap: anywhere; }
     .event strong { font-size: 15px; font-weight: 655; }
-    .event small { margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.4; }
-        .day-hero { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 18px; margin: 3px 0 18px; padding: 20px 22px; }
+    .event small { margin-top: 5px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .event-empty { margin: 0; padding: 18px 0 8px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .day-hero { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 18px; margin: 4px 0 20px; padding: 24px 22px; }
     .day-hero strong { order: 2; display: block; font-size: 24px; font-weight: 720; letter-spacing: -.035em; line-height: 1.2; }
     .day-hero span { font-size: 13px; color: var(--muted); }
     #dayHoliday { flex-basis: 100%; order: 3; }
     .date-nav { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 6px; margin: 0 0 18px; }
     .date-nav strong { font-size: clamp(14px,4.2vw,18px); font-weight: 695; text-align: center; line-height: 1.35; min-width: 0; }
     .date-nav .icon-btn, .stats-period .icon-btn { background: var(--surface); }
-    .add-item { display: flex; align-items: center; gap: 13px; width: 100%; min-height: 70px; padding: 11px 1px; background: transparent; border: 0; border-bottom: 1px solid var(--line); text-align: left; color: var(--ink); font-size: 15px; font-weight: 590; }
+    .add-item { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 74px; padding: 14px 1px; background: transparent; border: 0; border-bottom: 1px solid var(--line); text-align: left; color: var(--ink); font-size: 15px; font-weight: 590; }
     .add-item:last-child { border-bottom: 0; }
     .add-item > span:nth-child(2) { flex: 1; min-width: 0; }
-    .add-icon { display: inline-grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border-radius: 50%; color: white; }
-    .add-icon.work { background: #3d98d0; } .add-icon.leave { background: #5d74eb; } .add-icon.note { background: #efab42; }
-    .add-icon .icon { width: 21px; height: 21px; }
-    #dayQuickBlock { margin-top: 18px; }
+    .add-icon { display: inline-grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 50%; color: #4d5562; }
+    .add-icon.work { background: #e6f5ef; color: #2b8b60; } .add-icon.leave { background: #edf2ff; color: #5170dc; } .add-icon.note { background: #fff5dd; color: #b78417; }
+    .add-icon .icon { width: 17px; height: 17px; }
+    #dayQuickBlock { margin-top: 18px; padding-top: 18px; padding-bottom: 18px; }
+    #dayQuickBlock .section-title { margin-bottom: 12px; }
 
     /* Menu w grupach takich jak Ustawienia telefonu; wersja tylko w jego stopce. */
     .menu-screen { display: flex; flex-direction: column; min-height: calc(100dvh - 148px); }
@@ -184,6 +188,12 @@
     .settings-panel .section-title:not(:first-child) { margin-top: 22px; }
     .settings-panel .help { margin: 0 0 15px; }
     .settings-panel { padding-top: 20px; padding-bottom: 20px; }
+    .about-panel { padding-top: 22px; padding-bottom: 22px; }
+    .about-name { margin: 0 0 14px; font-size: 20px; line-height: 1.3; font-weight: 730; letter-spacing: -.025em; }
+    .about-copy { margin: 0 0 22px; color: #60636b; font-size: 15px; line-height: 1.65; }
+    .about-meta-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 56px; padding: 10px 0; border-top: 1px solid var(--line); }
+    .about-meta-row span { color: #60636b; font-size: 14px; }
+    .about-meta-row strong { color: var(--ink); font-size: 15px; font-weight: 660; text-align: right; }
     .field { display: block; margin: 0 0 18px; }
     .field > span { display: block; margin-bottom: 8px; color: #5e616b; font-size: 13px; font-weight: 630; }
     .field input:not([type=checkbox]), .field select, .field textarea { display: block; width: 100%; min-width: 0; max-width: 100%; min-height: 54px; padding: 13px 15px; border: 0; border-radius: var(--radius-sm); background: var(--input-bg); color: var(--ink); font-size: 16px; transition: box-shadow var(--speed) var(--ease), background-color var(--speed) var(--ease); }
@@ -216,6 +226,8 @@
     .segment button[aria-pressed="true"] { background: #6c6d70; color: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 7%); }
     .stats-period { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 6px; margin-bottom: 16px; }
     .stats-period .month-label { font-size: 19px; }
+    .period-title { display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
+    .period-title .icon { width: 15px; height: 15px; }
 
     /* Jeden system dolnych arkuszy bez przyklejonych przycisków formularza. */
     dialog { border: 0; color: var(--ink); background: var(--surface); box-shadow: 0 18px 50px rgb(20 23 31 / 18%); }
@@ -241,7 +253,7 @@
       .app { padding-inline: 9px; } .app-header { min-height: 74px; padding-bottom: 10px; }
       .header-title { font-size: 26px; } .icon-btn { width: 42px; height: 42px; }
       .calendar-grid, .weekday-row { gap: 2px; } .day-cell { min-height: 46px; padding-top: 4px; }
-      .calendar-legend { gap: 6px 9px; } .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel, .day-add-panel { padding-left: 17px; padding-right: 17px; }
+      .calendar-legend { gap: 6px 9px; } .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel, .day-add-panel { padding-left: 17px; padding-right: 17px; } .day-detail-panel, .day-add-panel, #dayQuickBlock { padding-top: 16px; padding-bottom: 16px; }
       .field-row { grid-template-columns: 1fr; } .sheet-body { padding-inline: 17px; }
     }
     @media (min-width: 620px) {
@@ -277,6 +289,7 @@
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/></symbol>
     <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 20h18M6 17v-6m6 6V5m6 12V9"/></symbol>
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7h.01"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
     <symbol id="i-swap" viewBox="0 0 24 24"><path d="M5 7h14l-4-4m4 4-4 4M19 17H5l4 4m-4-4 4-4"/></symbol>
   </svg>
   <div class="app">
@@ -403,7 +416,7 @@
         <div class="panel settings-panel"><h2 class="section-title">Aktualizacja</h2><p id="updateHelp" class="help">Sprawdź, czy jest dostępna nowa wersja aplikacji. Aktualizacja nie zmienia zapisanych wpisów.</p><button id="checkUpdatesBtn" class="btn ghost wide" type="button">Sprawdź aktualizacje</button></div>
       </section>
 
-      <section id="aboutScreen" class="screen" hidden aria-label="O aplikacji"><div class="panel settings-panel"><h2 class="section-title">Czas pracy — Next</h2><p class="help">Nowa implementacja HTML/CSS/JS inspirowana ergonomią Samsung One UI. Jeden plik, bez zewnętrznych bibliotek. Instalacja i działanie offline wymagają opublikowania przygotowanych plików manifest.webmanifest, sw.js i ikon.</p><p class="help">Pamięć danych: <code>worktime_next_v1</code>. Nie odczytuje ani nie zmienia klucza produkcyjnego <code>worktime_pwa_v1</code>.</p></div></section>
+      <section id="aboutScreen" class="screen" hidden aria-label="O aplikacji"><div class="panel settings-panel about-panel"><h2 class="about-name">Czas pracy</h2><p class="about-copy">Aplikacja do ewidencji czasu pracy, zmian godzinowych, urlopów, zwolnień i notatek. Pozwala szybko zapisywać wpisy dzienne oraz sprawdzać podsumowanie przepracowanego czasu i statystyki.</p><div class="about-meta-row"><span>Autor</span><strong>Jakub</strong></div><div class="about-meta-row"><span>Wersja</span><strong id="aboutVersion"></strong></div></div></section>
     </main>
   </div>
 
@@ -416,7 +429,7 @@
   "use strict";
   (() => {
     /* 6. Dane nowej aplikacji, normalizacja i pojedyncza kontrolowana ścieżka zapisu. */
-    const APP_VERSION = "1.0.1";
+    const APP_VERSION = "1.0.2";
     const STORAGE_KEY = "worktime_next_v1";
     const BACKUP_KEY = "worktime_next_last_backup_iso";
     const EMPTY = () => ({
@@ -862,12 +875,12 @@
       $("dayHoliday").textContent=holiday || "";
       const events=[];
       if (day) {
-        for (const [i,shift] of day.shifts.entries()) events.push(`<button class="event work" type="button" data-edit="shift" data-index="${i}"><span class="item-glyph work">${icon("clock")}</span><span class="event-text"><strong>${escapeHtml(shift.start)}–${escapeHtml(shift.end)}</strong><small>${fmtDuration(minutesBetween(iso,shift.start,shift.end))}</small></span>${icon("edit",true)}</button>`);
-        if (day.leaveType) events.push(`<button class="event ${day.leaveType}" type="button" data-edit="leave"><span class="item-glyph ${day.leaveType}">${icon("calendar")}</span><span class="event-text"><strong>${LEAVE[day.leaveType]}</strong><small>Dotknij, aby edytować lub usunąć status</small></span>${icon("edit",true)}</button>`);
-        if (day.note.trim()) events.push(`<button class="event note" type="button" data-edit="note"><span class="item-glyph note">${icon("notes")}</span><span class="event-text"><strong>Notatka</strong><small>${escapeHtml(day.note)}</small></span>${icon("edit",true)}</button>`);
+        for (const [i,shift] of day.shifts.entries()) events.push(`<button class="event work" type="button" data-edit="shift" data-index="${i}"><span class="item-glyph work">${icon("clock")}</span><span class="event-text"><strong>${escapeHtml(shift.start)}–${escapeHtml(shift.end)}</strong><small>${fmtDuration(minutesBetween(iso,shift.start,shift.end))}</small></span><span class="event-action" aria-hidden="true">${icon("next",true)}</span></button>`);
+        if (day.leaveType) events.push(`<button class="event ${day.leaveType}" type="button" data-edit="leave"><span class="item-glyph ${day.leaveType}">${icon("calendar")}</span><span class="event-text"><strong>${LEAVE[day.leaveType]}</strong><small>Dotknij, aby edytować lub usunąć status</small></span><span class="event-action" aria-hidden="true">${icon("next",true)}</span></button>`);
+        if (day.note.trim()) events.push(`<button class="event note" type="button" data-edit="note"><span class="item-glyph note">${icon("notes")}</span><span class="event-text"><strong>Notatka</strong><small>${escapeHtml(day.note)}</small></span><span class="event-action" aria-hidden="true">${icon("next",true)}</span></button>`);
       }
       if (holiday) events.push(`<div class="event holiday"><span class="item-glyph">${icon("calendar")}</span><span class="event-text"><strong>${escapeHtml(holiday)}</strong><small>Święto informacyjne</small></span></div>`);
-      $("dayEvents").innerHTML=events.join("")||'<p class="help">Brak wpisów w tym dniu. Wybierz poniżej rodzaj wpisu, który chcesz dodać.</p>';
+      $("dayEvents").innerHTML=events.join("")||'<p class="event-empty">Brak wpisów w tym dniu. Wybierz poniżej rodzaj wpisu, który chcesz dodać.</p>';
       $("dayChips").innerHTML=quickChips();
       $("dayQuickBlock").hidden=!db.settings.shiftTemplates.length;
     }
@@ -876,7 +889,7 @@
       const balance=computeLeaveBalance(year?ui.statsYear:Number(ui.statsMonth.slice(0,4)));
       $("statsMonthly").setAttribute("aria-pressed",String(!year));
       $("statsYearly").setAttribute("aria-pressed",String(year));
-      $("statsPeriodTitle").textContent=(year?String(ui.statsYear):fmtMonthPL(ui.statsMonth))+" ⌄";
+      $("statsPeriodTitle").innerHTML=`<span class="period-title">${escapeHtml(year?String(ui.statsYear):fmtMonthPL(ui.statsMonth))}${icon("down",true)}</span>`;
       $("statsMonthPicker").value=year?`${ui.statsYear}-01`:ui.statsMonth;
       renderSummary("statsGrid",computeStats(year?ui.statsYear:ui.statsMonth,year),true);
       $("statsGrid").insertAdjacentHTML("beforeend",[
@@ -1835,6 +1848,7 @@
     db=loadDatabase();
     updateTodayBadge();
     $("menuVersion").textContent=APP_VERSION;
+    $("aboutVersion").textContent=APP_VERSION;
     bindEvents();
     if (history.state?.cpNext && SCREENS[history.state.screen]) {
       Object.assign(ui,history.state);
