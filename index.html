@@ -12,12 +12,12 @@
     :root {
       font-family: "SamsungOne", "One UI Sans", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
       color-scheme: light;
-      --bg: #f7f8fc; --surface: #fff; --surface-alt: #f0f1f5; --input-bg: #f7f8fb;
-      --ink: #18191d; --muted: #797d86; --line: #e8e9ee; --focus-ring: #91adfb;
-      --blue: #4678e9; --blue-soft: #eaf0ff; --green: #238c66; --green-soft: #e9f7f1;
+      --bg: #f4f4f6; --surface: #fff; --surface-alt: #f1f2f5; --input-bg: #f5f6f9;
+      --ink: #17181c; --muted: #898b92; --line: #e3e4e8; --focus-ring: #8db2ff;
+      --blue: #3f82f7; --blue-soft: #eaf2ff; --green: #238c66; --green-soft: #e9f7f1;
       --purple-soft: #f2efff; --red: #bd4d52; --red-soft: #fff0f1;
       --yellow-soft: #fff7e4;
-      --radius-lg: 32px; --radius-md: 22px; --radius-sm: 16px; --radius-pill: 999px;
+      --radius-lg: 30px; --radius-md: 22px; --radius-sm: 18px; --radius-pill: 999px;
       --ease: cubic-bezier(.2,.75,.2,1); --speed: 160ms;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -43,10 +43,12 @@
     .header-title { min-width: 0; max-width: 100%; padding-right: 8px; overflow: visible; text-overflow: clip; white-space: nowrap; font-size: clamp(28px,7vw,36px); line-height: 1.12; letter-spacing: -.05em; font-weight: 760; }
     .icon-btn { display: inline-grid; place-items: center; flex: 0 0 auto; width: 44px; height: 44px; padding: 0; background: transparent; border: 0; border-radius: 50%; color: var(--ink); transition: transform var(--speed) var(--ease), background-color var(--speed) var(--ease); }
     #menuBtn { background: var(--surface); box-shadow: 0 1px 4px rgb(24 31 50 / 8%); }
-    #todayBtn { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 4px rgb(24 31 50 / 8%); color: var(--ink); font-size: 16px; font-weight: 760; letter-spacing: -.02em; }
+    #todayBtn { width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; box-shadow: none; color: var(--ink); }
     #todayBtn[hidden] { display: none !important; }
-    #todayBtn .today-number { line-height: 1; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 11px 21px; border: 0; border-radius: var(--radius-pill); background: #35363a; color: white; font-size: 14px; font-weight: 680; text-align: center; transition: background-color var(--speed) var(--ease), transform var(--speed) var(--ease); }
+    .today-calendar { position: relative; display: grid; place-items: center; width: 25px; height: 24px; padding-top: 4px; border: 2px solid currentColor; border-radius: 7px; font-size: 11px; line-height: 1; font-weight: 760; }
+    .today-calendar::before { content: ""; position: absolute; top: 5px; left: 2px; right: 2px; height: 1.5px; background: currentColor; opacity: .85; }
+    .today-calendar::after { content: ""; position: absolute; top: -4px; left: 6px; width: 9px; height: 5px; border-left: 2px solid currentColor; border-right: 2px solid currentColor; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 11px 21px; border: 0; border-radius: var(--radius-pill); background: var(--blue); color: white; font-size: 14px; font-weight: 680; text-align: center; transition: background-color var(--speed) var(--ease), transform var(--speed) var(--ease); }
     .btn.secondary { background: var(--surface-alt); color: var(--ink); }
     .btn.ghost { background: var(--surface-alt); color: #4b4e56; }
     .btn.danger { background: var(--red-soft); color: #af3943; }
@@ -54,8 +56,8 @@
     .btn.wide { width: 100%; }
     .btn-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
     .btn-row > .btn { flex: 1 1 auto; }
-    .btn:active:not(:disabled), .icon-btn:active:not(:disabled), .day-cell:active:not(:disabled), .event:active:not(:disabled), .nav-item:active:not(:disabled), .quick-chip:active:not(:disabled), .today-pill:active:not(:disabled), .add-item:active:not(:disabled) { transform: scale(.975); }
-    .panel { min-width: 0; background: var(--surface); border: 0; border-radius: var(--radius-lg); }
+    .btn:active:not(:disabled), .icon-btn:active:not(:disabled), .day-cell:active:not(:disabled), .event:active:not(:disabled), .nav-item:active:not(:disabled), .quick-chip:active:not(:disabled), .add-item:active:not(:disabled) { transform: scale(.975); }
+    .panel { min-width: 0; background: var(--surface); border: 0; border-radius: var(--radius-lg); box-shadow: none; }
     .space-bottom { margin-bottom: 18px; }
     .eyebrow { margin-bottom: 6px; color: var(--muted); font-size: 13px; font-weight: 600; }
     .section-title { margin: 0 0 14px; font-size: 18px; line-height: 1.3; font-weight: 745; letter-spacing: -.028em; }
@@ -96,42 +98,49 @@
     .calendar-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 7px 11px; font-size: 10px; color: var(--muted); }
     .calendar-legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .calendar-legend .marker { flex: 0 0 11px; height: 4px; }
-    .today-pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: 0 0 auto; min-height: 42px; padding: 9px 16px; border: 0; border-radius: var(--radius-pill); background: #f0f1f5; color: #303137; font-size: 13px; font-weight: 660; }
     
-    /* Karty wyglądają jak systemowe grupy; wpisy to wiersze, nie kolorowe chipy. */
-    .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel, .day-add-panel { padding: 22px; }
-    #previewPanel { cursor: pointer; }
-    .preview-top { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 8px; align-items: center; }
-    .preview-top .eyebrow { grid-column: 1; grid-row: 1; }
-    .preview-top h2 { grid-column: 1 / -1; grid-row: 2; margin: 0; font-size: 21px; line-height: 1.3; font-weight: 725; letter-spacing: -.035em; overflow-wrap: anywhere; }
-    .preview-content { display: grid; gap: 0; margin-top: 12px; }
-    .preview-entry { display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
-    .preview-entry:last-child { border-bottom: 0; }
-    .preview-entry .preview-label { flex: 1; min-width: 0; color: var(--ink); font-weight: 575; }
-    .preview-entry strong { min-width: 0; font-size: 14px; font-weight: 680; text-align: right; overflow-wrap: anywhere; }
-    .preview-entry .preview-note { max-width: 55%; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; text-align: right; white-space: pre-wrap; color: #53545c; }
-    .preview-total { display: flex; align-items: center; justify-content: space-between; gap: 9px; margin-top: 12px; padding: 13px 15px; border-radius: var(--radius-sm); background: var(--surface-alt); font-size: 13px; }
-    .preview-total strong { color: var(--ink); font-size: 15px; }
-    .item-glyph { display: inline-grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; border-radius: 50%; background: #f0f1f5; color: #5f626d; }
-    .item-glyph .icon { width: 21px; height: 21px; }
-    .item-glyph.work { background: #e6f8ef; color: #258657; }
-    .item-glyph.paid, .item-glyph.leave { background: #e9efff; color: #4b74d8; }
-    .item-glyph.unpaid { background: #f2edff; color: #7860c9; }
+    /* One UI: nagłówki sekcji poza kartami, a zawartość jako spokojne grupy wierszy. */
+    .home-section-title { margin: 0 0 10px 12px; color: #35363b; font-size: 16px; line-height: 1.3; font-weight: 720; letter-spacing: -.018em; }
+    .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel, .day-add-panel { padding: 0 22px; }
+    .home-group { margin-bottom: 22px; }
+    #previewPanel { cursor: default; overflow: hidden; }
+    .preview-date { margin: 0; padding: 20px 0 14px; font-size: 19px; line-height: 1.3; font-weight: 690; letter-spacing: -.025em; }
+    .preview-content { display: grid; gap: 0; margin: 0; }
+    .preview-entry { display: flex; align-items: center; gap: 12px; min-height: 62px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 14px; }
+    .preview-entry .preview-label { flex: 1; min-width: 0; color: var(--ink); font-weight: 560; }
+    .preview-entry strong { min-width: 0; font-size: 14px; font-weight: 650; text-align: right; overflow-wrap: anywhere; }
+    .preview-entry .preview-note { max-width: 52%; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; text-align: right; white-space: pre-wrap; color: #66686f; }
+    .preview-total { display: flex; align-items: center; justify-content: space-between; gap: 9px; min-height: 54px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+    .preview-total strong { color: var(--ink); font-size: 14px; font-weight: 650; }
+    .item-glyph { display: inline-grid; place-items: center; flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; background: #f0f1f4; color: #5f626d; }
+    .item-glyph .icon { width: 19px; height: 19px; }
+    .item-glyph.work { background: #e8f7f0; color: #258657; }
+    .item-glyph.paid, .item-glyph.leave { background: #edf2ff; color: #4b74d8; }
+    .item-glyph.unpaid { background: #f3efff; color: #7860c9; }
     .item-glyph.sick { background: #fff0f2; color: #ca5660; }
-    .item-glyph.note { background: #fff5da; color: #a67718; }
-    .empty-state { margin: 0; padding: 12px 0 3px; color: var(--muted); font-size: 14px; }
-    .quick-area { margin-top: 16px; padding-top: 15px; border-top: 1px solid var(--line); cursor: auto; }
-    .quick-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; }
-    .quick-chip { min-height: 44px; padding: 10px 16px; border: 0; border-radius: var(--radius-pill); background: var(--surface-alt); color: #28292e; font-size: 13px; font-weight: 670; }
-    .inline-action { grid-column: 2; grid-row: 1; justify-self: end; display: inline-flex; align-items: center; gap: 3px; min-height: 38px; padding: 8px 14px; border: 0; border-radius: var(--radius-pill); background: var(--surface-alt); color: #35363d; font-size: 13px; font-weight: 675; white-space: nowrap; }
-    .summary-top { display: flex; align-items: center; justify-content: space-between; gap: 9px; }
-    .summary-top h2 { margin: 0; font-size: 19px; font-weight: 740; letter-spacing: -.025em; }
-    .summary-period { margin: 3px 0 10px; color: var(--muted); font-size: 13px; }
+    .item-glyph.note { background: #fff6df; color: #a67718; }
+    .empty-state { margin: 0; padding: 17px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+    .quick-area { margin: 0; padding: 14px 0 15px; border-top: 1px solid var(--line); cursor: auto; }
+    .quick-area .eyebrow { margin: 0 0 9px; color: #5f6168; font-size: 13px; font-weight: 640; }
+    .quick-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+    .quick-chip { min-height: 38px; padding: 8px 13px; border: 0; border-radius: var(--radius-pill); background: var(--surface-alt); color: #28292e; font-size: 12px; font-weight: 650; }
+    .preview-open-row, .summary-open-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 58px; padding: 10px 0; border: 0; border-top: 1px solid var(--line); background: transparent; color: var(--ink); text-align: left; font-size: 14px; font-weight: 590; }
+    .preview-open-row .icon, .summary-open-row .icon { color: #73757d; width: 19px; height: 19px; }
+    .summary-panel { padding-top: 3px; padding-bottom: 3px; }
+    .summary-period { margin: 0; padding: 15px 0 8px; color: var(--muted); font-size: 13px; }
+    .summary-list { display: grid; }
+    .summary-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 58px; padding: 11px 0; border-top: 1px solid var(--line); }
+    .summary-row span { color: #37383d; font-size: 14px; font-weight: 520; }
+    .summary-row strong { color: var(--ink); font-size: 15px; font-weight: 680; text-align: right; }
     .stats-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 19px; }
     .stat-tile { min-width: 0; padding: 14px 0; }
     .stat-tile strong { display: block; font-size: clamp(19px,5.4vw,25px); font-weight: 740; letter-spacing: -.035em; overflow-wrap: anywhere; }
     .stat-tile span { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.4; }
-    .summary-panel .stat-tile:nth-child(-n+2), #statsGrid .stat-tile { border-bottom: 1px solid var(--line); }
+    #statsGrid { display: block; padding-top: 4px; padding-bottom: 4px; }
+    #statsGrid .stat-tile { display: flex; align-items: center; justify-content: space-between; gap: 18px; min-height: 60px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+    #statsGrid .stat-tile:last-child { border-bottom: 0; }
+    #statsGrid .stat-tile strong { order: 2; flex: 0 0 auto; font-size: 15px; font-weight: 680; text-align: right; }
+    #statsGrid .stat-tile span { order: 1; margin: 0; color: #3b3c41; font-size: 14px; font-weight: 520; }
     .event-list, .add-list { display: grid; gap: 0; }
     .event { display: flex; align-items: center; gap: 13px; width: 100%; min-height: 72px; padding: 12px 1px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; color: var(--ink); text-align: left; overflow-wrap: anywhere; }
     .event:last-child { border-bottom: 0; }
@@ -140,9 +149,10 @@
     .event strong, .event small { display: block; overflow-wrap: anywhere; }
     .event strong { font-size: 15px; font-weight: 655; }
     .event small { margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.4; }
-    .day-hero { margin: 3px 0 18px; padding: 27px 23px; }
-    .day-hero strong { display: block; font-size: clamp(37px,10vw,45px); font-weight: 760; letter-spacing: -.058em; line-height: 1.3; }
+        .day-hero { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 18px; margin: 3px 0 18px; padding: 20px 22px; }
+    .day-hero strong { order: 2; display: block; font-size: 24px; font-weight: 720; letter-spacing: -.035em; line-height: 1.2; }
     .day-hero span { font-size: 13px; color: var(--muted); }
+    #dayHoliday { flex-basis: 100%; order: 3; }
     .date-nav { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 6px; margin: 0 0 18px; }
     .date-nav strong { font-size: clamp(14px,4.2vw,18px); font-weight: 695; text-align: center; line-height: 1.35; min-width: 0; }
     .date-nav .icon-btn, .stats-period .icon-btn { background: var(--surface); }
@@ -171,21 +181,32 @@
     .menu-version { margin: auto 0 0; padding: 21px 0 27px; color: #888b94; font-size: 12px; text-align: center; }
 
     /* Ekrany ustawień i formularzy: pojedyncze powierzchnie, rowki i suwaki. */
-    .settings-panel .section-title:not(:first-child) { margin-top: 25px; }
+    .settings-panel .section-title:not(:first-child) { margin-top: 22px; }
     .settings-panel .help { margin: 0 0 15px; }
+    .settings-panel { padding-top: 20px; padding-bottom: 20px; }
     .field { display: block; margin: 0 0 18px; }
     .field > span { display: block; margin-bottom: 8px; color: #5e616b; font-size: 13px; font-weight: 630; }
     .field input:not([type=checkbox]), .field select, .field textarea { display: block; width: 100%; min-width: 0; max-width: 100%; min-height: 54px; padding: 13px 15px; border: 0; border-radius: var(--radius-sm); background: var(--input-bg); color: var(--ink); font-size: 16px; transition: box-shadow var(--speed) var(--ease), background-color var(--speed) var(--ease); }
     .field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible { outline: 0; background: #fff; box-shadow: inset 0 0 0 2px var(--blue), 0 0 0 3px var(--blue-soft); }
     .field textarea { min-height: 170px; resize: vertical; line-height: 1.5; }
     .field-row { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 11px; }
-    .check { display: flex; flex-direction: row-reverse; justify-content: space-between; align-items: center; gap: 12px; min-height: 62px; padding: 12px 0; border-bottom: 1px solid var(--line); color: var(--ink); font-size: 14px; font-weight: 550; cursor: pointer; }
+    .check { display: flex; flex-direction: row-reverse; justify-content: space-between; align-items: center; gap: 12px; min-height: 66px; padding: 12px 0; border-bottom: 1px solid var(--line); color: var(--ink); font-size: 15px; font-weight: 500; cursor: pointer; }
     .check:last-child { border-bottom: 0; }
-    .check input[type=checkbox] { appearance: none; position: relative; flex: 0 0 49px; width: 49px; height: 29px; margin: 0; padding: 0; border: 0; border-radius: var(--radius-pill); background: #d6d7dd; transition: background-color var(--speed) var(--ease); cursor: pointer; }
-    .check input[type=checkbox]::after { content: ""; position: absolute; top: 3px; left: 3px; width: 23px; height: 23px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgb(20 20 30 / 12%); transition: transform var(--speed) var(--ease); }
+    .check input[type=checkbox] { appearance: none; position: relative; flex: 0 0 46px; width: 46px; height: 27px; margin: 0; padding: 0; border: 0; border-radius: var(--radius-pill); background: #d6d7dd; transition: background-color var(--speed) var(--ease); cursor: pointer; }
+    .check input[type=checkbox]::after { content: ""; position: absolute; top: 3px; left: 3px; width: 21px; height: 21px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgb(20 20 30 / 12%); transition: transform var(--speed) var(--ease); }
     .check input[type=checkbox]:checked { background: var(--blue); }
-    .check input[type=checkbox]:checked::after { transform: translateX(20px); }
+    .check input[type=checkbox]:checked::after { transform: translateX(19px); }
     .check input[type=checkbox]:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+    .settings-list { display: grid; margin-top: 2px; }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 70px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .setting-row:last-child { border-bottom: 0; }
+    .setting-copy { min-width: 0; }
+    .setting-copy strong { display: block; font-size: 15px; font-weight: 520; line-height: 1.35; }
+    .setting-copy small { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .setting-inline-input { display: flex; align-items: center; gap: 7px; flex: 0 0 auto; }
+    .setting-inline-input input { width: 82px; min-height: 42px; padding: 8px 10px; border: 0; border-radius: 13px; background: var(--surface-alt); color: var(--ink); font-size: 15px; text-align: right; }
+    .setting-inline-input small { color: var(--muted); font-size: 12px; }
+    .settings-action { margin-top: 18px; }
     .soft-divider { margin: 22px 0; height: 0; border: 0; border-top: 1px solid var(--line); }
     .data-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
     .data-row:last-child { border-bottom: 0; }
@@ -220,7 +241,7 @@
       .app { padding-inline: 9px; } .app-header { min-height: 74px; padding-bottom: 10px; }
       .header-title { font-size: 26px; } .icon-btn { width: 42px; height: 42px; }
       .calendar-grid, .weekday-row { gap: 2px; } .day-cell { min-height: 46px; padding-top: 4px; }
-      .calendar-legend { gap: 6px 9px; } .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel, .day-add-panel { padding: 17px; }
+      .calendar-legend { gap: 6px 9px; } .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel, .day-add-panel { padding-left: 17px; padding-right: 17px; }
       .field-row { grid-template-columns: 1fr; } .sheet-body { padding-inline: 17px; }
     }
     @media (min-width: 620px) {
@@ -234,7 +255,7 @@
       #homeScreen .calendar-panel, #homeScreen .preview-panel, #homeScreen .summary-panel { margin-bottom: 0; }
     }
     @media (hover:hover) and (pointer:fine) {
-      .icon-btn:hover:not(:disabled), .month-label:hover:not(:disabled), .today-pill:hover:not(:disabled) { background: #edeef4; }
+      .icon-btn:hover:not(:disabled), .month-label:hover:not(:disabled) { background: #edeef4; }
       .day-cell:hover:not(:disabled) { border-color: #b4b7be; }
       .btn:hover:not(:disabled), .quick-chip:hover:not(:disabled) { filter: brightness(.96); }
       .nav-item:hover:not(:disabled), .event:hover:not(:disabled), .add-item:hover:not(:disabled) { background: #fafbff; }
@@ -265,7 +286,7 @@
         <strong id="headerTitle" class="header-title">Czas pracy</strong>
       </div>
       <div class="header-right">
-        <button id="todayBtn" class="icon-btn" type="button" title="Dzisiaj" aria-label="Przejdź do dzisiaj"><span id="todayBtnValue" class="today-number" aria-hidden="true"></span></button>
+        <button id="todayBtn" class="icon-btn" type="button" title="Dzisiaj" aria-label="Przejdź do dzisiaj"><span class="today-calendar" aria-hidden="true"><span id="todayBtnValue"></span></span></button>
         <button id="statsBtn" class="icon-btn" type="button" title="Statystyki" aria-label="Statystyki"><svg class="icon"><use href="#i-chart"/></svg></button>
         <button id="menuBtn" class="icon-btn" type="button" title="Więcej" aria-label="Więcej"><svg class="icon"><use href="#i-more"/></svg></button>
       </div>
@@ -289,15 +310,22 @@
             </div>
           </div>
         </div>
-        <section id="previewPanel" class="panel preview-panel space-bottom" aria-label="Podgląd dnia">
-          <div class="preview-top"><span class="eyebrow">Wybrany dzień</span><button id="openDayBtn" class="inline-action" type="button">Otwórz <svg class="icon sm"><use href="#i-next"/></svg></button><h2 id="previewTitle"></h2></div>
-          <div id="previewContent" class="preview-content" aria-live="polite"></div>
-          <div id="quickPreview" class="quick-area"><div class="eyebrow">Dodaj szybkie godziny</div><div id="previewChips" class="quick-row"></div></div>
+        <section class="home-group" aria-labelledby="previewSectionLabel">
+          <h2 id="previewSectionLabel" class="home-section-title">Wybrany dzień</h2>
+          <div id="previewPanel" class="panel preview-panel" aria-label="Podgląd dnia">
+            <h3 id="previewTitle" class="preview-date"></h3>
+            <div id="previewContent" class="preview-content" aria-live="polite"></div>
+            <div id="quickPreview" class="quick-area"><div class="eyebrow">Szybkie godziny</div><div id="previewChips" class="quick-row"></div></div>
+            <button id="openDayBtn" class="preview-open-row" type="button"><span>Otwórz szczegóły dnia</span><svg class="icon sm" aria-hidden="true"><use href="#i-next"/></svg></button>
+          </div>
         </section>
-        <section class="panel summary-panel" aria-label="Podsumowanie miesiąca">
-          <div class="summary-top"><h2>Ten miesiąc</h2><button id="homeStatsOpen" class="today-pill" type="button">Statystyki</button></div>
-          <p id="homeMonthLabel" class="summary-period"></p>
-          <div id="homeStats" class="stats-grid"></div>
+        <section class="home-group" aria-labelledby="summarySectionTitle">
+          <h2 id="summarySectionTitle" class="home-section-title">Ten miesiąc</h2>
+          <div class="panel summary-panel" aria-label="Podsumowanie miesiąca">
+            <p id="homeMonthLabel" class="summary-period"></p>
+            <div id="homeStats" class="summary-list"></div>
+            <button id="homeStatsOpen" class="summary-open-row" type="button"><span>Pokaż statystyki</span><svg class="icon sm" aria-hidden="true"><use href="#i-next"/></svg></button>
+          </div>
         </section>
       </section>
 
@@ -349,14 +377,18 @@
       <section id="settingsScreen" class="screen" hidden aria-label="Ustawienia">
         <div class="panel settings-panel space-bottom">
           <h2 class="section-title">Rozliczenia i absencje</h2>
-          <div class="field-row"><label class="field"><span>Stawka godzinowa (zł)</span><input id="settingRate" type="number" min="0" max="100000" step="0.01" inputmode="decimal"></label><label class="field"><span>Roczny limit urlopu (dni)</span><input id="settingQuota" type="number" min="0" max="365" step="1" inputmode="numeric"></label></div>
+          <div class="settings-list">
+            <label class="setting-row"><span class="setting-copy"><strong>Stawka godzinowa</strong><small>Używana do szacowania wypłaty</small></span><span class="setting-inline-input"><input id="settingRate" type="number" min="0" max="100000" step="0.01" inputmode="decimal" aria-label="Stawka godzinowa"><small>zł</small></span></label>
+            <label class="setting-row"><span class="setting-copy"><strong>Roczny limit urlopu</strong><small>Limit urlopu płatnego w roku</small></span><span class="setting-inline-input"><input id="settingQuota" type="number" min="0" max="365" step="1" inputmode="numeric" aria-label="Roczny limit urlopu"><small>dni</small></span></label>
+            <label class="setting-row"><span class="setting-copy"><strong>Przypomnienie o kopii</strong><small>Częstotliwość przypomnienia o kopii danych</small></span><span class="setting-inline-input"><input id="settingReminder" type="number" min="1" max="365" step="1" inputmode="numeric" aria-label="Przypomnienie o kopii"><small>dni</small></span></label>
+          </div>
+        </div>
+        <div class="panel settings-panel space-bottom">
           <h2 class="section-title">Domyślne wpisy zbiorcze</h2>
           <label class="check"><input id="settingSat" type="checkbox">Uwzględniaj soboty</label>
           <label class="check"><input id="settingSun" type="checkbox">Uwzględniaj niedziele</label>
           <label class="check"><input id="settingHolidays" type="checkbox">Uwzględniaj święta</label>
-          <hr class="soft-divider">
-          <label class="field"><span>Przypomnienie o kopii co (dni)</span><input id="settingReminder" type="number" min="1" max="365" step="1" inputmode="numeric"></label>
-          <button id="saveSettingsBtn" class="btn wide" type="button">Zapisz ustawienia</button>
+          <button id="saveSettingsBtn" class="btn wide settings-action" type="button">Zapisz ustawienia</button>
         </div>
         <div class="panel settings-panel"><h2 class="section-title">Szablony godzin</h2><p class="help">Maksymalnie 8 skrótów do szybkiego dodawania.</p><div id="templateList"></div><hr class="soft-divider"><div class="field-row"><label class="field"><span>Od</span><input id="templateStart" type="time" value="06:00"></label><label class="field"><span>Do</span><input id="templateEnd" type="time" value="15:00"></label></div><button id="addTemplateBtn" class="btn secondary wide" type="button">Dodaj szablon</button></div>
       </section>
@@ -384,7 +416,7 @@
   "use strict";
   (() => {
     /* 6. Dane nowej aplikacji, normalizacja i pojedyncza kontrolowana ścieżka zapisu. */
-    const APP_VERSION = "1.1";
+    const APP_VERSION = "1.0.1";
     const STORAGE_KEY = "worktime_next_v1";
     const BACKUP_KEY = "worktime_next_last_backup_iso";
     const EMPTY = () => ({
@@ -807,13 +839,22 @@
       if (holiday) rows.push(`<div class="preview-entry"><span class="item-glyph">${icon("calendar")}</span><span class="preview-label">${escapeHtml(holiday)}</span></div>`);
       if (day?.shifts.length) rows.push(`<div class="preview-total"><span>Łącznie przepracowano</span><strong>${fmtDuration(computeDayMinutes(day))}</strong></div>`);
       $("previewTitle").textContent=dayLabel(iso);
-      $("previewPanel").querySelector(".eyebrow").textContent=iso===todayISO()?"Dzisiaj":"Wybrany dzień";
+      $("previewSectionLabel").textContent=iso===todayISO()?"Dzisiaj":"Wybrany dzień";
       $("previewContent").innerHTML=rows.join("") || '<p class="empty-state">Brak wpisów w tym dniu.</p>';
       $("quickPreview").hidden=!db.settings.shiftTemplates.length;
       $("previewChips").innerHTML=quickChips();
     }
 
-    function renderHomeStats() { $("homeMonthLabel").textContent=fmtMonthPL(ui.month); renderSummary("homeStats",computeStats(ui.month)); }
+    function renderHomeStats() {
+      const stats=computeStats(ui.month), absences=stats.paid+stats.unpaid+stats.sick;
+      $("homeMonthLabel").textContent=fmtMonthPL(ui.month);
+      $("homeStats").innerHTML=[
+        ["Przepracowano",fmtDuration(stats.min)],
+        ["Szacowana wypłata",pln(stats.money)],
+        ["Dni pracy",stats.workDays],
+        ["Dni nieobecności",absences]
+      ].map(([label,value])=>`<div class="summary-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("");
+    }
     function renderDay() {
       const iso=ui.day,day=getDay(iso),holiday=getHolidayMap(Number(iso.slice(0,4))).get(iso);
       $("dayDate").textContent=dayLabel(iso);
@@ -1660,15 +1701,6 @@
       $("nextMonth").addEventListener("click",()=>setMonth(addMonths(ui.month,1)));
       $("homeStatsOpen").addEventListener("click",()=>navigate("stats",{statsMonth:ui.month,statsYear:Number(ui.month.slice(0,4))}));
       $("openDayBtn").addEventListener("click",openDay);
-      $("previewPanel").addEventListener("click", event => {
-        if (event.target.closest("button,[data-quick]")) return;
-        openDay();
-      });
-      $("previewPanel").addEventListener("keydown", event => {
-        if (event.target!==$("previewPanel")) return;
-        if (event.key==="Enter" || event.key===" ") {event.preventDefault();openDay();}
-      });
-      $("previewPanel").tabIndex=0;
       for (const id of ["previewChips","dayChips"]) $(id).addEventListener("click",event=>{
         const button=event.target.closest("[data-quick]");
         if (!button) return;
