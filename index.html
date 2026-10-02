@@ -152,22 +152,25 @@
     .event strong { font-size: 15px; font-weight: 655; }
     .event small { margin-top: 5px; color: var(--muted); font-size: 13px; line-height: 1.45; }
     .event-empty { margin: 0; padding: 18px 0 8px; color: var(--muted); font-size: 14px; line-height: 1.55; }
-    .day-hero { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 18px; margin: 4px 0 20px; padding: 24px 22px; }
-    .day-hero strong { order: 2; display: block; font-size: 24px; font-weight: 720; letter-spacing: -.035em; line-height: 1.2; }
-    .day-hero span { font-size: 13px; color: var(--muted); }
-    #dayHoliday { flex-basis: 100%; order: 3; }
+    .day-hero { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0; margin: 4px 0 18px; padding: 20px 22px; }
+    .day-metric { min-width: 0; padding: 4px 14px; text-align: center; }
+    .day-metric + .day-metric { border-left: 1px solid var(--line); }
+    .day-metric strong { display: block; color: var(--ink); font-size: clamp(21px,6vw,26px); font-weight: 720; letter-spacing: -.035em; line-height: 1.18; overflow-wrap: anywhere; }
+    .day-metric span { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    #dayHoliday { grid-column: 1 / -1; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; text-align: center; }
+    #dayHoliday:empty { display: none; }
     .date-nav { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 6px; margin: 0 0 18px; }
     .date-nav strong { font-size: clamp(14px,4.2vw,18px); font-weight: 695; text-align: center; line-height: 1.35; min-width: 0; }
     .date-nav .icon-btn, .stats-period .icon-btn { background: var(--surface); }
-    /* Stały pasek szybkich akcji widoku dnia. */
-    #dayScreen { padding-bottom: calc(154px + env(safe-area-inset-bottom)); }
-    .day-action-dock { position: fixed; z-index: 18; left: 50%; bottom: calc(10px + env(safe-area-inset-bottom)); width: min(560px, calc(100vw - 28px)); transform: translateX(-50%); padding: 9px; border: 1px solid rgb(215 217 223 / 72%); border-radius: 30px; background: rgb(255 255 255 / 96%); box-shadow: 0 8px 28px rgb(25 29 38 / 13%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
-    .dock-templates { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; padding: 1px 2px 8px; }
-    .dock-templates::-webkit-scrollbar { display: none; }
+    /* Stałe, bezpośrednie akcje widoku dnia. */
+    #dayScreen { padding-bottom: calc(176px + env(safe-area-inset-bottom)); }
+    .day-action-area { position: fixed; z-index: 18; inset-inline: 14px; bottom: calc(10px + env(safe-area-inset-bottom)); max-width: 560px; margin-inline: auto; pointer-events: none; }
+    .day-quick-strip { display: flex; gap: 7px; width: max-content; max-width: 100%; margin: 0 auto 8px; padding: 7px; overflow-x: auto; border: 1px solid rgb(215 217 223 / 72%); border-radius: var(--radius-pill); background: rgb(255 255 255 / 96%); box-shadow: 0 4px 16px rgb(25 29 38 / 9%); scrollbar-width: none; pointer-events: auto; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    .day-quick-strip::-webkit-scrollbar { display: none; }
     .dock-template { flex: 0 0 auto; min-height: 34px; padding: 7px 12px; border: 0; border-radius: var(--radius-pill); background: #f0f1f4; color: #292a2f; font-size: 12px; font-weight: 650; white-space: nowrap; }
+    .day-action-dock { padding: 9px; border: 1px solid rgb(215 217 223 / 72%); border-radius: 30px; background: rgb(255 255 255 / 96%); box-shadow: 0 8px 28px rgb(25 29 38 / 13%); pointer-events: auto; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
     .dock-actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4px; }
     .dock-action { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 0; min-height: 58px; padding: 7px 4px; border: 0; border-radius: 22px; background: transparent; color: #24252a; font-size: 11px; font-weight: 620; line-height: 1.15; }
-    .dock-action:first-child { background: #ececef; }
     .dock-action .icon { width: 21px; height: 21px; }
     .dock-action span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 
@@ -224,9 +227,9 @@
     .data-row { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--line); }
     .data-row:last-child { border-bottom: 0; }
     .data-row strong { flex: 1; min-width: 0; font-size: 14px; }
-    .segment { display: flex; gap: 3px; padding: 4px; margin-bottom: 19px; border-radius: var(--radius-pill); background: #e9eaee; }
-    .segment button { flex: 1; min-width: 0; min-height: 46px; padding: 9px 12px; border: 0; border-radius: var(--radius-pill); background: transparent; color: #71737c; font-size: 14px; font-weight: 630; }
-    .segment button[aria-pressed="true"] { background: #6c6d70; color: #fff; box-shadow: 0 1px 3px rgb(0 0 0 / 7%); }
+    .choice-segment { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; padding: 4px; margin-bottom: 19px; border-radius: var(--radius-pill); background: #e9eaee; }
+    .choice-segment button { min-width: 0; min-height: 46px; padding: 9px 12px; border: 0; border-radius: var(--radius-pill); background: transparent; color: #666972; font-size: 14px; font-weight: 630; }
+    .choice-segment button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 5px rgb(25 29 38 / 8%); }
     .stats-period { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 6px; margin-bottom: 16px; }
     .stats-period .month-label { font-size: 19px; }
     .period-title { display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
@@ -351,20 +354,22 @@
           <strong id="dayDate"></strong>
           <button id="nextDay" class="icon-btn" type="button" aria-label="Następny dzień"><svg class="icon"><use href="#i-next"/></svg></button>
         </nav>
-        <div class="panel day-hero"><span>Łącznie przepracowano</span><strong id="dayTotal">0h 00m</strong><span id="dayHoliday"></span></div>
+        <div class="panel day-hero"><div class="day-metric"><strong id="dayTotal">0h 00m</strong><span>Przepracowano</span></div><div class="day-metric"><strong id="dayPay">0,00 zł</strong><span>Zarobiono</span></div><span id="dayHoliday"></span></div>
         <div class="panel day-detail-panel"><h2 class="section-title">Wydarzenia</h2><div id="dayEvents" class="event-list"></div></div>
-        <div id="dayActionDock" class="day-action-dock" aria-label="Szybkie akcje dnia">
-          <div id="dockTemplates" class="dock-templates" aria-label="Szybkie godziny"></div>
-          <div class="dock-actions">
-            <button type="button" class="dock-action" data-add="shift"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span>Godziny</span></button>
-            <button type="button" class="dock-action" data-add="leave"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg><span>Urlop/L4</span></button>
-            <button type="button" class="dock-action" data-add="note"><svg class="icon" aria-hidden="true"><use href="#i-notes"/></svg><span>Notatka</span></button>
+        <div id="dayActionArea" class="day-action-area" aria-label="Szybkie akcje dnia">
+          <div id="dockTemplates" class="day-quick-strip" aria-label="Szybkie godziny"></div>
+          <div id="dayActionDock" class="day-action-dock">
+            <div class="dock-actions">
+              <button type="button" class="dock-action" data-add="shift"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span>Godziny</span></button>
+              <button type="button" class="dock-action" data-add="leave"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg><span>Urlop/L4</span></button>
+              <button type="button" class="dock-action" data-add="note"><svg class="icon" aria-hidden="true"><use href="#i-notes"/></svg><span>Notatka</span></button>
+            </div>
           </div>
         </div>
       </section>
 
       <section id="statsScreen" class="screen" hidden aria-label="Statystyki">
-        <div class="segment" role="group" aria-label="Zakres statystyk"><button id="statsMonthly" type="button" aria-pressed="true">Miesiąc</button><button id="statsYearly" type="button" aria-pressed="false">Rok</button></div>
+        <div class="choice-segment" role="group" aria-label="Zakres statystyk"><button id="statsMonthly" type="button" aria-pressed="true">Miesiąc</button><button id="statsYearly" type="button" aria-pressed="false">Rok</button></div>
         <div class="stats-period"><button id="statsPrev" class="icon-btn" type="button" aria-label="Poprzedni okres"><svg class="icon"><use href="#i-back"/></svg></button><button id="statsPeriodTitle" class="month-label" type="button" style="text-align:center" aria-label="Wybierz okres statystyk"></button><button id="statsNext" class="icon-btn" type="button" aria-label="Następny okres"><svg class="icon"><use href="#i-next"/></svg></button></div>
         <input id="statsMonthPicker" class="sr-only" type="month" aria-label="Wybierz miesiąc lub rok statystyk" tabindex="-1"><div id="statsGrid" class="panel stats-panel stats-grid space-bottom"></div>
         <div class="panel settings-panel"><p class="help">Raport PDF zachowuje układ i tabelę znane z poprzedniej aplikacji.</p><button id="reportBtn" class="btn wide" type="button"><svg class="icon"><use href="#i-download"/></svg> Raport miesięczny PDF</button><div id="yearReportNote" class="help" hidden>W widoku rocznym raport dotyczy miesiąca wybranego w kalendarzu.</div></div>
@@ -431,7 +436,7 @@
   "use strict";
   (() => {
     /* 6. Dane nowej aplikacji, normalizacja i pojedyncza kontrolowana ścieżka zapisu. */
-    const APP_VERSION = "1.0.3";
+    const APP_VERSION = "1.0.4";
     const STORAGE_KEY = "worktime_next_v1";
     const BACKUP_KEY = "worktime_next_last_backup_iso";
     const EMPTY = () => ({
@@ -876,7 +881,9 @@
     function renderDay() {
       const iso=ui.day,day=getDay(iso),holiday=getHolidayMap(Number(iso.slice(0,4))).get(iso);
       $("dayDate").textContent=dayLabel(iso);
-      $("dayTotal").textContent=fmtDuration(computeDayMinutes(day));
+      const dayMinutes=computeDayMinutes(day);
+      $("dayTotal").textContent=fmtDuration(dayMinutes);
+      $("dayPay").textContent=pln(estimatedPay(dayMinutes));
       $("dayHoliday").textContent=holiday || "";
       const events=[];
       if (day) {
@@ -1142,7 +1149,7 @@
       } else if (kind==="note") {
         content=`<div class="eyebrow">${fmtDateLongPL(date)}</div><label class="field"><span>Treść notatki</span><textarea id="formNote" spellcheck="true" rows="5" placeholder="Wpisz notatkę...">${escapeHtml(day.note)}</textarea></label><p class="help">Notatka zapisze się dopiero po wybraniu przycisku poniżej.</p><div class="btn-row"><button id="saveForm" type="button" class="btn">Zapisz notatkę</button>${day.note?'<button id="deleteForm" type="button" class="btn danger">Usuń notatkę</button>':""}</div>`;
       } else if (kind==="bulk") {
-        content=`<div class="segment" role="group" aria-label="Rodzaj wpisów zbiorczych"><button type="button" data-bulk-kind="hours" aria-pressed="true">Godziny pracy</button><button type="button" data-bulk-kind="leave" aria-pressed="false">Urlop / L4</button></div><input id="bulkKind" type="hidden" value="hours"><div class="field-row">${fieldDate("Od","formFrom",ui.selected)}${fieldDate("Do","formTo",ui.selected)}</div><div id="bulkFields"></div>${optionsHtml(currentRangeDefaults())}<p class="help">Konfliktujące godziny są pomijane i raportowane; istniejące notatki i inne wydarzenia pozostają bez zmian.</p><div class="btn-row"><button id="saveForm" type="button" class="btn">Wykonaj operację</button></div>`;
+        content=`<div class="choice-segment" role="group" aria-label="Rodzaj wpisów zbiorczych"><button type="button" data-bulk-kind="hours" aria-pressed="true">Godziny pracy</button><button type="button" data-bulk-kind="leave" aria-pressed="false">Urlop / L4</button></div><input id="bulkKind" type="hidden" value="hours"><div class="field-row">${fieldDate("Od","formFrom",ui.selected)}${fieldDate("Do","formTo",ui.selected)}</div><div id="bulkFields"></div>${optionsHtml(currentRangeDefaults())}<p class="help">Konfliktujące godziny są pomijane i raportowane; istniejące notatki i inne wydarzenia pozostają bez zmian.</p><div class="btn-row"><button id="saveForm" type="button" class="btn">Wykonaj operację</button></div>`;
       }
       $("formBody").innerHTML=content+'<span id="formError" class="error-text" role="alert"></span>';
       if (kind==="bulk") renderBulkFields();
@@ -1732,7 +1739,7 @@
         const button=event.target.closest("[data-edit]");
         if (button) openForm(button.dataset.edit,button.dataset.edit==="shift"?Number(button.dataset.index):-1);
       });
-      $("dayActionDock").addEventListener("click",event=>{
+      $("dayActionArea").addEventListener("click",event=>{
         const quick=event.target.closest("[data-quick]");
         if (quick) {
           const [start,end]=quick.dataset.quick.split("|");
