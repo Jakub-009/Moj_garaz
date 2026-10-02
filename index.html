@@ -36,13 +36,16 @@
     .app { max-width: 900px; margin: auto; padding: 0 max(16px,env(safe-area-inset-right)) calc(52px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left)); }
 
     /* Duży nagłówek strony zamiast przyklejonego paska strony internetowej. */
-    .app-header { display: flex; align-items: flex-end; gap: 8px; min-height: 116px; padding: calc(24px + env(safe-area-inset-top)) 0 19px; }
+    .app-header { display: flex; align-items: center; gap: 12px; min-height: 82px; padding: calc(4px + env(safe-area-inset-top)) 0 12px; }
     .header-left, .header-right { display: flex; align-items: center; min-width: 0; gap: 3px; }
     .header-left { flex: 1 1 auto; }
     .header-right { flex: 0 0 auto; }
-    .header-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(28px,7vw,36px); line-height: 1.14; letter-spacing: -.055em; font-weight: 760; }
+    .header-title { min-width: 0; max-width: 100%; padding-right: 8px; overflow: visible; text-overflow: clip; white-space: nowrap; font-size: clamp(28px,7vw,36px); line-height: 1.12; letter-spacing: -.05em; font-weight: 760; }
     .icon-btn { display: inline-grid; place-items: center; flex: 0 0 auto; width: 44px; height: 44px; padding: 0; background: transparent; border: 0; border-radius: 50%; color: var(--ink); transition: transform var(--speed) var(--ease), background-color var(--speed) var(--ease); }
     #menuBtn { background: var(--surface); box-shadow: 0 1px 4px rgb(24 31 50 / 8%); }
+    #todayBtn { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--surface); box-shadow: 0 1px 4px rgb(24 31 50 / 8%); color: var(--ink); font-size: 16px; font-weight: 760; letter-spacing: -.02em; }
+    #todayBtn[hidden] { display: none !important; }
+    #todayBtn .today-number { line-height: 1; }
     .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 11px 21px; border: 0; border-radius: var(--radius-pill); background: #35363a; color: white; font-size: 14px; font-weight: 680; text-align: center; transition: background-color var(--speed) var(--ease), transform var(--speed) var(--ease); }
     .btn.secondary { background: var(--surface-alt); color: var(--ink); }
     .btn.ghost { background: var(--surface-alt); color: #4b4e56; }
@@ -61,12 +64,12 @@
     @keyframes appear { from { opacity: .7; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Kalendarz Samsung: osobne delikatne pola i dolne kolorowe belki. */
-    .month-head { display: flex; align-items: center; gap: 3px; margin-bottom: 12px; }
+    .month-head { display: flex; align-items: center; gap: 4px; margin-bottom: 12px; }
     .month-head #prevMonth { order: 0; }
     .month-head #monthTitle { order: 1; }
     .month-head #nextMonth { order: 2; }
-    .month-label { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-width: 0; min-height: 60px; padding: 4px 6px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--ink); font-size: 30px; font-weight: 760; letter-spacing: -.045em; line-height: 1.13; text-align: center; }
-    .month-year { display: block; padding-top: 3px; color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: 0; }
+    .month-label { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; min-width: 0; min-height: 56px; padding: 2px 6px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--ink); font-size: clamp(24px,8vw,28px); font-weight: 760; letter-spacing: -.04em; line-height: 1.14; text-align: center; }
+    .month-year { display: block; padding-top: 2px; color: var(--muted); font-size: 11px; font-weight: 650; letter-spacing: 0; }
     .calendar-panel { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
     .weekday-row, .calendar-grid { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 3px; }
     .weekday-row { margin-bottom: 5px; }
@@ -89,13 +92,12 @@
     .marker.work { background: #83dabe; } .marker.paid { background: #a3b0ef; }
     .marker.unpaid { background: #b6a5e8; } .marker.sick { background: #ed9ca4; }
     .marker.note { background: #f4d47e; }
-    .calendar-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 10px; margin-top: 18px; }
+    .calendar-footer { display: flex; align-items: center; justify-content: flex-start; flex-wrap: wrap; gap: 8px 10px; margin-top: 14px; }
     .calendar-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 7px 11px; font-size: 10px; color: var(--muted); }
     .calendar-legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .calendar-legend .marker { flex: 0 0 11px; height: 4px; }
     .today-pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; flex: 0 0 auto; min-height: 42px; padding: 9px 16px; border: 0; border-radius: var(--radius-pill); background: #f0f1f5; color: #303137; font-size: 13px; font-weight: 660; }
-    #calendarToday { background: var(--surface); box-shadow: 0 1px 7px rgb(20 24 35 / 7%); }
-
+    
     /* Karty wyglądają jak systemowe grupy; wpisy to wiersze, nie kolorowe chipy. */
     .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel, .day-add-panel { padding: 22px; }
     #previewPanel { cursor: pointer; }
@@ -215,7 +217,7 @@
     .toast.show { opacity: 1; transform: translate(-50%,0); }
     .import-summary { margin-bottom: 13px; padding: 15px; border-radius: var(--radius-sm); background: var(--input-bg); color: #3c3e46; font-size: 13px; line-height: 1.55; white-space: pre-wrap; }
     @media (max-width: 350px) {
-      .app { padding-inline: 9px; } .app-header { min-height: 104px; }
+      .app { padding-inline: 9px; } .app-header { min-height: 74px; padding-bottom: 10px; }
       .header-title { font-size: 26px; } .icon-btn { width: 42px; height: 42px; }
       .calendar-grid, .weekday-row { gap: 2px; } .day-cell { min-height: 46px; padding-top: 4px; }
       .calendar-legend { gap: 6px 9px; } .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel, .day-add-panel { padding: 17px; }
@@ -263,7 +265,7 @@
         <strong id="headerTitle" class="header-title">Czas pracy</strong>
       </div>
       <div class="header-right">
-        <button id="todayBtn" class="icon-btn" type="button" title="Dzisiaj" aria-label="Przejdź do dzisiaj"><svg class="icon"><use href="#i-calendar"/></svg></button>
+        <button id="todayBtn" class="icon-btn" type="button" title="Dzisiaj" aria-label="Przejdź do dzisiaj"><span id="todayBtnValue" class="today-number" aria-hidden="true"></span></button>
         <button id="statsBtn" class="icon-btn" type="button" title="Statystyki" aria-label="Statystyki"><svg class="icon"><use href="#i-chart"/></svg></button>
         <button id="menuBtn" class="icon-btn" type="button" title="Więcej" aria-label="Więcej"><svg class="icon"><use href="#i-more"/></svg></button>
       </div>
@@ -274,7 +276,7 @@
       <section id="homeScreen" class="screen" aria-label="Kalendarz">
         <div class="calendar-section space-bottom">
           <div class="month-head">
-            <button id="monthTitle" class="month-label" type="button" aria-label="Wybierz miesiąc">PAŹ<span class="month-year">2026</span></button>
+            <button id="monthTitle" class="month-label" type="button" aria-label="Wybierz miesiąc">Październik<span class="month-year">2026</span></button>
             <button id="prevMonth" class="icon-btn" type="button" aria-label="Poprzedni miesiąc"><svg class="icon"><use href="#i-back"/></svg></button>
             <button id="nextMonth" class="icon-btn" type="button" aria-label="Następny miesiąc"><svg class="icon"><use href="#i-next"/></svg></button>
             <input id="monthPicker" class="sr-only" type="month" aria-label="Miesiąc" tabindex="-1">
@@ -284,7 +286,6 @@
             <div id="calendarGrid" class="calendar-grid" role="group" aria-label="Dni miesiąca"></div>
             <div class="calendar-footer">
               <div class="calendar-legend" aria-label="Oznaczenia w kalendarzu"><span><i class="marker work"></i> Praca</span><span><i class="marker paid"></i> Urlop</span><span><i class="marker unpaid"></i> Bezpłatny</span><span><i class="marker sick"></i> L4</span><span><i class="marker note"></i> Notatka</span></div>
-              <button id="calendarToday" class="today-pill" type="button"> <svg class="icon sm" aria-hidden="true"><use href="#i-calendar"/></svg>Dzisiaj</button>
             </div>
           </div>
         </div>
@@ -383,7 +384,7 @@
   "use strict";
   (() => {
     /* 6. Dane nowej aplikacji, normalizacja i pojedyncza kontrolowana ścieżka zapisu. */
-    const APP_VERSION = "1.0";
+    const APP_VERSION = "1.1";
     const STORAGE_KEY = "worktime_next_v1";
     const BACKUP_KEY = "worktime_next_last_backup_iso";
     const EMPTY = () => ({
@@ -754,9 +755,18 @@
         ...(day.note.trim() ? ["note"] : [])
       ];
     }
+    function updateTodayBadge() {
+      const today = dateFromISO(todayISO());
+      $("todayBtnValue").textContent=String(today.getDate());
+      $("todayBtn").setAttribute("aria-label",`Przejdź do dzisiaj: ${new Intl.DateTimeFormat("pl-PL", {day:"numeric", month:"long"}).format(today)}`);
+      $("todayBtn").title=`Dzisiaj (${today.getDate()})`;
+    }
     function renderCalendar() {
-      $("monthTitle").innerHTML=`${escapeHtml(fmtMonthPL(ui.month).split(" ")[0].slice(0,3).toLocaleUpperCase("pl-PL"))}<span class="month-year">${ui.month.slice(0,4)}</span>`;
-      $("monthTitle").setAttribute("aria-label",`Wybierz miesiąc: ${fmtMonthPL(ui.month)}`);
+      const monthLabel = fmtMonthPL(ui.month);
+      const monthOnly = monthLabel.replace(/\s+\d{4}$/, "");
+      $("monthTitle").innerHTML=`${escapeHtml(monthOnly)}<span class="month-year">${ui.month.slice(0,4)}</span>`;
+      $("monthTitle").setAttribute("aria-label",`Wybierz miesiąc: ${monthLabel}`);
+      updateTodayBadge();
       $("monthPicker").value=ui.month;
       const [year,month]=ui.month.split("-").map(Number);
       const first=new Date(year,month-1,1).getDay();
@@ -872,7 +882,7 @@
       for (const key of Object.keys(SCREENS)) $(key+"Screen").hidden=key!==name;
       $("headerTitle").textContent=SCREENS[name];
       $("backBtn").hidden=name==="home";
-      $("todayBtn").hidden=name!=="day";
+      $("todayBtn").hidden=name!=="home";
       $("statsBtn").hidden=name!=="day";
       $("menuBtn").hidden=name==="menu";
       if (name==="home") { renderCalendar();renderPreview();renderHomeStats(); }
@@ -1648,7 +1658,6 @@
       $("monthPicker").addEventListener("change",event=>setMonth(event.target.value));
       $("prevMonth").addEventListener("click",()=>setMonth(addMonths(ui.month,-1)));
       $("nextMonth").addEventListener("click",()=>setMonth(addMonths(ui.month,1)));
-      $("calendarToday").addEventListener("click",()=>setMonth(ym(todayISO())));
       $("homeStatsOpen").addEventListener("click",()=>navigate("stats",{statsMonth:ui.month,statsYear:Number(ui.month.slice(0,4))}));
       $("openDayBtn").addEventListener("click",openDay);
       $("previewPanel").addEventListener("click", event => {
@@ -1679,8 +1688,10 @@
       });
       $("backBtn").addEventListener("click",goBack);
       $("todayBtn").addEventListener("click",()=>{
-        if (ui.screen==="day") { ui.day=todayISO(); renderDay();replaceRoute(); }
-        else setMonth(ym(todayISO()));
+        const today=todayISO();
+        ui.selected=today;
+        if (ui.screen!=="home") navigate("home",{month:ym(today),selected:today});
+        else setMonth(ym(today));
       });
       $("statsBtn").addEventListener("click",()=>navigate("stats",{statsMonth:ui.month,statsYear:Number(ui.month.slice(0,4))}));
       $("menuBtn").addEventListener("click",()=>navigate("menu"));
@@ -1790,6 +1801,7 @@
 
     /* 14. Inicjalizacja lokalnych danych nowej aplikacji. */
     db=loadDatabase();
+    updateTodayBadge();
     $("menuVersion").textContent=APP_VERSION;
     bindEvents();
     if (history.state?.cpNext && SCREENS[history.state.screen]) {
