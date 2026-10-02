@@ -8,9 +8,9 @@
   <title>Czas pracy</title>
   <link rel="manifest" href="./manifest.webmanifest">
   <style>
-    /* Samsung One UI: jeden zestaw kolorów i komponentów dla wszystkich ekranów. */
+    /* Wspólny system wizualny aplikacji: jedna paleta i zestaw komponentów. */
     :root {
-      font-family: "SamsungOne", "One UI Sans", system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+      font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
       color-scheme: light;
       --bg: #f4f4f6; --surface: #fff; --surface-alt: #f1f2f5; --input-bg: #f5f6f9;
       --ink: #17181c; --muted: #898b92; --line: #e3e4e8; --focus-ring: #8db2ff;
@@ -56,7 +56,7 @@
     .btn.wide { width: 100%; }
     .btn-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
     .btn-row > .btn { flex: 1 1 auto; }
-    .btn:active:not(:disabled), .icon-btn:active:not(:disabled), .day-cell:active:not(:disabled), .event:active:not(:disabled), .nav-item:active:not(:disabled), .quick-chip:active:not(:disabled), .add-item:active:not(:disabled) { transform: scale(.975); }
+    .btn:active:not(:disabled), .icon-btn:active:not(:disabled), .day-cell:active:not(:disabled), .event:active:not(:disabled), .nav-item:active:not(:disabled), .quick-chip:active:not(:disabled), .dock-template:active:not(:disabled), .dock-action:active:not(:disabled) { transform: scale(.975); }
     .panel { min-width: 0; background: var(--surface); border: 0; border-radius: var(--radius-lg); box-shadow: none; }
     .space-bottom { margin-bottom: 18px; }
     .eyebrow { margin-bottom: 6px; color: var(--muted); font-size: 13px; font-weight: 600; }
@@ -65,7 +65,7 @@
     .screen { animation: appear var(--speed) var(--ease); }
     @keyframes appear { from { opacity: .7; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Kalendarz Samsung: osobne delikatne pola i dolne kolorowe belki. */
+    /* Kalendarz: delikatne pola dni i dolne kolorowe oznaczenia. */
     .month-head { display: flex; align-items: center; gap: 4px; margin-bottom: 12px; }
     .month-head #prevMonth { order: 0; }
     .month-head #monthTitle { order: 1; }
@@ -99,10 +99,10 @@
     .calendar-legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .calendar-legend .marker { flex: 0 0 11px; height: 4px; }
     
-    /* One UI: nagłówki sekcji poza kartami, a zawartość jako spokojne grupy wierszy. */
+    /* Nagłówki sekcji i zawartość jako spokojne grupy wierszy. */
     .home-section-title { margin: 0 0 10px 12px; color: #35363b; font-size: 16px; line-height: 1.3; font-weight: 720; letter-spacing: -.018em; }
-    .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel, .day-add-panel { padding: 0 22px; }
-    .day-detail-panel, .day-add-panel { padding-top: 20px; padding-bottom: 20px; }
+    .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel { padding: 0 22px; }
+    .day-detail-panel { padding-top: 20px; padding-bottom: 20px; }
     .home-group { margin-bottom: 22px; }
     #previewPanel { cursor: default; overflow: hidden; }
     .preview-date { margin: 0; padding: 20px 0 14px; font-size: 19px; line-height: 1.3; font-weight: 690; letter-spacing: -.025em; }
@@ -142,7 +142,7 @@
     #statsGrid .stat-tile:last-child { border-bottom: 0; }
     #statsGrid .stat-tile strong { order: 2; flex: 0 0 auto; font-size: 15px; font-weight: 680; text-align: right; }
     #statsGrid .stat-tile span { order: 1; margin: 0; color: #3b3c41; font-size: 14px; font-weight: 520; }
-    .event-list, .add-list { display: grid; gap: 0; }
+    .event-list { display: grid; gap: 0; }
     .event { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 82px; padding: 16px 1px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: transparent; color: var(--ink); text-align: left; overflow-wrap: anywhere; }
     .event:last-child { border-bottom: 0; }
     .event .event-text { flex: 1; min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -159,14 +159,17 @@
     .date-nav { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 6px; margin: 0 0 18px; }
     .date-nav strong { font-size: clamp(14px,4.2vw,18px); font-weight: 695; text-align: center; line-height: 1.35; min-width: 0; }
     .date-nav .icon-btn, .stats-period .icon-btn { background: var(--surface); }
-    .add-item { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 74px; padding: 14px 1px; background: transparent; border: 0; border-bottom: 1px solid var(--line); text-align: left; color: var(--ink); font-size: 15px; font-weight: 590; }
-    .add-item:last-child { border-bottom: 0; }
-    .add-item > span:nth-child(2) { flex: 1; min-width: 0; }
-    .add-icon { display: inline-grid; place-items: center; flex: 0 0 32px; width: 32px; height: 32px; border-radius: 50%; color: #4d5562; }
-    .add-icon.work { background: #e6f5ef; color: #2b8b60; } .add-icon.leave { background: #edf2ff; color: #5170dc; } .add-icon.note { background: #fff5dd; color: #b78417; }
-    .add-icon .icon { width: 17px; height: 17px; }
-    #dayQuickBlock { margin-top: 18px; padding-top: 18px; padding-bottom: 18px; }
-    #dayQuickBlock .section-title { margin-bottom: 12px; }
+    /* Stały pasek szybkich akcji widoku dnia. */
+    #dayScreen { padding-bottom: calc(154px + env(safe-area-inset-bottom)); }
+    .day-action-dock { position: fixed; z-index: 18; left: 50%; bottom: calc(10px + env(safe-area-inset-bottom)); width: min(560px, calc(100vw - 28px)); transform: translateX(-50%); padding: 9px; border: 1px solid rgb(215 217 223 / 72%); border-radius: 30px; background: rgb(255 255 255 / 96%); box-shadow: 0 8px 28px rgb(25 29 38 / 13%); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+    .dock-templates { display: flex; gap: 7px; overflow-x: auto; scrollbar-width: none; padding: 1px 2px 8px; }
+    .dock-templates::-webkit-scrollbar { display: none; }
+    .dock-template { flex: 0 0 auto; min-height: 34px; padding: 7px 12px; border: 0; border-radius: var(--radius-pill); background: #f0f1f4; color: #292a2f; font-size: 12px; font-weight: 650; white-space: nowrap; }
+    .dock-actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 4px; }
+    .dock-action { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 0; min-height: 58px; padding: 7px 4px; border: 0; border-radius: 22px; background: transparent; color: #24252a; font-size: 11px; font-weight: 620; line-height: 1.15; }
+    .dock-action:first-child { background: #ececef; }
+    .dock-action .icon { width: 21px; height: 21px; }
+    .dock-action span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 
     /* Menu w grupach takich jak Ustawienia telefonu; wersja tylko w jego stopce. */
     .menu-screen { display: flex; flex-direction: column; min-height: calc(100dvh - 148px); }
@@ -253,7 +256,7 @@
       .app { padding-inline: 9px; } .app-header { min-height: 74px; padding-bottom: 10px; }
       .header-title { font-size: 26px; } .icon-btn { width: 42px; height: 42px; }
       .calendar-grid, .weekday-row { gap: 2px; } .day-cell { min-height: 46px; padding-top: 4px; }
-      .calendar-legend { gap: 6px 9px; } .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel, .day-add-panel { padding-left: 17px; padding-right: 17px; } .day-detail-panel, .day-add-panel, #dayQuickBlock { padding-top: 16px; padding-bottom: 16px; }
+      .calendar-legend { gap: 6px 9px; } .preview-panel, .summary-panel, .stats-panel, .settings-panel, .day-detail-panel { padding-left: 17px; padding-right: 17px; } .day-detail-panel { padding-top: 16px; padding-bottom: 16px; }
       .field-row { grid-template-columns: 1fr; } .sheet-body { padding-inline: 17px; }
     }
     @media (min-width: 620px) {
@@ -270,7 +273,7 @@
       .icon-btn:hover:not(:disabled), .month-label:hover:not(:disabled) { background: #edeef4; }
       .day-cell:hover:not(:disabled) { border-color: #b4b7be; }
       .btn:hover:not(:disabled), .quick-chip:hover:not(:disabled) { filter: brightness(.96); }
-      .nav-item:hover:not(:disabled), .event:hover:not(:disabled), .add-item:hover:not(:disabled) { background: #fafbff; }
+      .nav-item:hover:not(:disabled), .event:hover:not(:disabled) { background: #fafbff; }
     }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms; transition-duration: .01ms; scroll-behavior: auto; } }
   </style>
@@ -349,16 +352,15 @@
           <button id="nextDay" class="icon-btn" type="button" aria-label="Następny dzień"><svg class="icon"><use href="#i-next"/></svg></button>
         </nav>
         <div class="panel day-hero"><span>Łącznie przepracowano</span><strong id="dayTotal">0h 00m</strong><span id="dayHoliday"></span></div>
-        <div class="panel day-detail-panel space-bottom"><h2 class="section-title">Wydarzenia</h2><div id="dayEvents" class="event-list"></div></div>
-        <section class="panel day-add-panel" aria-labelledby="dayAddTitle">
-          <h2 id="dayAddTitle" class="section-title">Dodaj wpis</h2>
-          <div id="dayAddActions" class="add-list">
-            <button type="button" class="add-item" data-add="shift"><span class="add-icon work"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg></span><span>Godziny pracy</span></button>
-            <button type="button" class="add-item" data-add="leave"><span class="add-icon leave"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg></span><span>Urlop lub zwolnienie L4</span></button>
-            <button type="button" class="add-item" data-add="note"><span class="add-icon note"><svg class="icon" aria-hidden="true"><use href="#i-notes"/></svg></span><span>Notatka</span></button>
+        <div class="panel day-detail-panel"><h2 class="section-title">Wydarzenia</h2><div id="dayEvents" class="event-list"></div></div>
+        <div id="dayActionDock" class="day-action-dock" aria-label="Szybkie akcje dnia">
+          <div id="dockTemplates" class="dock-templates" aria-label="Szybkie godziny"></div>
+          <div class="dock-actions">
+            <button type="button" class="dock-action" data-add="shift"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span>Godziny</span></button>
+            <button type="button" class="dock-action" data-add="leave"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg><span>Urlop/L4</span></button>
+            <button type="button" class="dock-action" data-add="note"><svg class="icon" aria-hidden="true"><use href="#i-notes"/></svg><span>Notatka</span></button>
           </div>
-        </section>
-        <div id="dayQuickBlock" class="panel preview-panel"><div class="section-title">Szybkie szablony</div><div id="dayChips" class="quick-row"></div></div>
+        </div>
       </section>
 
       <section id="statsScreen" class="screen" hidden aria-label="Statystyki">
@@ -429,7 +431,7 @@
   "use strict";
   (() => {
     /* 6. Dane nowej aplikacji, normalizacja i pojedyncza kontrolowana ścieżka zapisu. */
-    const APP_VERSION = "1.0.2";
+    const APP_VERSION = "1.0.3";
     const STORAGE_KEY = "worktime_next_v1";
     const BACKUP_KEY = "worktime_next_last_backup_iso";
     const EMPTY = () => ({
@@ -839,6 +841,9 @@
     function quickChips() {
       return db.settings.shiftTemplates.map(t=>`<button type="button" class="quick-chip" data-quick="${escapeHtml(t.start)}|${escapeHtml(t.end)}" aria-label="Dodaj ${escapeHtml(t.start)} do ${escapeHtml(t.end)}">${escapeHtml(t.start)}–${escapeHtml(t.end)}</button>`).join("");
     }
+    function dockTemplateChips() {
+      return db.settings.shiftTemplates.map(t=>`<button type="button" class="dock-template" data-quick="${escapeHtml(t.start)}|${escapeHtml(t.end)}" aria-label="Dodaj godziny ${escapeHtml(t.start)} do ${escapeHtml(t.end)}">${escapeHtml(t.start)}–${escapeHtml(t.end)}</button>`).join("");
+    }
     function renderPreview() {
       const iso=ui.selected;
       const day=getDay(iso);
@@ -881,8 +886,8 @@
       }
       if (holiday) events.push(`<div class="event holiday"><span class="item-glyph">${icon("calendar")}</span><span class="event-text"><strong>${escapeHtml(holiday)}</strong><small>Święto informacyjne</small></span></div>`);
       $("dayEvents").innerHTML=events.join("")||'<p class="event-empty">Brak wpisów w tym dniu. Wybierz poniżej rodzaj wpisu, który chcesz dodać.</p>';
-      $("dayChips").innerHTML=quickChips();
-      $("dayQuickBlock").hidden=!db.settings.shiftTemplates.length;
+      $("dockTemplates").innerHTML=dockTemplateChips();
+      $("dockTemplates").hidden=!db.settings.shiftTemplates.length;
     }
     function renderStats() {
       const year=ui.statsMode==="year";
@@ -1714,7 +1719,7 @@
       $("nextMonth").addEventListener("click",()=>setMonth(addMonths(ui.month,1)));
       $("homeStatsOpen").addEventListener("click",()=>navigate("stats",{statsMonth:ui.month,statsYear:Number(ui.month.slice(0,4))}));
       $("openDayBtn").addEventListener("click",openDay);
-      for (const id of ["previewChips","dayChips"]) $(id).addEventListener("click",event=>{
+      for (const id of ["previewChips"]) $(id).addEventListener("click",event=>{
         const button=event.target.closest("[data-quick]");
         if (!button) return;
         event.stopPropagation();
@@ -1727,9 +1732,15 @@
         const button=event.target.closest("[data-edit]");
         if (button) openForm(button.dataset.edit,button.dataset.edit==="shift"?Number(button.dataset.index):-1);
       });
-      $("dayAddActions").addEventListener("click",event=>{
-        const button=event.target.closest("[data-add]");
-        if (button) openForm(button.dataset.add);
+      $("dayActionDock").addEventListener("click",event=>{
+        const quick=event.target.closest("[data-quick]");
+        if (quick) {
+          const [start,end]=quick.dataset.quick.split("|");
+          addShift(ui.day,start,end);
+          return;
+        }
+        const action=event.target.closest("[data-add]");
+        if (action) openForm(action.dataset.add);
       });
       $("backBtn").addEventListener("click",goBack);
       $("todayBtn").addEventListener("click",()=>{
